@@ -68,6 +68,11 @@ svg{width:100%;height:auto;aspect-ratio:4/3;background:linear-gradient(180deg,#f
 .l-given{border-color:#172033!important}.l-help{border-color:#e99800!important}.l-final{border-color:#137a43!important}
 .teacher-note{margin-top:18px;border-top:1px solid var(--line);padding-top:14px;color:#475569;line-height:1.55;font-size:14px}
 sub{font-size:.72em;line-height:0;vertical-align:sub}
+.sketchbox{margin-top:14px}
+.sketchbox h3{margin:0 0 8px;font-size:15px}
+.sketchbox p{margin:8px 0 0;color:#475569;line-height:1.5;font-size:14px}
+.sketch-preview svg{aspect-ratio:16/10;max-height:290px}
+
 .home{max-width:980px;margin:auto}
 .home h1{font-size:38px}
 .catalog{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
@@ -86,6 +91,285 @@ sub{font-size:.72em;line-height:0;vertical-align:sub}
  h1{font-size:25px}
  .kv{grid-template-columns:1fr}
 }
+
+/* ===== Mobilní režim: seznam -> detail úlohy ===== */
+.mobile-floating-nav{display:none}
+
+@media(max-width:700px){
+  body{background:#f3f6fb}
+  body.mobile-detail{padding-bottom:84px}
+
+  .app{display:block;min-height:100vh}
+
+  aside{
+    position:relative;
+    width:100%;
+    height:auto;
+    min-height:100vh;
+    padding:18px 14px 28px;
+    background:#0f172a;
+  }
+  .brand{
+    font-size:21px;
+    padding:4px 4px 2px;
+  }
+  .brand small{font-size:12.5px;max-width:34em}
+  .search{
+    position:sticky;
+    top:8px;
+    z-index:4;
+    margin:14px 0 10px;
+    box-shadow:0 8px 24px rgba(15,23,42,.25);
+  }
+  .filters{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    padding:1px 1px 8px;
+    margin-right:-14px;
+    scrollbar-width:none;
+  }
+  .filters::-webkit-scrollbar{display:none}
+  .filters button{
+    flex:0 0 auto;
+    min-height:34px;
+  }
+  .problem-list{gap:8px}
+  .problem-item{
+    background:#172033;
+    border:1px solid #29364b;
+    border-radius:13px;
+    padding:12px 13px;
+    min-height:62px;
+  }
+  .problem-item:hover{background:#1e293b}
+  .problem-item.active{background:#172033;border-color:#3b4c66}
+  .problem-item b{font-size:15px;line-height:1.28}
+  .problem-item span{display:block;margin-top:5px;font-size:12px}
+
+  main{display:none;padding:0}
+
+  body.mobile-detail aside{display:none}
+  body.mobile-detail main{
+    display:block;
+    min-height:100vh;
+    padding:12px 12px 24px;
+  }
+  body.mobile-detail .topbar{display:none}
+
+  .mobile-detail-wrap{
+    max-width:680px;
+    margin:0 auto;
+  }
+  .mobile-detail-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:17px;
+    padding:16px 14px;
+    box-shadow:0 4px 18px rgba(15,23,42,.05);
+  }
+  .mobile-detail-card h1{
+    margin:5px 0 8px;
+    font-size:25px;
+    line-height:1.17;
+  }
+  .mobile-detail-card .lead{
+    margin-bottom:12px;
+    font-size:14px;
+  }
+  .mobile-detail-card .badges{
+    margin:10px 0 13px;
+  }
+  .mobile-assignment{
+    display:grid;
+    gap:10px;
+    padding:13px;
+    border:1px solid var(--line);
+    border-radius:13px;
+    background:#f8fafc;
+  }
+  .mobile-assignment-row{
+    display:grid;
+    grid-template-columns:72px 1fr;
+    gap:9px;
+    align-items:start;
+    font-size:14px;
+    line-height:1.45;
+  }
+  .mobile-assignment-row > span{
+    color:var(--muted);
+    font-weight:800;
+  }
+  .mobile-detail-card .notice{
+    margin:12px 0 14px;
+    font-size:14px;
+  }
+
+  .mobile-accordions{
+    display:grid;
+    gap:9px;
+    margin-top:12px;
+  }
+  .mobile-accordion{
+    border:1px solid var(--line);
+    border-radius:13px;
+    overflow:hidden;
+    background:#fff;
+  }
+  .mobile-accordion-toggle{
+    width:100%;
+    border:0;
+    background:#fff;
+    color:var(--ink);
+    padding:14px 13px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    text-align:left;
+    font-weight:850;
+    cursor:pointer;
+  }
+  .mobile-accordion-toggle:active{background:#f8fafc}
+  .mobile-accordion-toggle .left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .mobile-accordion-toggle .icon{
+    width:31px;height:31px;
+    display:grid;place-items:center;
+    border-radius:9px;
+    background:var(--soft);
+    color:#2448bd;
+    font-size:16px;
+  }
+  .mobile-accordion-toggle .chev{
+    font-size:20px;
+    color:#64748b;
+    transform:rotate(0deg);
+    transition:transform .18s ease;
+  }
+  .mobile-accordion.open .mobile-accordion-toggle .chev{
+    transform:rotate(180deg);
+  }
+  .mobile-accordion-panel{
+    display:none;
+    border-top:1px solid var(--line);
+    padding:12px;
+    background:#fbfcfe;
+  }
+  .mobile-accordion.open .mobile-accordion-panel{display:block}
+
+  .mobile-sketch-note{
+    margin:9px 2px 2px;
+    color:#475569;
+    line-height:1.5;
+    font-size:13px;
+  }
+  .mobile-sketch svg{
+    aspect-ratio:4/3;
+    max-height:none;
+  }
+
+  .mobile-procedure-diagram{
+    background:white;
+    border:1px solid var(--line);
+    border-radius:13px;
+    padding:9px;
+    margin-bottom:10px;
+  }
+  .mobile-procedure-diagram .diagram-head{
+    margin:0 2px 8px;
+  }
+  .mobile-procedure-diagram svg{border-radius:10px}
+  .mobile-procedure-diagram .diagram-controls{
+    margin-top:8px;
+  }
+  .mobile-procedure-diagram .diagram-controls button{
+    min-height:42px;
+    padding:8px 6px;
+    font-size:13px;
+  }
+  .mobile-procedure-diagram .legend{
+    gap:8px;
+    margin:8px 2px 0;
+    font-size:11px;
+  }
+
+  .mobile-steps{
+    display:grid;
+    gap:7px;
+  }
+  .mobile-steps .step{
+    background:#fff;
+    padding:10px;
+  }
+  .mobile-steps .step p{
+    margin-left:33px;
+    font-size:13px;
+  }
+
+  .mobile-construction{
+    margin:0;
+    border:0;
+    background:transparent;
+    padding:2px 4px;
+  }
+  .mobile-construction ol{
+    margin:0;
+    padding-left:23px;
+    line-height:1.75;
+    font-size:14px;
+  }
+
+  .mobile-floating-nav{
+    display:none;
+    position:fixed;
+    z-index:50;
+    left:8px;
+    right:8px;
+    bottom:calc(8px + env(safe-area-inset-bottom));
+    grid-template-columns:.92fr 1fr 1fr;
+    gap:7px;
+    padding:7px;
+    border:1px solid rgba(203,213,225,.88);
+    border-radius:16px;
+    background:rgba(255,255,255,.94);
+    box-shadow:0 12px 35px rgba(15,23,42,.22);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+  }
+  body.mobile-detail .mobile-floating-nav{display:grid}
+  .mobile-floating-nav button{
+    min-width:0;
+    min-height:48px;
+    border:1px solid var(--line);
+    border-radius:11px;
+    background:#fff;
+    color:var(--ink);
+    padding:7px 5px;
+    font-weight:800;
+    font-size:12px;
+    line-height:1.15;
+    cursor:pointer;
+  }
+  .mobile-floating-nav button.mobile-next{
+    border-color:var(--accent);
+    background:var(--accent);
+    color:#fff;
+  }
+  .mobile-floating-nav .nav-symbol{
+    display:block;
+    font-size:17px;
+    line-height:1;
+    margin-bottom:3px;
+  }
+}
+
+@media(min-width:701px){
+  body.mobile-detail .mobile-floating-nav{display:none!important}
+}
+
 @media print{
  aside,.topbar,.diagram-controls,.solution-toggle{display:none!important}
  .app{display:block}.grid{grid-template-columns:1fr}.card{box-shadow:none;break-inside:avoid}.solution{display:block}
@@ -112,6 +396,12 @@ sub{font-size:.72em;line-height:0;vertical-align:sub}
   </div>
   <div id="content"></div>
 </main>
+
+<div id="mobileFloatingNav" class="mobile-floating-nav" aria-label="Navigace mezi příklady">
+  <button id="mobileBackToList"><span class="nav-symbol">↩</span>Zpět</button>
+  <button id="mobilePrevProblem"><span class="nav-symbol">←</span>Předchozí</button>
+  <button id="mobileNextProblem" class="mobile-next"><span class="nav-symbol">→</span>Další příklad</button>
+</div>
 </div>
 
 <script>
@@ -421,6 +711,18 @@ const P = [
 
 const cats = ["Vše", ...new Set(P.map(x=>x.cat))];
 let current = 0, filter = "Vše", query = "", stepIndex = 0, openSolution = false;
+let mobileDetail = false;
+let mobilePanels = {sketch:false, steps:false, construction:false};
+
+function isMobileLayout(){
+ return window.matchMedia("(max-width:700px)").matches;
+}
+function resetMobilePanels(){
+ mobilePanels = {sketch:false, steps:false, construction:false};
+}
+function syncMobileBody(){
+ document.body.classList.toggle("mobile-detail", isMobileLayout() && mobileDetail);
+}
 
 const $ = s => document.querySelector(s);
 const el = (name, attrs={}) => {
@@ -448,18 +750,27 @@ function renderList(){
  const list=$("#problemList"); list.innerHTML="";
  const arr=filtered();
  arr.forEach(p=>{
-   const b=el("button",{class:"problem-item"+(p._i===current?" active":"")});
+   const b=el("button",{class:"problem-item"+(p._i===current && !isMobileLayout()?" active":"")});
    b.innerHTML=`<b>${p.title}</b><span>${p.cat}</span>`;
-   b.onclick=()=>{current=p._i;stepIndex=0;openSolution=false;renderAll(); if(innerWidth<1000) scrollTo({top:0,behavior:"smooth"});};
+   b.onclick=()=>{
+     current=p._i;
+     stepIndex=0;
+     openSolution=false;
+     if(isMobileLayout()){
+       mobileDetail=true;
+       resetMobilePanels();
+     }
+     syncMobileBody();
+     renderAll();
+     scrollTo({top:0,behavior:"smooth"});
+   };
    list.appendChild(b);
  });
  if(!arr.length) list.innerHTML='<div style="color:#94a3b8;padding:10px">Nic nenalezeno.</div>';
 }
-function renderAll(){
- renderList();
- const p=P[current];
- $("#progress").textContent=`${current+1} / ${P.length}`;
- $("#content").innerHTML=`
+
+function desktopDetailTemplate(p){
+ return `
  <div class="grid">
   <section class="card">
    <div class="eyebrow">${p.cat}</div>
@@ -472,6 +783,11 @@ function renderAll(){
     <dt>Varianty</dt><dd>${p.variants}</dd>
    </dl>
    <div class="notice"><b>Podmínka / počet řešení:</b><br>${p.existence}</div>
+   <div class="construction sketchbox">
+     <h3>Náčrtek situace</h3>
+     <div class="sketch-preview">${drawSketch(p)}</div>
+     <p>Tohle je rychlý orientační náčrtek celé úlohy. <b>Zeleně</b> jsou vyznačené zadané (známé) údaje, <b>černě</b> nezadané části trojúhelníku a <b>oranžově</b> pomocné konstrukce. Přesný postup po jednotlivých krocích je vpravo v části <b>Grafické řešení krok po kroku</b>.</p>
+   </div>
    <button id="solutionToggle" class="solution-toggle">${openSolution?"Skrýt řešení":"Rozbalit kompletní řešení"}</button>
    <div id="solution" class="solution ${openSolution?"open":""}">
      <div class="steps">${p.steps.map((s,i)=>`
@@ -501,15 +817,184 @@ function renderAll(){
     </div>
   </section>
  </div>`;
- $("#solutionToggle").onclick=()=>{openSolution=!openSolution;renderAll();};
- document.querySelectorAll(".step").forEach(n=>n.onclick=()=>{stepIndex=+n.dataset.step;openSolution=true;renderAll();});
- $("#prevStep").onclick=()=>{stepIndex=Math.max(0,stepIndex-1);openSolution=true;renderAll();};
- $("#nextStep").onclick=()=>{stepIndex=Math.min(p.steps.length-1,stepIndex+1);openSolution=true;renderAll();};
- $("#svgWrap").innerHTML=draw(p,stepIndex);
 }
-$("#prevProblem").onclick=()=>{current=(current-1+P.length)%P.length;stepIndex=0;openSolution=false;renderAll();}
-$("#nextProblem").onclick=()=>{current=(current+1)%P.length;stepIndex=0;openSolution=false;renderAll();}
+
+function mobileAccordion(key, icon, title, body){
+ const open=mobilePanels[key];
+ return `
+ <section class="mobile-accordion ${open?"open":""}" data-mobile-accordion="${key}">
+   <button class="mobile-accordion-toggle" data-mobile-toggle="${key}" aria-expanded="${open}">
+     <span class="left"><span class="icon">${icon}</span><span>${title}</span></span>
+     <span class="chev">⌄</span>
+   </button>
+   <div class="mobile-accordion-panel">${body}</div>
+ </section>`;
+}
+
+function mobileDetailTemplate(p){
+ const sketchBody=`
+   <div class="mobile-sketch">${drawSketch(p)}</div>
+   <p class="mobile-sketch-note"><b>Zeleně</b> známé údaje, <b>černě</b> neznámé části a <b>oranžově</b> pomocné prvky.</p>`;
+
+ const stepsBody=`
+   <div class="mobile-procedure-diagram">
+     <div class="diagram-head">
+       <span class="diagram-title">Grafický krok</span>
+       <span class="step-counter">Krok ${stepIndex+1} z ${p.steps.length}</span>
+     </div>
+     <div id="mobileSvgWrap">${draw(p,stepIndex)}</div>
+     <div class="diagram-controls">
+       <button id="mobilePrevStep">← Krok zpět</button>
+       <button class="primary" id="mobileNextStep">Další krok →</button>
+     </div>
+     <div class="legend">
+       <span><i class="l-given"></i>zadané</span>
+       <span><i class="l-help"></i>pomocné</span>
+       <span><i class="l-final"></i>výsledek</span>
+     </div>
+   </div>
+   <div class="mobile-steps">
+     ${p.steps.map((s,i)=>`
+       <div class="step ${i===stepIndex?"active":""}" data-mobile-step="${i}">
+        <span class="num">${i+1}</span><strong>${s[0]}</strong>
+        <p>${s[1]}</p>
+       </div>`).join("")}
+   </div>`;
+
+ const constructionBody=`
+   <div class="mobile-construction">
+     <ol>${p.construction.map(x=>`<li>${x}</li>`).join("")}</ol>
+   </div>`;
+
+ return `
+ <div class="mobile-detail-wrap">
+   <article class="mobile-detail-card">
+     <div class="eyebrow">${p.cat}</div>
+     <h1>${p.title}</h1>
+     <p class="lead">${p.find}</p>
+     <div class="badges">${p.tags.map(t=>`<span class="badge">${t}</span>`).join("")}</div>
+
+     <div class="mobile-assignment">
+       <div class="mobile-assignment-row"><span>Zadáno</span><b>${p.given}</b></div>
+       <div class="mobile-assignment-row"><span>Úkol</span><div>${p.find}</div></div>
+       <div class="mobile-assignment-row"><span>Varianty</span><div>${p.variants}</div></div>
+     </div>
+
+     <div class="notice"><b>Podmínka / počet řešení:</b><br>${p.existence}</div>
+
+     <div class="mobile-accordions">
+       ${mobileAccordion("sketch","△","Náčrtek",sketchBody)}
+       ${mobileAccordion("steps","1→","Postup krok po kroku",stepsBody)}
+       ${mobileAccordion("construction","✎","Zápis konstrukce",constructionBody)}
+     </div>
+   </article>
+ </div>`;
+}
+
+function bindDesktopDetail(p){
+ const toggle=$("#solutionToggle");
+ if(toggle) toggle.onclick=()=>{openSolution=!openSolution;renderAll();};
+
+ document.querySelectorAll(".step").forEach(n=>n.onclick=()=>{
+   stepIndex=+n.dataset.step;
+   openSolution=true;
+   renderAll();
+ });
+
+ const prev=$("#prevStep"), next=$("#nextStep");
+ if(prev) prev.onclick=()=>{stepIndex=Math.max(0,stepIndex-1);openSolution=true;renderAll();};
+ if(next) next.onclick=()=>{stepIndex=Math.min(p.steps.length-1,stepIndex+1);openSolution=true;renderAll();};
+
+ const wrap=$("#svgWrap");
+ if(wrap) wrap.innerHTML=draw(p,stepIndex);
+}
+
+function bindMobileDetail(p){
+ document.querySelectorAll("[data-mobile-toggle]").forEach(btn=>{
+   btn.onclick=()=>{
+     const key=btn.dataset.mobileToggle;
+     mobilePanels[key]=!mobilePanels[key];
+     renderAll();
+   };
+ });
+
+ document.querySelectorAll("[data-mobile-step]").forEach(n=>{
+   n.onclick=()=>{
+     stepIndex=+n.dataset.mobileStep;
+     mobilePanels.steps=true;
+     renderAll();
+     const acc=document.querySelector('[data-mobile-accordion="steps"]');
+     if(acc) acc.scrollIntoView({behavior:"smooth",block:"start"});
+   };
+ });
+
+ const prev=$("#mobilePrevStep"), next=$("#mobileNextStep");
+ if(prev) prev.onclick=()=>{
+   stepIndex=Math.max(0,stepIndex-1);
+   mobilePanels.steps=true;
+   renderAll();
+ };
+ if(next) next.onclick=()=>{
+   stepIndex=Math.min(p.steps.length-1,stepIndex+1);
+   mobilePanels.steps=true;
+   renderAll();
+ };
+}
+
+function renderAll(){
+ syncMobileBody();
+ renderList();
+
+ const p=P[current];
+ const progress=$("#progress");
+ if(progress) progress.textContent=`${current+1} / ${P.length}`;
+
+ if(isMobileLayout()){
+   if(!mobileDetail){
+     $("#content").innerHTML="";
+     return;
+   }
+   $("#content").innerHTML=mobileDetailTemplate(p);
+   bindMobileDetail(p);
+   return;
+ }
+
+ $("#content").innerHTML=desktopDetailTemplate(p);
+ bindDesktopDetail(p);
+}
+
+function moveProblem(delta){
+ current=(current+delta+P.length)%P.length;
+ stepIndex=0;
+ openSolution=false;
+ resetMobilePanels();
+ renderAll();
+ scrollTo({top:0,behavior:"smooth"});
+}
+
+$("#prevProblem").onclick=()=>moveProblem(-1);
+$("#nextProblem").onclick=()=>moveProblem(1);
+
+$("#mobileBackToList").onclick=()=>{
+ mobileDetail=false;
+ resetMobilePanels();
+ syncMobileBody();
+ renderAll();
+ scrollTo({top:0,behavior:"smooth"});
+};
+$("#mobilePrevProblem").onclick=()=>moveProblem(-1);
+$("#mobileNextProblem").onclick=()=>moveProblem(1);
+
 $("#search").addEventListener("input",e=>{query=e.target.value;renderList();});
+
+window.addEventListener("resize",()=>{
+ syncMobileBody();
+ if(!isMobileLayout()){
+   renderAll();
+ }else if(!mobileDetail){
+   renderList();
+ }
+});
 
 const W=800,H=600;
 const fmt=n=>Number(n).toFixed(1);
@@ -521,7 +1006,7 @@ function txt(x,y,t,anchor="start"){return `<text x="${x}" y="${y}" text-anchor="
 function arcPath(cx,cy,r,a1,a2,cls="help"){
  const p1={x:cx+r*Math.cos(a1),y:cy+r*Math.sin(a1)}, p2={x:cx+r*Math.cos(a2),y:cy+r*Math.sin(a2)};
  const large=Math.abs(a2-a1)>Math.PI?1:0;
- return `<path d="M ${p1.x} ${p1.y} A ${r} ${r} 0 ${large} 1 ${p2.x} ${p2.y}" fill="none" stroke="${cls==="final"?"#137a43":"#e99800"}" stroke-width="3"/>`
+ return `<path d="M ${p1.x} ${p1.y} A ${r} ${r} 0 ${large} 1 ${p2.x} ${p2.y}" fill="none" stroke="${cls==="final"?"#137a43":cls==="given"?"#172033":"#e99800"}" stroke-width="3"/>`
 }
 function mapPoint(x,y){return {x:120+x*85,y:500-y*85}}
 function baseSetup(a=6){return {B:mapPoint(0,0),C:mapPoint(a,0),M:mapPoint(a/2,0)}}
@@ -532,7 +1017,229 @@ function draw(p,s){
  const f = renderers[p.diagram] || renderers.sss;
  return f(s,p.steps.length);
 }
+function drawSketch(p){
+ const f = sketchRenderers[p.id] || sketchRenderers[p.diagram];
+ if(f) return f();
+ const finalStep = Math.max(0, p.steps.length - 1);
+ return draw(p, finalStep);
+}
 const renderers={};
+const sketchRenderers={};
+
+function rightMark(p, size=18, cls="help", orient="ur"){
+ const dirs={
+  ur:[[0,0],[size,0],[size,-size],[0,-size]],
+  ul:[[0,0],[-size,0],[-size,-size],[0,-size]],
+  dr:[[0,0],[size,0],[size,size],[0,size]],
+  dl:[[0,0],[-size,0],[-size,size],[0,size]]
+ };
+ const d=dirs[orient]||dirs.ur;
+ const pts=d.map(([dx,dy])=>`${p.x+dx},${p.y+dy}`).join(" ");
+ const col = cls==="final" ? "#137a43" : cls==="given" ? "#172033" : "#e99800";
+ return `<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="3"/>`;
+}
+
+// ===== Náčrtky: zeleně známé, černě neznámé, oranžově pomocné =====
+sketchRenderers.sss=()=>{
+ const B={x:140,y:430},C={x:650,y:430};
+ const D=Math.hypot(C.x-B.x,C.y-B.y), rB=382.5, rC=425;
+ const aa=(rB*rB-rC*rC+D*D)/(2*D), h=Math.sqrt(Math.max(0,rB*rB-aa*aa));
+ const xm=B.x+aa*(C.x-B.x)/D, ym=B.y+aa*(C.y-B.y)/D, A={x:xm,y:ym-h};
+ let q=[line(A,B,"final"),line(A,C,"final"),line(B,C,"final"),pt(A,"A"),pt(B,"B"),pt(C,"C")];
+ q.push(txt(390,458,"a","middle"),txt((A.x+C.x)/2+10,(A.y+C.y)/2,"b"),txt((A.x+B.x)/2-20,(A.y+B.y)/2,"c"));
+ return svg(q);
+};
+
+sketchRenderers.sus=()=>{
+ const A={x:165,y:450},B={x:505,y:450},ang=-70*Math.PI/180,C={x:A.x+425*Math.cos(ang),y:A.y+425*Math.sin(ang)};
+ let q=[line(A,B,"final"),line(A,C,"final"),line(B,C,"given"),pt(A,"A"),pt(B,"B"),pt(C,"C")];
+ q.push(arcPath(A.x,A.y,70,ang,0,"final"),txt(228,405,"α"));
+ q.push(txt(335,478,"c"),txt((A.x+C.x)/2-10,(A.y+C.y)/2,"b"));
+ return svg(q);
+};
+
+sketchRenderers.usu=()=>{
+ const B={x:145,y:450},C={x:655,y:450};
+ const beta=55*Math.PI/180,gamma=65*Math.PI/180;
+ const d1={x:Math.cos(-beta),y:Math.sin(-beta)}, d2={x:Math.cos(Math.PI+gamma),y:Math.sin(Math.PI+gamma)};
+ const den=d1.x*d2.y-d1.y*d2.x, dx=C.x-B.x,dy=C.y-B.y;
+ const t=(dx*d2.y-dy*d2.x)/den, A={x:B.x+t*d1.x,y:B.y+t*d1.y};
+ let q=[line(B,C,"final"),line(A,B,"given"),line(A,C,"given"),pt(A,"A"),pt(B,"B"),pt(C,"C")];
+ q.push(arcPath(B.x,B.y,60,-beta,0,"final"),txt(202,412,"β"));
+ q.push(arcPath(C.x,C.y,60,Math.PI,Math.PI+gamma,"final"),txt(595,410,"γ"));
+ q.push(txt(400,478,"a","middle"));
+ return svg(q);
+};
+
+sketchRenderers.ssu=()=>{
+ const B={x:190,y:430},C={x:615,y:430}, alpha=35*Math.PI/180;
+ const a=C.x-B.x, R=a/(2*Math.sin(alpha)), d=a/(2*Math.tan(alpha));
+ const O={x:(B.x+C.x)/2,y:430+d}, r2=7/5*a;
+ const x0=O.x,y0=O.y,x1=C.x,y1=C.y, D=Math.hypot(x1-x0,y1-y0);
+ const aa=(R*R-r2*r2+D*D)/(2*D), hh=Math.sqrt(Math.max(0,R*R-aa*aa));
+ const xm=x0+aa*(x1-x0)/D, ym=y0+aa*(y1-y0)/D;
+ const A={x:xm+hh*-(y1-y0)/D,y:ym+hh*(x1-x0)/D};
+ let q=[line(B,C,"final"),line(A,C,"final"),line(A,B,"given"),pt(A,"A"),pt(B,"B"),pt(C,"C")];
+ q.push(arcPath(A.x,A.y,48,Math.atan2(B.y-A.y,B.x-A.x),Math.atan2(C.y-A.y,C.x-A.x),"final"),txt(A.x+18,A.y+32,"α"));
+ q.push(circle(O,R,"help",true),circle(C,r2,"help",true));
+ q.push(txt(398,458,"a","middle"),txt((A.x+C.x)/2+15,(A.y+C.y)/2,"b"));
+ return svg(q);
+};
+
+sketchRenderers.abva=()=>{
+ const {B,C}=baseSetup(6), y=160, r=425, xs=intersectCircleHorizontal(C.x,C.y,r,y), A={x:xs[0],y}, D={x:A.x,y:B.y};
+ let q=[line(B,C,"final"),line(A,C,"final"),line(A,B,"given"),line(A,D,"final"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(D,"D")];
+ q.push(rightMark(D,16,"final","ur"));
+ q.push(txt(402,530,"a","middle"),txt((A.x+C.x)/2+10,(A.y+C.y)/2,"b"),txt(A.x+12,(A.y+B.y)/2,"vₐ"));
+ return svg(q);
+};
+
+sketchRenderers.acva=()=>{
+ const {B,C}=baseSetup(6), y=160, r=425, xs=intersectCircleHorizontal(B.x,B.y,r,y), A={x:xs[1],y}, D={x:A.x,y:B.y};
+ let q=[line(B,C,"final"),line(A,B,"final"),line(A,C,"given"),line(A,D,"final"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(D,"D")];
+ q.push(rightMark(D,16,"final","ul"));
+ q.push(txt(402,530,"a","middle"),txt((A.x+B.x)/2-18,(A.y+B.y)/2,"c"),txt(A.x+12,(A.y+B.y)/2,"vₐ"));
+ return svg(q);
+};
+
+sketchRenderers["ab-ta"]=()=>{
+ const {B,C,M}=baseSetup(6), rM=382.5,rC=425, D=C.x-M.x;
+ const aa=(rM*rM-rC*rC+D*D)/(2*D), h=Math.sqrt(Math.max(0,rM*rM-aa*aa));
+ const A={x:M.x+aa,y:M.y-h};
+ let q=[line(B,C,"final"),line(A,C,"final"),line(A,B,"given"),line(A,M,"final"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(M,"M")];
+ q.push(txt(402,530,"a","middle"),txt((A.x+C.x)/2+8,(A.y+C.y)/2,"b"),txt(M.x+12,(A.y+M.y)/2,"tₐ"));
+ return svg(q);
+};
+
+sketchRenderers["a-beta-va"]=()=>{
+ const {B,C}=baseSetup(6), beta=50*Math.PI/180, y=160, t=(B.y-y)/Math.sin(beta), A={x:B.x+t*Math.cos(beta),y}, D={x:A.x,y:B.y};
+ let q=[line(B,C,"final"),line(A,B,"given"),line(A,C,"given"),line(A,D,"final"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(D,"D")];
+ q.push(arcPath(B.x,B.y,60,-beta,0,"final"),rightMark(D,16,"final","ur"));
+ q.push(txt(205,452,"β"),txt(402,530,"a","middle"),txt(A.x+12,(A.y+B.y)/2,"vₐ"));
+ return svg(q);
+};
+
+sketchRenderers["a-alpha-va"]=()=>{
+ const {B,C,O,R}=angleCircleBase(74), y=160, dx=Math.sqrt(Math.max(0,R*R-(y-O.y)*(y-O.y))), A={x:O.x-dx,y}, D={x:A.x,y:B.y};
+ let q=[line(B,C,"final"),line(A,B,"given"),line(A,C,"given"),line(A,D,"final"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(D,"D")];
+ q.push(arcPath(A.x,A.y,48,Math.atan2(B.y-A.y,B.x-A.x),Math.atan2(C.y-A.y,C.x-A.x),"final"),rightMark(D,16,"final","ur"));
+ q.push(txt(A.x+12,A.y+32,"α"),txt(402,530,"a","middle"),txt(A.x+12,(A.y+B.y)/2,"vₐ"));
+ q.push(circle(O,R,"help",true));
+ return svg(q);
+};
+
+sketchRenderers["a-beta-ta"]=()=>{
+ const {B,C,M}=baseSetup(6), beta=50*Math.PI/180,r=382.5;
+ const d={x:Math.cos(beta),y:-Math.sin(beta)}, vx=B.x-M.x,vy=B.y-M.y;
+ const bb=2*(vx*d.x+vy*d.y),cc=vx*vx+vy*vy-r*r, disc=bb*bb-4*cc, t=(-bb+Math.sqrt(Math.max(0,disc)))/2;
+ const A={x:B.x+t*d.x,y:B.y+t*d.y};
+ let q=[line(B,C,"final"),line(A,B,"given"),line(A,C,"given"),line(A,M,"final"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(M,"M")];
+ q.push(arcPath(B.x,B.y,60,-beta,0,"final"),txt(205,452,"β"),txt(402,530,"a","middle"),txt(M.x+12,(A.y+M.y)/2,"tₐ"));
+ return svg(q);
+};
+
+sketchRenderers["a-alpha-ta"]=()=>{
+ const {B,C,M,O,R}=angleCircleBase(74),r=348.5;
+ const D=Math.hypot(M.x-O.x,M.y-O.y), aa=(R*R-r*r+D*D)/(2*D), h=Math.sqrt(Math.max(0,R*R-aa*aa));
+ const xm=O.x+aa*(M.x-O.x)/D, ym=O.y+aa*(M.y-O.y)/D;
+ const A={x:xm+h*-(M.y-O.y)/D,y:ym+h*(M.x-O.x)/D};
+ let q=[line(B,C,"final"),line(A,B,"given"),line(A,C,"given"),line(A,M,"final"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(M,"M")];
+ q.push(arcPath(A.x,A.y,48,Math.atan2(B.y-A.y,B.x-A.x),Math.atan2(C.y-A.y,C.x-A.x),"final"),txt(A.x+14,A.y+32,"α"));
+ q.push(txt(402,530,"a","middle"),txt(M.x+12,(A.y+M.y)/2,"tₐ"),circle(O,R,"help",true));
+ return svg(q);
+};
+
+sketchRenderers["a-va-ta"]=()=>{
+ const {B,C,M}=baseSetup(6), y=160,r=425, dx=Math.sqrt(r*r-(y-M.y)*(y-M.y)), A={x:M.x-dx,y}, D={x:A.x,y:B.y};
+ let q=[line(B,C,"final"),line(A,B,"given"),line(A,C,"given"),line(A,D,"final"),line(A,M,"final"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(M,"M"),pt(D,"D")];
+ q.push(rightMark(D,16,"final","ur"),txt(402,530,"a","middle"),txt(A.x+12,(A.y+B.y)/2,"vₐ"),txt(M.x+12,(A.y+M.y)/2+10,"tₐ"));
+ return svg(q);
+};
+
+sketchRenderers["3tez"]=()=>{
+ const C={x:380,y:90}, S={x:380,y:330}, T={x:380,y:250}, Tp={x:380,y:410};
+ const r1=270, r2=230, D=Math.hypot(Tp.x-T.x,Tp.y-T.y);
+ const aa=(r1*r1-r2*r2+D*D)/(2*D), h=Math.sqrt(Math.max(0,r1*r1-aa*aa));
+ const xm=T.x+aa*(Tp.x-T.x)/D, ym=T.y+aa*(Tp.y-T.y)/D;
+ const B={x:xm+h,y:ym}, A={x:2*S.x-B.x, y:2*S.y-B.y};
+ const M={x:(B.x+C.x)/2,y:(B.y+C.y)/2}, N={x:(A.x+C.x)/2,y:(A.y+C.y)/2};
+ let q=[line(A,B,"given"),line(B,C,"given"),line(C,A,"given"),line(C,S,"final"),line(A,M,"final"),line(B,N,"final"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(S,"S"),pt(M,"M"),pt(N,"N")];
+ q.push(txt(405,215,"t₍c₎"),txt((A.x+M.x)/2-10,(A.y+M.y)/2,"t₍b₎"),txt((B.x+N.x)/2+8,(B.y+N.y)/2,"t₍a₎"));
+ q.push(circle(T,r1,"help",true),circle(Tp,r2,"help",true),pt(T,"T"),pt(Tp,"T′"));
+ return svg(q);
+};
+
+sketchRenderers["R-ab"]=()=>{
+ const O={x:400,y:305},R=230,B={x:190,y:400},C={x:610,y:400},r2=350;
+ const D=Math.hypot(C.x-O.x,C.y-O.y), aa=(R*R-r2*r2+D*D)/(2*D), h=Math.sqrt(Math.max(0,R*R-aa*aa));
+ const xm=O.x+aa*(C.x-O.x)/D,ym=O.y+aa*(C.y-O.y)/D, A={x:xm-h*(C.y-O.y)/D,y:ym+h*(C.x-O.x)/D};
+ let q=[circle(O,R,"final"),line(O,{x:O.x+R,y:O.y},"final"),line(B,C,"final"),line(A,C,"final"),line(A,B,"given"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(O,"O")];
+ q.push(txt(515,288,"R"),txt(400,425,"a","middle"),txt((A.x+C.x)/2+10,(A.y+C.y)/2,"b"));
+ return svg(q);
+};
+
+sketchRenderers["R-angles"]=()=>{
+ const O={x:400,y:300},R=230,deg=[-90,30,150].map(d=>d*Math.PI/180);
+ const A={x:O.x+R*Math.cos(deg[0]),y:O.y+R*Math.sin(deg[0])},B={x:O.x+R*Math.cos(deg[1]),y:O.y+R*Math.sin(deg[1])},C={x:O.x+R*Math.cos(deg[2]),y:O.y+R*Math.sin(deg[2])};
+ let q=[circle(O,R,"final"),line(O,{x:O.x+R,y:O.y},"final"),line(A,B,"given"),line(B,C,"given"),line(C,A,"given"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(O,"O")];
+ q.push(arcPath(B.x,B.y,40,Math.atan2(A.y-B.y,A.x-B.x),Math.atan2(C.y-B.y,C.x-B.x),"final"),txt(B.x-38,B.y-8,"β"));
+ q.push(arcPath(C.x,C.y,40,Math.atan2(B.y-C.y,B.x-C.x),Math.atan2(A.y-C.y,A.x-C.x),"final"),txt(C.x+12,C.y+8,"γ"));
+ q.push(txt(515,288,"R"));
+ return svg(q);
+};
+
+sketchRenderers["r-angles"]=()=>{
+ const I={x:400,y:305},r=120;
+ const ds=[-90,40,155].map(d=>d*Math.PI/180);
+ const T=ds.map(a=>({x:I.x+r*Math.cos(a),y:I.y+r*Math.sin(a)}));
+ const tangent=(p,a,L=400)=>{const d={x:-Math.sin(a),y:Math.cos(a)};return [{x:p.x-d.x*L,y:p.y-d.y*L},{x:p.x+d.x*L,y:p.y+d.y*L}]}
+ const Ls=T.map((p,i)=>tangent(p,ds[i]));
+ function inter(l1,l2){const [p,p2]=l1,[q,q2]=l2;const r1={x:p2.x-p.x,y:p2.y-p.y},s1={x:q2.x-q.x,y:q2.y-q.y};const den=r1.x*s1.y-r1.y*s1.x;const t=((q.x-p.x)*s1.y-(q.y-p.y)*s1.x)/den;return{x:p.x+t*r1.x,y:p.y+t*r1.y}}
+ const A=inter(Ls[0],Ls[1]),B=inter(Ls[1],Ls[2]),C=inter(Ls[2],Ls[0]);
+ let q=[circle(I,r,"final"),line(I,{x:I.x+r,y:I.y},"final"),line(A,B,"given"),line(B,C,"given"),line(C,A,"given"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(I,"I")];
+ q.push(arcPath(B.x,B.y,40,Math.atan2(A.y-B.y,A.x-B.x),Math.atan2(C.y-B.y,C.x-B.x),"final"),txt(B.x-36,B.y-8,"β"));
+ q.push(arcPath(C.x,C.y,40,Math.atan2(B.y-C.y,B.x-C.x),Math.atan2(A.y-C.y,A.x-C.x),"final"),txt(C.x+12,C.y+8,"γ"));
+ q.push(txt(I.x+40,I.y-15,"r"));
+ return svg(q);
+};
+
+sketchRenderers["r-a-beta"]=()=>{
+ const B={x:140,y:470},C={x:650,y:470},beta=50*Math.PI/180,r=118,dir={x:Math.cos(beta),y:-Math.sin(beta)};
+ const I={x:B.x+r/Math.tan(beta/2),y:B.y-r};
+ const D={x:(I.x+C.x)/2,y:(I.y+C.y)/2},Rci=Math.hypot(C.x-I.x,C.y-I.y)/2;
+ const dx=D.x-I.x,dy=D.y-I.y,dist=Math.hypot(dx,dy),aa=(r*r-Rci*Rci+dist*dist)/(2*dist),h=Math.sqrt(Math.max(0,r*r-aa*aa));
+ const xm=I.x+aa*dx/dist,ym=I.y+aa*dy/dist;
+ const T1={x:xm+h*-dy/dist,y:ym+h*dx/dist},T2={x:xm-h*-dy/dist,y:ym-h*dx/dist};
+ const T=T1.y<I.y?T1:T2;
+ const den=dir.x*(T.y-C.y)-dir.y*(T.x-C.x), tt=((C.x-B.x)*(T.y-C.y)-(C.y-B.y)*(T.x-C.x))/den;
+ const A={x:B.x+tt*dir.x,y:B.y+tt*dir.y};
+ let q=[circle(I,r,"final"),line(I,{x:I.x+r,y:I.y},"final"),line(B,C,"final"),line(A,B,"given"),line(A,C,"given"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(I,"I")];
+ q.push(arcPath(B.x,B.y,60,-beta,0,"final"),txt(195,435,"β"),txt(400,497,"a","middle"),txt(I.x+35,I.y-8,"r"));
+ q.push(line(C,T,"help",true),pt(T,"T"),circle(D,Rci,"help",true));
+ return svg(q);
+};
+
+sketchRenderers["R-a-va"]=()=>{
+ const O={x:400,y:300},R=230,yBC=390,half=Math.sqrt(R*R-(yBC-O.y)*(yBC-O.y)),B={x:400-half,y:yBC},C={x:400+half,y:yBC};
+ const y=175,dx=Math.sqrt(Math.max(0,R*R-(y-O.y)*(y-O.y))),A={x:O.x-dx,y},D={x:A.x,y:B.y};
+ let q=[circle(O,R,"final"),line(O,{x:O.x+R,y:O.y},"final"),line(B,C,"final"),line(A,B,"given"),line(A,C,"given"),line(A,D,"final"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(O,"O"),pt(D,"D")];
+ q.push(rightMark(D,16,"final","ur"),txt(515,285,"R"),txt(400,415,"a","middle"),txt(A.x+12,(A.y+B.y)/2,"vₐ"));
+ return svg(q);
+};
+
+sketchRenderers["bc-va"]=()=>{
+ const A={x:395,y:130},B={x:170,y:430},C={x:610,y:430},D={x:A.x,y:B.y};
+ let q=[line(A,B,"final"),line(A,C,"final"),line(B,C,"given"),line(A,D,"final"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(D,"D")];
+ q.push(rightMark(D,16,"final","ur"),txt((A.x+B.x)/2-20,(A.y+B.y)/2,"c"),txt((A.x+C.x)/2+10,(A.y+C.y)/2,"b"),txt(A.x+12,(A.y+B.y)/2,"vₐ"));
+ return svg(q);
+};
+
+sketchRenderers["bc-ta"]=()=>{
+ const A={x:395,y:130},B={x:170,y:430},C={x:610,y:430},M={x:(B.x+C.x)/2,y:(B.y+C.y)/2};
+ let q=[line(A,B,"final"),line(A,C,"final"),line(B,C,"given"),line(A,M,"final"),pt(A,"A"),pt(B,"B"),pt(C,"C"),pt(M,"M")];
+ q.push(txt((A.x+B.x)/2-20,(A.y+B.y)/2,"c"),txt((A.x+C.x)/2+10,(A.y+C.y)/2,"b"),txt(M.x+12,(A.y+M.y)/2+8,"tₐ"));
+ return svg(q);
+};
 
 renderers.sss=(s)=>{
  const B={x:140,y:430},C={x:650,y:430}, rB=382.5,rC=425;
