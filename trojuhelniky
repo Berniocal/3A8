@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atlas konstrukcí trojúhelníku</title>
+<style>
+:root{
+  --bg:#f6f7fb; --panel:#fff; --ink:#172033; --muted:#64748b; --line:#dbe2ea;
+  --accent:#315efb; --soft:#eef3ff; --good:#137a43; --warn:#a85b00; --bad:#b42318;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select{font:inherit}
+.app{min-height:100vh;display:grid;grid-template-columns:330px 1fr}
+aside{background:#0f172a;color:white;padding:22px 16px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{font-size:22px;font-weight:800;line-height:1.15;margin-bottom:6px}
+.brand small{display:block;color:#cbd5e1;font-size:13px;font-weight:500;margin-top:7px;line-height:1.45}
+.search{width:100%;margin:16px 0 10px;border:0;border-radius:11px;padding:11px 12px;background:#1e293b;color:white;outline:none}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.filters button{border:1px solid #334155;background:#172033;color:#cbd5e1;border-radius:999px;padding:6px 9px;cursor:pointer;font-size:12px}
+.filters button.active{background:white;color:#0f172a;border-color:white}
+.problem-list{display:grid;gap:6px}
+.problem-item{width:100%;text-align:left;border:0;background:transparent;color:#dbeafe;padding:9px 10px;border-radius:9px;cursor:pointer}
+.problem-item:hover{background:#1e293b}
+.problem-item.active{background:#315efb;color:#fff}
+.problem-item b{display:block;font-size:14px}
+.problem-item span{font-size:12px;color:#94a3b8}
+.problem-item.active span{color:#dbeafe}
+main{padding:28px;min-width:0}
+.topbar{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-bottom:18px}
+.navbtn{border:1px solid var(--line);background:white;border-radius:10px;padding:9px 12px;cursor:pointer}
+.progress{color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:minmax(360px,1fr) minmax(420px,1.15fr);gap:20px;align-items:start}
+.card{background:white;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 4px 18px rgba(15,23,42,.04)}
+.eyebrow{font-size:12px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+h1{font-size:30px;line-height:1.15;margin:6px 0 10px}
+.lead{color:var(--muted);line-height:1.6;margin:0 0 16px}
+.badges{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 18px}
+.badge{background:var(--soft);color:#2448bd;border-radius:999px;padding:6px 9px;font-size:12px;font-weight:700}
+.kv{display:grid;grid-template-columns:135px 1fr;gap:8px 12px;margin:12px 0}
+.kv dt{color:var(--muted);font-weight:700}
+.kv dd{margin:0}
+.notice{border-left:4px solid var(--accent);background:#f8faff;padding:12px 14px;border-radius:10px;line-height:1.55;margin:15px 0}
+.notice.warn{border-color:#e99800;background:#fff8e8}
+.solution-toggle{width:100%;border:0;background:#137a43;color:white;padding:12px 14px;border-radius:11px;font-weight:800;cursor:pointer;margin-top:8px}
+.solution{display:none;margin-top:16px}
+.solution.open{display:block}
+.steps{display:grid;gap:9px;margin-top:10px}
+.step{border:1px solid var(--line);border-radius:11px;padding:11px 12px;cursor:pointer}
+.step.active{border-color:#8ca6ff;background:#f7f9ff}
+.step .num{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#e9efff;color:#2448bd;font-weight:800;font-size:12px;margin-right:8px}
+.step strong{font-size:14px}
+.step p{margin:7px 0 0 33px;color:#475569;font-size:14px;line-height:1.5}
+.construction{margin-top:15px;padding:14px;background:#f8fafc;border-radius:11px;border:1px solid var(--line)}
+.construction h3{margin:0 0 8px;font-size:15px}
+.construction ol{margin:0;padding-left:22px;line-height:1.62;color:#334155}
+.diagram-card{position:sticky;top:20px}
+.diagram-head{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-bottom:12px}
+.diagram-title{font-size:16px;font-weight:800}
+.step-counter{font-size:13px;color:var(--muted)}
+svg{width:100%;height:auto;aspect-ratio:4/3;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--line);border-radius:14px}
+.diagram-controls{display:flex;gap:8px;margin-top:10px}
+.diagram-controls button{flex:1;border:1px solid var(--line);background:white;border-radius:10px;padding:9px;cursor:pointer}
+.diagram-controls button.primary{background:var(--accent);border-color:var(--accent);color:white}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;color:var(--muted);font-size:12px}
+.legend i{display:inline-block;width:18px;border-top:3px solid;margin-right:5px;vertical-align:middle}
+.l-given{border-color:#172033!important}.l-help{border-color:#e99800!important}.l-final{border-color:#137a43!important}
+.teacher-note{margin-top:18px;border-top:1px solid var(--line);padding-top:14px;color:#475569;line-height:1.55;font-size:14px}
+sub{font-size:.72em;line-height:0;vertical-align:sub}
+.home{max-width:980px;margin:auto}
+.home h1{font-size:38px}
+.catalog{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.stat{background:white;border:1px solid var(--line);border-radius:14px;padding:18px}
+.stat b{display:block;font-size:26px}
+.stat span{color:var(--muted);font-size:13px}
+@media(max-width:1000px){
+ .app{grid-template-columns:1fr}
+ aside{position:relative;height:auto}
+ .grid{grid-template-columns:1fr}
+ .diagram-card{position:relative;top:auto}
+}
+@media(max-width:600px){
+ main{padding:16px}
+ .catalog{grid-template-columns:1fr}
+ h1{font-size:25px}
+ .kv{grid-template-columns:1fr}
+}
+@media print{
+ aside,.topbar,.diagram-controls,.solution-toggle{display:none!important}
+ .app{display:block}.grid{grid-template-columns:1fr}.card{box-shadow:none;break-inside:avoid}.solution{display:block}
+ .diagram-card{position:relative;top:auto}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="brand">△ Atlas konstrukcí
+    <small>Trojúhelníky krok po kroku: zápis konstrukce + grafické řešení.</small>
+  </div>
+  <input id="search" class="search" placeholder="Hledat: těžnice, výška, R, r…">
+  <div id="filters" class="filters"></div>
+  <div id="problemList" class="problem-list"></div>
+</aside>
+
+<main>
+  <div class="topbar">
+    <button class="navbtn" id="prevProblem">← Předchozí</button>
+    <div class="progress" id="progress"></div>
+    <button class="navbtn" id="nextProblem">Další →</button>
+  </div>
+  <div id="content"></div>
+</main>
+</div>
+
+<script>
+const P = [
+{
+ id:"sss", cat:"Základní věty", title:"SSS – tři strany", tags:["SSS","strany"],
+ given:"a = 6 cm, b = 5 cm, c = 4,5 cm", find:"Sestroj trojúhelník ABC.",
+ existence:"Musí platit trojúhelníková nerovnost: součet libovolných dvou stran je větší než třetí.",
+ variants:"Stejný postup funguje pro libovolné tři strany a, b, c.",
+ diagram:"sss",
+ steps:[
+  ["Narýsuj základnu","Narýsuj úsečku BC délky a = 6 cm."],
+  ["Kružnice z bodu B","Vrchol A musí být od B vzdálen c = 4,5 cm. Narýsuj kružnici se středem B a poloměrem c."],
+  ["Kružnice z bodu C","Vrchol A musí být od C vzdálen b = 5 cm. Narýsuj kružnici se středem C a poloměrem b."],
+  ["Najdi vrchol A","Průsečík obou kružnic označ A. Druhý průsečík dává zrcadlově shodný trojúhelník."],
+  ["Dokonči trojúhelník","Spoj A s B a A s C."]
+ ],
+ construction:["BC; |BC| = a","k₁(B; c)","k₂(C; b)","A ∈ k₁ ∩ k₂","△ABC"]
+},
+{
+ id:"sus", cat:"Základní věty", title:"SUS – dvě strany a úhel mezi nimi", tags:["SUS","úhel","strany"],
+ given:"b = 5 cm, c = 4 cm, α = 70°", find:"Sestroj trojúhelník ABC.",
+ existence:"Pro 0° < α < 180° a kladné délky b, c vznikne právě jeden trojúhelník až na zrcadlení.",
+ variants:"Např. a, b, γ nebo a, c, β – vždy dvě strany a úhel mezi nimi.",
+ diagram:"sus",
+ steps:[
+  ["První strana","Narýsuj AB = c = 4 cm."],
+  ["Úhel u A","V bodě A sestroj polopřímku, která s AB svírá α = 70°."],
+  ["Druhá strana","Na této polopřímce odměř AC = b = 5 cm."],
+  ["Dokonči","Spoj C s B."]
+ ],
+ construction:["AB; |AB| = c","∠BAC = α","C ∈ →AX; |AC| = b","△ABC"]
+},
+{
+ id:"usu", cat:"Základní věty", title:"USU – strana a dva přilehlé úhly", tags:["USU","úhly"],
+ given:"a = 6 cm, β = 55°, γ = 65°", find:"Sestroj trojúhelník ABC.",
+ existence:"Musí platit β + γ < 180°. Potom je α = 180° − β − γ.",
+ variants:"Stejně lze zadat c, α, β nebo b, α, γ.",
+ diagram:"usu",
+ steps:[
+  ["Základna","Narýsuj BC = a = 6 cm."],
+  ["Úhel u B","V bodě B sestroj polopřímku BA tak, aby ∠ABC = β = 55°."],
+  ["Úhel u C","V bodě C sestroj polopřímku CA tak, aby ∠BCA = γ = 65°."],
+  ["Vrchol A","Průsečík obou polopřímek je A."],
+  ["Dokonči","Zvýrazni strany trojúhelníku."]
+ ],
+ construction:["BC; |BC| = a","∠ABC = β","∠BCA = γ","A = →BA ∩ →CA","△ABC"]
+},
+{
+ id:"ssu", cat:"Základní věty", title:"SSU – dvě strany a úhel proti jedné z nich", tags:["SSU","2 řešení","úhel"],
+ given:"a = 5 cm, b = 7 cm, α = 35°", find:"Sestroj všechny trojúhelníky ABC.",
+ existence:"SSU není obecně jednoznačná věta. Podle délek mohou vzniknout 0, 1 nebo 2 řešení.",
+ variants:"Např. a, c, α; b, c, β. Důležité je, že známý úhel neleží mezi oběma známými stranami.",
+ diagram:"ssu",
+ steps:[
+  ["Základna","Narýsuj BC = a = 5 cm."],
+  ["Místa pro úhel α","Sestroj kružnici (resp. oblouk), ze které je úsečka BC vidět pod úhlem α = 35°. Každý bod A na tomto oblouku splňuje ∠BAC = α."],
+  ["Druhá známá strana","Narýsuj kružnici se středem C a poloměrem b = 7 cm."],
+  ["Průsečíky","Průsečíky pomocné kružnice s úhlovým obloukem jsou možné vrcholy A₁ a A₂."],
+  ["Dokonči obě řešení","Spoj A₁ a A₂ s body B a C. Pokud jsou dva průsečíky, jsou dvě různá řešení."]
+ ],
+ construction:["BC; |BC| = a","oblouk l: ∠BXC = α","k(C; b)","A₁, A₂ ∈ l ∩ k","△A₁BC, △A₂BC"]
+},
+{
+ id:"abva", cat:"Výšky", title:"Dvě strany + výška: a, b, vₐ", tags:["výška","2 strany"],
+ given:"a = 6 cm, b = 5 cm, vₐ = 4 cm", find:"Sestroj všechny trojúhelníky ABC.",
+ existence:"Musí být b ≥ vₐ. Při b > vₐ mohou na jedné straně od BC vzniknout dva vrcholy A.",
+ variants:"Symetricky a, c, vₐ; nebo po přejmenování vrcholů obdobné úlohy s v_b a v_c.",
+ diagram:"baseCircleHeight",
+ steps:[
+  ["Základna","Narýsuj BC = a."],
+  ["Výška určí přímku","Vrchol A musí mít od přímky BC vzdálenost vₐ. Sestroj rovnoběžku s BC ve vzdálenosti vₐ."],
+  ["Strana b určí kružnici","Protože AC = b, narýsuj kružnici se středem C a poloměrem b."],
+  ["Průsečíky","Průsečíky kružnice s rovnoběžkou jsou možné vrcholy A."],
+  ["Dokonči","Spoj každý možný bod A s B a C."]
+ ],
+ construction:["BC; |BC| = a","p ∥ BC; d(p,BC)=vₐ","k(C; b)","A ∈ p ∩ k","△ABC"]
+},
+{
+ id:"acva", cat:"Výšky", title:"Dvě strany + výška: a, c, vₐ", tags:["výška","2 strany"],
+ given:"a = 6 cm, c = 5 cm, vₐ = 4 cm", find:"Sestroj všechny trojúhelníky ABC.",
+ existence:"Musí být c ≥ vₐ. Počet řešení závisí na počtu průsečíků kružnice s rovnoběžkou.",
+ variants:"Je to zrcadlová varianta předchozího typu: kružnice má střed B.",
+ diagram:"baseCircleHeightB",
+ steps:[
+  ["Základna","Narýsuj BC = a."],
+  ["Výška","Sestroj rovnoběžku p s BC ve vzdálenosti vₐ."],
+  ["Strana c","Narýsuj kružnici k se středem B a poloměrem c."],
+  ["Vrchol A","Průsečík(y) p a k označ A."],
+  ["Dokonči","Spoj A s B a C."]
+ ],
+ construction:["BC; |BC| = a","p ∥ BC; d(p,BC)=vₐ","k(B; c)","A ∈ p ∩ k","△ABC"]
+},
+{
+ id:"ab-ta", cat:"Těžnice", title:"Dvě strany + těžnice: a, b, tₐ", tags:["těžnice","2 strany"],
+ given:"a = 6 cm, b = 5 cm, tₐ = 4,5 cm", find:"Sestroj trojúhelník ABC.",
+ existence:"Vrchol A musí současně ležet ve vzdálenosti b od C a tₐ od středu M strany BC.",
+ variants:"a, c, tₐ je stejný typ se středem kružnice v B místo C.",
+ diagram:"baseSideMedian",
+ steps:[
+  ["Základna","Narýsuj BC = a."],
+  ["Střed strany","Sestroj střed M úsečky BC."],
+  ["Těžnice","A musí být od M vzdálen tₐ. Narýsuj kružnici k₁(M; tₐ)."],
+  ["Známá strana","A musí být od C vzdálen b. Narýsuj k₂(C; b)."],
+  ["Vrchol A","Průsečík kružnic je A. Spoj A s B a C."]
+ ],
+ construction:["BC; |BC| = a","M = střed BC","k₁(M; tₐ)","k₂(C; b)","A ∈ k₁ ∩ k₂","△ABC"]
+},
+{
+ id:"a-beta-va", cat:"Výšky", title:"Strana + úhel + výška: a, β, vₐ", tags:["výška","úhel","strana"],
+ given:"a = 6 cm, β = 50°, vₐ = 4 cm", find:"Sestroj trojúhelník ABC.",
+ existence:"Při 0° < β < 180° a vhodné výšce vznikne průsečík polopřímky s rovnoběžkou.",
+ variants:"Stejně a, γ, vₐ; nebo po přejmenování vrcholů další kombinace.",
+ diagram:"baseRayHeight",
+ steps:[
+  ["Základna","Narýsuj BC = a."],
+  ["Úhel u B","V bodě B sestroj polopřímku BA tak, aby ∠ABC = β."],
+  ["Výška","Sestroj přímku p rovnoběžnou s BC ve vzdálenosti vₐ."],
+  ["Vrchol A","A je průsečík polopřímky BA a přímky p."],
+  ["Dokonči","Spoj A s C."]
+ ],
+ construction:["BC; |BC| = a","→BA; ∠ABC = β","p ∥ BC; d(p,BC)=vₐ","A = →BA ∩ p","△ABC"]
+},
+{
+ id:"a-alpha-va", cat:"Výšky", title:"Strana + protilehlý úhel + výška: a, α, vₐ", tags:["výška","úhel","množina bodů"],
+ given:"a = 6 cm, α = 74°, vₐ = 4 cm", find:"Sestroj všechny trojúhelníky ABC.",
+ existence:"A musí ležet současně na úhlovém oblouku nad BC a na rovnoběžce ve vzdálenosti vₐ. Podle zadání může být 0, 1 nebo 2 průsečíky.",
+ variants:"Tato varianta je jiná než a, β, vₐ, protože známý úhel je proti známé straně.",
+ diagram:"baseAngleHeight",
+ steps:[
+  ["Základna","Narýsuj BC = a."],
+  ["Úhlový oblouk","Sestroj oblouk všech bodů X, pro které ∠BXC = α."],
+  ["Výška","Sestroj rovnoběžku p s BC ve vzdálenosti vₐ."],
+  ["Možné vrcholy","Průsečíky oblouku a přímky p jsou možné body A."],
+  ["Dokonči","Spoj každý možný A s B a C."]
+ ],
+ construction:["BC; |BC| = a","oblouk l: ∠BXC = α","p ∥ BC; d(p,BC)=vₐ","A ∈ l ∩ p","△ABC"]
+},
+{
+ id:"a-beta-ta", cat:"Těžnice", title:"Strana + úhel + těžnice: a, β, tₐ", tags:["těžnice","úhel","strana"],
+ given:"a = 6 cm, β = 50°, tₐ = 4,5 cm", find:"Sestroj trojúhelník ABC.",
+ existence:"A je průsečík polopřímky z B a kružnice se středem ve středu M strany BC.",
+ variants:"Analogicky a, γ, tₐ.",
+ diagram:"baseRayMedian",
+ steps:[
+  ["Základna","Narýsuj BC = a a najdi její střed M."],
+  ["Úhel","V bodě B sestroj polopřímku BA s úhlem β."],
+  ["Těžnice","Narýsuj kružnici k(M; tₐ)."],
+  ["Vrchol A","Průsečík polopřímky BA a kružnice k je A."],
+  ["Dokonči","Spoj A s C."]
+ ],
+ construction:["BC; |BC| = a","M = střed BC","→BA; ∠ABC = β","k(M; tₐ)","A = →BA ∩ k","△ABC"]
+},
+{
+ id:"a-alpha-ta", cat:"Těžnice", title:"Strana + protilehlý úhel + těžnice: a, α, tₐ", tags:["těžnice","úhel","množina bodů"],
+ given:"a = 6 cm, α = 74°, tₐ = 4,1 cm", find:"Sestroj všechny trojúhelníky ABC.",
+ existence:"Vrchol A musí být na úhlovém oblouku nad BC a zároveň na kružnici se středem M a poloměrem tₐ.",
+ variants:"Počet řešení určuje počet průsečíků obou pomocných křivek.",
+ diagram:"baseAngleMedian",
+ steps:[
+  ["Základna","Narýsuj BC = a a sestroj střed M."],
+  ["Úhlový oblouk","Sestroj oblouk bodů X, z nichž je BC vidět pod úhlem α."],
+  ["Těžnice","Narýsuj kružnici k(M; tₐ)."],
+  ["Průsečíky","Průsečíky oblouku a kružnice jsou možné vrcholy A."],
+  ["Dokonči","Spoj A s B a C."]
+ ],
+ construction:["BC; |BC| = a","M = střed BC","oblouk l: ∠BXC = α","k(M; tₐ)","A ∈ l ∩ k","△ABC"]
+},
+{
+ id:"a-va-ta", cat:"Výšky + těžnice", title:"Strana + výška + těžnice: a, vₐ, tₐ", tags:["výška","těžnice","strana"],
+ given:"a = 6 cm, vₐ = 4 cm, tₐ = 5 cm", find:"Sestroj všechny trojúhelníky ABC.",
+ existence:"Musí být tₐ ≥ vₐ. Při tₐ > vₐ jsou na zvolené straně od BC zpravidla dva možné vrcholy A.",
+ variants:"Velmi čistý typ: výška dává rovnoběžku, těžnice dává kružnici.",
+ diagram:"baseHeightMedian",
+ steps:[
+  ["Základna","Narýsuj BC = a a najdi její střed M."],
+  ["Výška","Sestroj rovnoběžku p s BC ve vzdálenosti vₐ."],
+  ["Těžnice","Narýsuj kružnici k(M; tₐ)."],
+  ["Vrchol(y) A","Průsečíky k a p jsou možné vrcholy A₁, A₂."],
+  ["Dokonči","Spoj možné vrcholy s B a C."]
+ ],
+ construction:["BC; |BC| = a","M = střed BC","p ∥ BC; d(p,BC)=vₐ","k(M; tₐ)","A₁,A₂ ∈ p ∩ k","△ABC"]
+},
+{
+ id:"3tez", cat:"Těžnice", title:"Tři těžnice: t<sub>a</sub>, t<sub>b</sub>, t<sub>c</sub>", tags:["3 těžnice","těžiště","pokročilé"],
+ given:"t<sub>a</sub> = 4,1 cm, t<sub>b</sub> = 4,7 cm, t<sub>c</sub> = 5,0 cm", find:"Sestroj trojúhelník ABC.",
+ existence:"Použijeme známý postup přes těžnici t<sub>c</sub> = CS, bod S jako střed strany AB, bod T ve třetině těžnice od S a bod T′ na opačné straně od S. Potom platí BT = 2/3 · t<sub>b</sub> a BT′ = 2/3 · t<sub>a</sub>.",
+ variants:"Postup je upraven podle odkazu z Mathematicatoru. Druhý průsečík pomocných kružnic dává zrcadlově shodné řešení.",
+ diagram:"threeMedians",
+ steps:[
+  ["Narýsuj těžnici","Narýsuj úsečku CS délky t<sub>c</sub>. Bod S bude střed strany AB."],
+  ["Najdi body T a T′","Na úsečce CS vyznač bod T tak, aby ST = 1/3 · t<sub>c</sub>. Potom úsečku protáhni přes S na druhou stranu a sestroj bod T′ tak, aby ST′ = ST."],
+  ["První pomocná kružnice","Narýsuj kružnici k₁ se středem T a poloměrem 2/3 · t<sub>b</sub>."],
+  ["Druhá pomocná kružnice","Narýsuj kružnici k₂ se středem T′ a poloměrem 2/3 · t<sub>a</sub>."],
+  ["Najdi body B a A","Průsečík kružnic označ B. Bod A je obraz bodu B ve středové souměrnosti se středem S, protože S je střed strany AB."],
+  ["Dokonči trojúhelník","Spoj A s B, A s C a B s C."]
+ ],
+ construction:["CS; |CS| = t<sub>c</sub>","T ∈ CS; |ST| = 1/3 · t<sub>c</sub>","T′ leží na přímce CS za bodem S; |ST′| = |ST|","k₁(T; 2/3 · t<sub>b</sub>)","k₂(T′; 2/3 · t<sub>a</sub>)","B ∈ k₁ ∩ k₂","A = obraz B ve středové souměrnosti se středem S","△ABC"]
+},
+{
+ id:"R-ab", cat:"Kružnice opsaná", title:"Poloměr opsané kružnice + dvě strany: R, a, b", tags:["R","opsaná kružnice","2 strany"],
+ given:"R = 4 cm, a = 6 cm, b = 5 cm", find:"Sestroj trojúhelník ABC.",
+ existence:"Každá zadaná strana musí být nejvýše 2R, protože je tětivou kružnice opsané.",
+ variants:"Stejně R, a, c nebo R, b, c.",
+ diagram:"circumTwoSides",
+ steps:[
+  ["Opsaná kružnice","Narýsuj kružnici k(O; R)."],
+  ["Strana a jako tětiva","Na kružnici sestroj tětivu BC délky a."],
+  ["Strana b","Narýsuj kružnici se středem C a poloměrem b."],
+  ["Vrchol A","Průsečík této kružnice s kružnicí opsanou je A (neber bod B)."],
+  ["Dokonči","Spoj A, B, C."]
+ ],
+ construction:["k(O; R)","B,C ∈ k; |BC|=a","k₂(C; b)","A ∈ k ∩ k₂, A≠B","△ABC"]
+},
+{
+ id:"R-angles", cat:"Kružnice opsaná", title:"Poloměr opsané kružnice + dva úhly: R, β, γ", tags:["R","úhly","opsaná kružnice"],
+ given:"R = 4 cm, β = 55°, γ = 65°", find:"Sestroj trojúhelník ABC.",
+ existence:"α = 180° − β − γ musí být kladný. Poloměr R potom určuje velikost trojúhelníku.",
+ variants:"Libovolné dva vnitřní úhly + R.",
+ diagram:"circumAngles",
+ steps:[
+  ["Opsaná kružnice","Narýsuj k(O; R)."],
+  ["Dopočítej α","α = 180° − β − γ."],
+  ["Převeď úhly na středové","Nad stranou a platí ∠BOC = 2α, nad b je 2β a nad c je 2γ."],
+  ["Umísti vrcholy","Od jednoho poloměru postupně vynes příslušné středové úhly a označ A, B, C na kružnici."],
+  ["Spoj vrcholy","Spoj A, B, C."]
+ ],
+ construction:["k(O; R)","α = 180°−β−γ","∠BOC=2α, ∠COA=2β, ∠AOB=2γ","A,B,C ∈ k","△ABC"]
+},
+{
+ id:"r-angles", cat:"Kružnice vepsaná", title:"Poloměr vepsané kružnice + dva úhly: r, β, γ", tags:["r","vepsaná kružnice","úhly"],
+ given:"r = 1,5 cm, β = 55°, γ = 65°", find:"Sestroj trojúhelník ABC.",
+ existence:"α = 180° − β − γ > 0. Poloměr r určí měřítko trojúhelníku.",
+ variants:"Libovolné dva úhly + r.",
+ diagram:"inAngles",
+ steps:[
+  ["Vepsaná kružnice","Narýsuj kružnici k(I; r)."],
+  ["Dopočítej α","α = 180° − β − γ."],
+  ["Rozmísti poloměry k bodům dotyku","Úhel mezi dvěma poloměry vedenými do bodů dotyku u vrcholu A je 180° − α. Stejně pro B a C."],
+  ["Sestroj tečny","V každém bodě dotyku narýsuj tečnu ke kružnici – je kolmá na příslušný poloměr."],
+  ["Vrcholové průsečíky","Průsečíky sousedních tečen jsou A, B, C."]
+ ],
+ construction:["k(I; r)","α=180°−β−γ","středové úhly mezi body dotyku: 180°−α, 180°−β, 180°−γ","tečny v bodech dotyku","△ABC"]
+},
+{
+ id:"r-a-beta", cat:"Kružnice vepsaná", title:"Poloměr vepsané kružnice + strana + úhel: r, a, β", tags:["r","strana","úhel","tečna"],
+ given:"r = 1,4 cm, a = 6 cm, β = 50°", find:"Sestroj trojúhelník ABC.",
+ existence:"Střed vepsané kružnice musí ležet na ose úhlu B a současně ve vzdálenosti r od strany BC.",
+ variants:"Analogicky r, a, γ. Po přejmenování vrcholů i další strany.",
+ diagram:"inSideAngle",
+ steps:[
+  ["Základna a úhel","Narýsuj BC = a a v B sestroj polopřímku BA s úhlem β."],
+  ["Osa úhlu","Sestroj osu úhlu ABC."],
+  ["Vzdálenost r od strany","Sestroj rovnoběžku s BC ve vzdálenosti r. Její průsečík s osou úhlu je střed I vepsané kružnice."],
+  ["Vepsaná kružnice","Narýsuj k(I; r). Strana BC už je jednou její tečnou."],
+  ["Tečna z C","Z bodu C sestroj druhou tečnu ke kružnici k. Její průsečík s BA je A."],
+  ["Dokonči","Zvýrazni trojúhelník ABC."]
+ ],
+ construction:["BC; |BC|=a, ∠ABC=β","osa úhlu ABC","p ∥ BC; d(p,BC)=r; I=p∩osa","k(I;r)","tečna z C ke k; A=tečna∩→BA","△ABC"]
+},
+{
+ id:"R-a-va", cat:"Kružnice opsaná", title:"R + strana + výška: R, a, vₐ", tags:["R","výška","strana"],
+ given:"R = 4 cm, a = 6 cm, vₐ = 3,5 cm", find:"Sestroj všechny trojúhelníky ABC.",
+ existence:"Nejdřív musí jít na kružnici poloměru R sestrojit tětivu a, tedy a ≤ 2R. Pak rozhodne průsečík opsané kružnice s rovnoběžkou ve vzdálenosti vₐ.",
+ variants:"Dobrá ukázka kontroly existence: pomocná přímka může kružnici minout, dotknout se jí, nebo ji protnout dvakrát.",
+ diagram:"circumSideHeight",
+ steps:[
+  ["Opsaná kružnice","Narýsuj k(O; R)."],
+  ["Tětiva a","Na kružnici sestroj BC = a."],
+  ["Výška","Sestroj přímku p rovnoběžnou s BC ve vzdálenosti vₐ."],
+  ["Vrchol(y) A","Průsečík(y) p s kružnicí k jsou možné vrcholy A."],
+  ["Dokonči","Spoj každý možný A s B a C."]
+ ],
+ construction:["k(O;R)","B,C∈k; |BC|=a","p ∥ BC; d(p,BC)=vₐ","A ∈ p∩k","△ABC"]
+},
+{
+ id:"bc-va", cat:"Výšky", title:"Dvě strany u vrcholu A + výška: b, c, vₐ", tags:["výška","2 strany","více řešení"],
+ given:"b = 5 cm, c = 4,5 cm, vₐ = 3,5 cm", find:"Sestroj všechny trojúhelníky ABC.",
+ existence:"Musí být b ≥ vₐ a c ≥ vₐ. Každá z kružnic může protnout nositelku strany BC ve dvou bodech, proto je nutné projít možné kombinace a vyřadit shodná či degenerovaná řešení.",
+ variants:"Tady není známa základna a. Nejjednodušší je proto začít vrcholem A a přímkou, na které bude ležet BC.",
+ diagram:"twoSidesHeightOpp",
+ steps:[
+  ["Zvol vrchol A","Označ bod A a sestroj přímku p tak, aby její vzdálenost od A byla vₐ. Přímka p bude nositelkou strany BC."],
+  ["Strana c určí body B","Narýsuj kružnici k₁(A; c). Její průsečíky s p jsou možné body B."],
+  ["Strana b určí body C","Narýsuj kružnici k₂(A; b). Její průsečíky s p jsou možné body C."],
+  ["Vyber dvojice B, C","Spojuj možné body B a C ležící na p. Každá přípustná dvojice dává kandidáta trojúhelníku."],
+  ["Zkontroluj","Ověř AB = c, AC = b a vzdálenost A od BC = vₐ."]
+ ],
+ construction:["A; p tak, že d(A,p)=vₐ","k₁(A;c); B ∈ k₁∩p","k₂(A;b); C ∈ k₂∩p","zvol přípustné B,C","△ABC"]
+},
+{
+ id:"bc-ta", cat:"Těžnice", title:"Dvě strany u vrcholu A + těžnice: b, c, tₐ", tags:["těžnice","2 strany","pomocný rovnoběžník"],
+ given:"b = 5 cm, c = 4,5 cm, tₐ = 4 cm", find:"Sestroj trojúhelník ABC.",
+ existence:"Po zdvojení těžnice musí jít s délkami b a c sestrojit pomocný trojúhelník: b + c > 2tₐ, b + 2tₐ > c a c + 2tₐ > b.",
+ variants:"Klíčový trik: bod D je obraz A ve středu M strany BC. Pak AD = 2tₐ a čtyřúhelník A–B–D–C je rovnoběžník.",
+ diagram:"twoSidesMedianOpp",
+ steps:[
+  ["Zdvojnásob těžnici","Sestroj úsečku AD délky 2tₐ."],
+  ["Pomocný trojúhelník ABD","Kolem A narýsuj kružnici s poloměrem c a kolem D kružnici s poloměrem b. Jejich průsečík je B."],
+  ["Najdi střed M","Sestroj střed M úsečky AD. Platí AM = tₐ."],
+  ["Doplň bod C","Bod C je obraz bodu B ve středové souměrnosti se středem M."],
+  ["Dokonči a zkontroluj","Spoj A, B, C. Protože diagonály AD a BC mají společný střed M, AB = CD = c a AC = BD = b."]
+ ],
+ construction:["AD; |AD|=2tₐ","k₁(A;c), k₂(D;b); B∈k₁∩k₂","M = střed AD","C = obraz B ve středové souměrnosti se středem M","△ABC"]
+},
+];
+
+const cats = ["Vše", ...new Set(P.map(x=>x.cat))];
+let current = 0, filter = "Vše", query = "", stepIndex = 0, openSolution = false;
+
+const $ = s => document.querySelector(s);
+const el = (name, attrs={}) => {
+  const n=document.createElement(name);
+  Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));
+  return n;
+};
+
+function filtered(){
+ return P.map((p,i)=>({...p,_i:i})).filter(p=>{
+   const okCat = filter==="Vše" || p.cat===filter;
+   const hay=(p.title+" "+p.given+" "+p.tags.join(" ")+" "+p.cat).toLowerCase();
+   return okCat && hay.includes(query.toLowerCase());
+ });
+}
+function renderFilters(){
+ $("#filters").innerHTML="";
+ cats.forEach(c=>{
+   const b=el("button"); b.textContent=c; if(c===filter)b.classList.add("active");
+   b.onclick=()=>{filter=c;renderFilters();renderList();};
+   $("#filters").appendChild(b);
+ });
+}
+function renderList(){
+ const list=$("#problemList"); list.innerHTML="";
+ const arr=filtered();
+ arr.forEach(p=>{
+   const b=el("button",{class:"problem-item"+(p._i===current?" active":"")});
+   b.innerHTML=`<b>${p.title}</b><span>${p.cat}</span>`;
+   b.onclick=()=>{current=p._i;stepIndex=0;openSolution=false;renderAll(); if(innerWidth<1000) scrollTo({top:0,behavior:"smooth"});};
+   list.appendChild(b);
+ });
+ if(!arr.length) list.innerHTML='<div style="color:#94a3b8;padding:10px">Nic nenalezeno.</div>';
+}
+function renderAll(){
+ renderList();
+ const p=P[current];
+ $("#progress").textContent=`${current+1} / ${P.length}`;
+ $("#content").innerHTML=`
+ <div class="grid">
+  <section class="card">
+   <div class="eyebrow">${p.cat}</div>
+   <h1>${p.title}</h1>
+   <p class="lead">${p.find}</p>
+   <div class="badges">${p.tags.map(t=>`<span class="badge">${t}</span>`).join("")}</div>
+   <dl class="kv">
+    <dt>Zadáno</dt><dd><b>${p.given}</b></dd>
+    <dt>Úkol</dt><dd>${p.find}</dd>
+    <dt>Varianty</dt><dd>${p.variants}</dd>
+   </dl>
+   <div class="notice"><b>Podmínka / počet řešení:</b><br>${p.existence}</div>
+   <button id="solutionToggle" class="solution-toggle">${openSolution?"Skrýt řešení":"Rozbalit kompletní řešení"}</button>
+   <div id="solution" class="solution ${openSolution?"open":""}">
+     <div class="steps">${p.steps.map((s,i)=>`
+       <div class="step ${i===stepIndex?"active":""}" data-step="${i}">
+        <span class="num">${i+1}</span><strong>${s[0]}</strong>
+        <p>${s[1]}</p>
+       </div>`).join("")}
+     </div>
+     <div class="construction">
+       <h3>Zápis konstrukce</h3>
+       <ol>${p.construction.map(x=>`<li>${x}</li>`).join("")}</ol>
+     </div>
+     <div class="teacher-note"><b>Jak to číst:</b> oranžové čáry jsou pomocné konstrukce, tmavé části jsou zadané a zeleně se zvýrazní výsledný trojúhelník. Kliknutím na kterýkoli krok se obrázek přepne přesně do dané fáze.</div>
+   </div>
+  </section>
+  <section class="card diagram-card">
+    <div class="diagram-head"><span class="diagram-title">Grafické řešení krok po kroku</span><span class="step-counter">Krok ${stepIndex+1} z ${p.steps.length}</span></div>
+    <div id="svgWrap"></div>
+    <div class="diagram-controls">
+      <button id="prevStep">← Krok zpět</button>
+      <button class="primary" id="nextStep">Další krok →</button>
+    </div>
+    <div class="legend">
+      <span><i class="l-given"></i>zadané</span>
+      <span><i class="l-help"></i>pomocné</span>
+      <span><i class="l-final"></i>výsledek</span>
+    </div>
+  </section>
+ </div>`;
+ $("#solutionToggle").onclick=()=>{openSolution=!openSolution;renderAll();};
+ document.querySelectorAll(".step").forEach(n=>n.onclick=()=>{stepIndex=+n.dataset.step;openSolution=true;renderAll();});
+ $("#prevStep").onclick=()=>{stepIndex=Math.max(0,stepIndex-1);openSolution=true;renderAll();};
+ $("#nextStep").onclick=()=>{stepIndex=Math.min(p.steps.length-1,stepIndex+1);openSolution=true;renderAll();};
+ $("#svgWrap").innerHTML=draw(p,stepIndex);
+}
+$("#prevProblem").onclick=()=>{current=(current-1+P.length)%P.length;stepIndex=0;openSolution=false;renderAll();}
+$("#nextProblem").onclick=()=>{current=(current+1)%P.length;stepIndex=0;openSolution=false;renderAll();}
+$("#search").addEventListener("input",e=>{query=e.target.value;renderList();});
+
+const W=800,H=600;
+const fmt=n=>Number(n).toFixed(1);
+function svg(parts){return `<svg viewBox="0 0 ${W} ${H}" role="img">${parts.join("")}</svg>`}
+function line(a,b,cls="help",dash=false){return `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${cls==="final"?"#137a43":cls==="given"?"#172033":"#e99800"}" stroke-width="${cls==="final"?5:3}" ${dash?'stroke-dasharray="9 8"':""} stroke-linecap="round"/>`}
+function circle(c,r,cls="help",dash=false){return `<circle cx="${c.x}" cy="${c.y}" r="${r}" fill="none" stroke="${cls==="final"?"#137a43":cls==="given"?"#172033":"#e99800"}" stroke-width="3" ${dash?'stroke-dasharray="9 8"':""}/>`}
+function pt(p,name,cls="given"){return `<circle cx="${p.x}" cy="${p.y}" r="6" fill="${cls==="final"?"#137a43":"#172033"}"/><text x="${p.x+10}" y="${p.y-10}" font-size="22" font-weight="800" fill="#172033">${name}</text>`}
+function txt(x,y,t,anchor="start"){return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="18" fill="#64748b">${t}</text>`}
+function arcPath(cx,cy,r,a1,a2,cls="help"){
+ const p1={x:cx+r*Math.cos(a1),y:cy+r*Math.sin(a1)}, p2={x:cx+r*Math.cos(a2),y:cy+r*Math.sin(a2)};
+ const large=Math.abs(a2-a1)>Math.PI?1:0;
+ return `<path d="M ${p1.x} ${p1.y} A ${r} ${r} 0 ${large} 1 ${p2.x} ${p2.y}" fill="none" stroke="${cls==="final"?"#137a43":"#e99800"}" stroke-width="3"/>`
+}
+function mapPoint(x,y){return {x:120+x*85,y:500-y*85}}
+function baseSetup(a=6){return {B:mapPoint(0,0),C:mapPoint(a,0),M:mapPoint(a/2,0)}}
+function intersectCircleHorizontal(cx,cy,r,y){
+ const dy=y-cy, dx=Math.sqrt(Math.max(0,r*r-dy*dy)); return [cx-dx,cx+dx];
+}
+function draw(p,s){
+ const f = renderers[p.diagram] || renderers.sss;
+ return f(s,p.steps.length);
+}
+const renderers={};
+
+renderers.sss=(s)=>{
+ const B={x:140,y:430},C={x:650,y:430}, rB=382.5,rC=425;
+ const D=Math.hypot(C.x-B.x,C.y-B.y);
+ const aa=(rB*rB-rC*rC+D*D)/(2*D);
+ const h=Math.sqrt(Math.max(0,rB*rB-aa*aa));
+ const xm=B.x+aa*(C.x-B.x)/D, ym=B.y+aa*(C.y-B.y)/D;
+ const A={x:xm,y:ym-h};
+ let q=[];
+ q.push(line(B,C,"given"),pt(B,"B"),pt(C,"C"),txt(395,458,"a = 6 cm","middle"));
+ if(s>=1)q.push(circle(B,rB,"help"),txt(170,170,"k₁(B; c)"));
+ if(s>=2)q.push(circle(C,rC,"help"),txt(525,145,"k₂(C; b)"));
+ if(s>=3)q.push(pt(A,"A","final"));
+ if(s>=4)q.push(line(A,B,"final"),line(A,C,"final"));
+ return svg(q);
+};
+renderers.sus=(s)=>{
+ const A={x:165,y:450},B={x:505,y:450},ang=-70*Math.PI/180,C={x:A.x+425*Math.cos(ang),y:A.y+425*Math.sin(ang)};
+ let q=[];
+ q.push(pt(A,"A"),pt(B,"B"));
+ if(s>=0)q.push(line(A,B,"given"),txt(335,478,"c"));
+ if(s>=1){q.push(line(A,{x:A.x+520*Math.cos(ang),y:A.y+520*Math.sin(ang)},"help",true));q.push(arcPath(A.x,A.y,80,ang,0),txt(235,405,"α"))}
+ if(s>=2)q.push(pt(C,"C","final"),line(A,C,"given"),txt((A.x+C.x)/2-10,(A.y+C.y)/2,"b"));
+ if(s>=3)q.push(line(B,C,"final"),line(A,B,"final"),line(A,C,"final"));
+ return svg(q);
+};
+renderers.usu=(s)=>{
+ const B={x:145,y:450},C={x:655,y:450};
+ const beta=55*Math.PI/180,gamma=65*Math.PI/180;
+ const d1={x:Math.cos(-beta),y:Math.sin(-beta)}, d2={x:Math.cos(Math.PI+gamma),y:Math.sin(Math.PI+gamma)};
+ const den=d1.x*d2.y-d1.y*d2.x, dx=C.x-B.x,dy=C.y-B.y;
+ const t=(dx*d2.y-dy*d2.x)/den, A={x:B.x+t*d1.x,y:B.y+t*d1.y};
+ let q=[line(B,C,"given"),pt(B,"B"),pt(C,"C"),txt(400,478,"a","middle")];
+ if(s>=1)q.push(line(B,{x:B.x+550*d1.x,y:B.y+550*d1.y},"help",true),arcPath(B.x,B.y,70,-beta,0),txt(205,410,"β"));
+ if(s>=2)q.push(line(C,{x:C.x+550*d2.x,y:C.y+550*d2.y},"help",true),arcPath(C.x,C.y,70,Math.PI,Math.PI+gamma),txt(585,405,"γ"));
+ if(s>=3)q.push(pt(A,"A","final"));
+ if(s>=4)q.push(line(A,B,"final"),line(A,C,"final"),line(B,C,"final"));
+ return svg(q);
+};
+renderers.ssu=(s)=>{
+ const B={x:190,y:430},C={x:615,y:430}, alpha=35*Math.PI/180;
+ const a=C.x-B.x, R=a/(2*Math.sin(alpha)), d=a/(2*Math.tan(alpha));
+ const O={x:(B.x+C.x)/2,y:430+d}, r2=7/5*a;
+ // intersections circle O,R with circle C,r2
+ const x0=O.x,y0=O.y,x1=C.x,y1=C.y;
+ const D=Math.hypot(x1-x0,y1-y0);
+ const aa=(R*R-r2*r2+D*D)/(2*D), hh=Math.sqrt(Math.max(0,R*R-aa*aa));
+ const xm=x0+aa*(x1-x0)/D, ym=y0+aa*(y1-y0)/D;
+ const A1={x:xm+hh*-(y1-y0)/D,y:ym+hh*(x1-x0)/D};
+ const A2={x:xm-hh*-(y1-y0)/D,y:ym-hh*(x1-x0)/D};
+ let q=[line(B,C,"given"),pt(B,"B"),pt(C,"C"),txt(402,458,"a","middle")];
+ if(s>=1)q.push(circle(O,R,"help",true),txt(70,95,"oblouk pro ∠A = α"));
+ if(s>=2)q.push(circle(C,r2,"help",true),txt(570,115,"k(C; b)"));
+ if(s>=3){q.push(pt(A1,"A₁","final")); if(A2.y<430)q.push(pt(A2,"A₂","final"))}
+ if(s>=4){q.push(line(A1,B,"final"),line(A1,C,"final")); if(A2.y<430)q.push(line(A2,B,"final"),line(A2,C,"final"))}
+ return svg(q);
+};
+function baseCircleHeight(centerSide="C"){
+ return (s)=>{
+  const {B,C}=baseSetup(6), y=160, r=425;
+  const cent=centerSide==="C"?C:B;
+  const xs=intersectCircleHorizontal(cent.x,cent.y,r,y);
+  const A1={x:xs[0],y},A2={x:xs[1],y}; let q=[line(B,C,"given"),pt(B,"B"),pt(C,"C")];
+  if(s>=1)q.push(line({x:60,y},{x:760,y},"help",true),txt(70,y-14,"p ∥ BC, vzdálenost vₐ"));
+  if(s>=2)q.push(circle(cent,r,"help",true));
+  if(s>=3){q.push(pt(A1,"A₁","final")); if(A2.x<760)q.push(pt(A2,"A₂","final"))}
+  if(s>=4){q.push(line(A1,B,"final"),line(A1,C,"final")); if(A2.x<760){q.push(line(A2,B,"final"),line(A2,C,"final"))}}
+  return svg(q);
+ }
+}
+renderers.baseCircleHeight=baseCircleHeight("C");
+renderers.baseCircleHeightB=baseCircleHeight("B");
+
+renderers.baseSideMedian=(s)=>{
+ const {B,C,M}=baseSetup(6), rM=382.5,rC=425;
+ // intersect two circles
+ const D=C.x-M.x, aa=(rM*rM-rC*rC+D*D)/(2*D), h=Math.sqrt(Math.max(0,rM*rM-aa*aa));
+ const A={x:M.x+aa,y:M.y-h};
+ let q=[line(B,C,"given"),pt(B,"B"),pt(C,"C")];
+ if(s>=1)q.push(pt(M,"M"),txt(M.x,530,"střed BC","middle"));
+ if(s>=2)q.push(circle(M,rM,"help",true),txt(255,125,"k₁(M; tₐ)"));
+ if(s>=3)q.push(circle(C,rC,"help",true),txt(580,125,"k₂(C; b)"));
+ if(s>=4)q.push(pt(A,"A","final"),line(A,B,"final"),line(A,C,"final"),line(A,M,"help",true));
+ return svg(q);
+};
+renderers.baseRayHeight=(s)=>{
+ const {B,C}=baseSetup(6), beta=50*Math.PI/180, y=160;
+ const t=(B.y-y)/Math.sin(beta),A={x:B.x+t*Math.cos(beta),y};
+ let q=[line(B,C,"given"),pt(B,"B"),pt(C,"C")];
+ if(s>=1)q.push(line(B,{x:B.x+520*Math.cos(beta),y:B.y-520*Math.sin(beta)},"help",true),arcPath(B.x,B.y,70,-beta,0),txt(190,455,"β"));
+ if(s>=2)q.push(line({x:60,y},{x:760,y},"help",true),txt(70,y-14,"p ∥ BC"));
+ if(s>=3)q.push(pt(A,"A","final"));
+ if(s>=4)q.push(line(A,B,"final"),line(A,C,"final"));
+ return svg(q);
+};
+function angleCircleBase(alphaDeg=74){
+ const {B,C,M}=baseSetup(6), alpha=alphaDeg*Math.PI/180;
+ const chord=C.x-B.x,R=chord/(2*Math.sin(alpha)),d=chord/(2*Math.tan(alpha));
+ const O={x:M.x,y:B.y+d};
+ return {B,C,M,O,R};
+}
+renderers.baseAngleHeight=(s)=>{
+ const {B,C,O,R}=angleCircleBase(74), y=160;
+ const dx=Math.sqrt(Math.max(0,R*R-(y-O.y)*(y-O.y))),A1={x:O.x-dx,y},A2={x:O.x+dx,y};
+ let q=[line(B,C,"given"),pt(B,"B"),pt(C,"C")];
+ if(s>=1)q.push(circle(O,R,"help",true),txt(70,100,"oblouk pro ∠A = α"));
+ if(s>=2)q.push(line({x:60,y},{x:760,y},"help",true),txt(70,y-14,"p ∥ BC, vzdálenost vₐ"));
+ if(s>=3){q.push(pt(A1,"A₁","final")); if(Math.abs(A2.x-A1.x)>12)q.push(pt(A2,"A₂","final"))}
+ if(s>=4){q.push(line(A1,B,"final"),line(A1,C,"final")); if(Math.abs(A2.x-A1.x)>12)q.push(line(A2,B,"final"),line(A2,C,"final"))}
+ return svg(q);
+};
+renderers.baseRayMedian=(s)=>{
+ const {B,C,M}=baseSetup(6), beta=50*Math.PI/180,r=382.5;
+ const d={x:Math.cos(beta),y:-Math.sin(beta)}, vx=B.x-M.x,vy=B.y-M.y;
+ const bb=2*(vx*d.x+vy*d.y),cc=vx*vx+vy*vy-r*r;
+ const disc=bb*bb-4*cc, t=(-bb+Math.sqrt(Math.max(0,disc)))/2;
+ const A={x:B.x+t*d.x,y:B.y+t*d.y};
+ let q=[line(B,C,"given"),pt(B,"B"),pt(C,"C")];
+ if(s>=0)q.push(pt(M,"M"));
+ if(s>=1)q.push(line(B,{x:B.x+520*d.x,y:B.y+520*d.y},"help",true),arcPath(B.x,B.y,70,-beta,0),txt(190,455,"β"));
+ if(s>=2)q.push(circle(M,r,"help",true),txt(300,110,"k(M; tₐ)"));
+ if(s>=3)q.push(pt(A,"A","final"));
+ if(s>=4)q.push(line(A,B,"final"),line(A,C,"final"),line(A,M,"help",true));
+ return svg(q);
+};
+renderers.baseAngleMedian=(s)=>{
+ const {B,C,M,O,R}=angleCircleBase(74),r=348.5;
+ // circle-circle intersections
+ const D=Math.hypot(M.x-O.x,M.y-O.y), aa=(R*R-r*r+D*D)/(2*D), h=Math.sqrt(Math.max(0,R*R-aa*aa));
+ const xm=O.x+aa*(M.x-O.x)/D, ym=O.y+aa*(M.y-O.y)/D;
+ const A1={x:xm+h*-(M.y-O.y)/D,y:ym+h*(M.x-O.x)/D};
+ const A2={x:xm-h*-(M.y-O.y)/D,y:ym-h*(M.x-O.x)/D};
+ let q=[line(B,C,"given"),pt(B,"B"),pt(C,"C")];
+ if(s>=0)q.push(pt(M,"M"));
+ if(s>=1)q.push(circle(O,R,"help",true),txt(70,100,"oblouk pro ∠A = α"));
+ if(s>=2)q.push(circle(M,r,"help",true),txt(310,130,"k(M; tₐ)"));
+ if(s>=3){ if(A1.y<500)q.push(pt(A1,"A₁","final")); if(A2.y<500)q.push(pt(A2,"A₂","final"))}
+ if(s>=4){ [A1,A2].filter(A=>A.y<500).forEach(A=>q.push(line(A,B,"final"),line(A,C,"final"))); }
+ return svg(q);
+};
+renderers.baseHeightMedian=(s)=>{
+ const {B,C,M}=baseSetup(6), y=160,r=425;
+ const dx=Math.sqrt(r*r-(y-M.y)*(y-M.y)),A1={x:M.x-dx,y},A2={x:M.x+dx,y};
+ let q=[line(B,C,"given"),pt(B,"B"),pt(C,"C")];
+ if(s>=0)q.push(pt(M,"M"));
+ if(s>=1)q.push(line({x:60,y},{x:760,y},"help",true),txt(70,y-14,"p ∥ BC"));
+ if(s>=2)q.push(circle(M,r,"help",true),txt(300,105,"k(M; tₐ)"));
+ if(s>=3)q.push(pt(A1,"A₁","final"),pt(A2,"A₂","final"));
+ if(s>=4){q.push(line(A1,B,"final"),line(A1,C,"final"),line(A2,B,"final"),line(A2,C,"final"))}
+ return svg(q);
+};
+renderers.threeMedians=(s)=>{
+ const C={x:380,y:90}, S={x:380,y:330}, T={x:380,y:250}, Tp={x:380,y:410};
+ const r1=270, r2=230;
+ const D=Math.hypot(Tp.x-T.x,Tp.y-T.y);
+ const aa=(r1*r1-r2*r2+D*D)/(2*D);
+ const h=Math.sqrt(Math.max(0,r1*r1-aa*aa));
+ const xm=T.x+aa*(Tp.x-T.x)/D, ym=T.y+aa*(Tp.y-T.y)/D;
+ const B={x:xm+h,y:ym};
+ const A={x:2*S.x-B.x, y:2*S.y-B.y};
+ let q=[];
+ if(s>=0){
+   q.push(line(C,S,"given"),pt(C,"C"),pt(S,"S"),txt(405,215,"t_c = CS"));
+ }
+ if(s>=1){
+   q.push(pt(T,"T"),pt(Tp,"T′"),line(C,{x:380,y:545},"help",true),txt(405,285,"ST = 1/3 · t_c"),txt(405,390,"ST′ = ST"));
+ }
+ if(s>=2){
+   q.push(circle(T,r1,"help",true),txt(90,155,"k₁(T; 2/3 · t_b)"));
+ }
+ if(s>=3){
+   q.push(circle(Tp,r2,"help",true),txt(485,525,"k₂(T′; 2/3 · t_a)"));
+ }
+ if(s>=4){
+   q.push(pt(B,"B","final"),pt(A,"A","final"),line(A,B,"help",true),txt(350,305,"S je střed AB","middle"));
+ }
+ if(s>=5){
+   q.push(line(A,B,"final"),line(A,C,"final"),line(B,C,"final"));
+ }
+ return svg(q);
+};
+renderers.circumTwoSides=(s)=>{
+ const O={x:400,y:305},R=230;
+ const B={x:190,y:400},C={x:610,y:400};
+ const r2=350;
+ // intersection main circle with circle centered C
+ const D=Math.hypot(C.x-O.x,C.y-O.y), aa=(R*R-r2*r2+D*D)/(2*D), h=Math.sqrt(Math.max(0,R*R-aa*aa));
+ const xm=O.x+aa*(C.x-O.x)/D,ym=O.y+aa*(C.y-O.y)/D;
+ const A={x:xm-h*(C.y-O.y)/D,y:ym+h*(C.x-O.x)/D};
+ let q=[];
+ if(s>=0)q.push(circle(O,R,"given"),pt(O,"O"),txt(430,315,"R"));
+ if(s>=1)q.push(line(B,C,"given"),pt(B,"B"),pt(C,"C"),txt(400,425,"a","middle"));
+ if(s>=2)q.push(circle(C,r2,"help",true),txt(610,145,"k₂(C; b)"));
+ if(s>=3)q.push(pt(A,"A","final"));
+ if(s>=4)q.push(line(A,B,"final"),line(A,C,"final"),line(B,C,"final"));
+ return svg(q);
+};
+renderers.circumAngles=(s)=>{
+ const O={x:400,y:300},R=230;
+ const deg=[-90,30,150].map(d=>d*Math.PI/180);
+ const A={x:O.x+R*Math.cos(deg[0]),y:O.y+R*Math.sin(deg[0])};
+ const B={x:O.x+R*Math.cos(deg[1]),y:O.y+R*Math.sin(deg[1])};
+ const C={x:O.x+R*Math.cos(deg[2]),y:O.y+R*Math.sin(deg[2])}; let q=[];
+ q.push(circle(O,R,"given"),pt(O,"O"));
+ if(s>=1)q.push(txt(85,75,"α = 180° − β − γ"));
+ if(s>=2)q.push(line(O,A,"help"),line(O,B,"help"),line(O,C,"help"),arcPath(O.x,O.y,80,deg[0],deg[1]),txt(485,270,"2γ"));
+ if(s>=3)q.push(pt(A,"A","final"),pt(B,"B","final"),pt(C,"C","final"));
+ if(s>=4)q.push(line(A,B,"final"),line(B,C,"final"),line(C,A,"final"));
+ return svg(q);
+};
+renderers.inAngles=(s)=>{
+ const I={x:400,y:305},r=120;
+ const ds=[-90,40,155].map(d=>d*Math.PI/180);
+ const T=ds.map(a=>({x:I.x+r*Math.cos(a),y:I.y+r*Math.sin(a)}));
+ const tangent=(p,a,L=400)=>{const d={x:-Math.sin(a),y:Math.cos(a)};return [{x:p.x-d.x*L,y:p.y-d.y*L},{x:p.x+d.x*L,y:p.y+d.y*L}]}
+ const Ls=T.map((p,i)=>tangent(p,ds[i]));
+ function inter(l1,l2){const [p,p2]=l1,[q,q2]=l2;const r1={x:p2.x-p.x,y:p2.y-p.y},s1={x:q2.x-q.x,y:q2.y-q.y};const den=r1.x*s1.y-r1.y*s1.x;const t=((q.x-p.x)*s1.y-(q.y-p.y)*s1.x)/den;return{x:p.x+t*r1.x,y:p.y+t*r1.y}}
+ const A=inter(Ls[0],Ls[1]),B=inter(Ls[1],Ls[2]),C=inter(Ls[2],Ls[0]); let q=[circle(I,r,"given"),pt(I,"I")];
+ if(s>=1)q.push(txt(70,70,"α = 180° − β − γ"));
+ if(s>=2)T.forEach((t,i)=>{q.push(line(I,t,"help"));q.push(pt(t,`T${i+1}`))});
+ if(s>=3)Ls.forEach(l=>q.push(line(l[0],l[1],"help")));
+ if(s>=4){q.push(pt(A,"A","final"),pt(B,"B","final"),pt(C,"C","final"),line(A,B,"final"),line(B,C,"final"),line(C,A,"final"))}
+ return svg(q);
+};
+renderers.inSideAngle=(s)=>{
+ const B={x:140,y:470},C={x:650,y:470},beta=50*Math.PI/180,r=118;
+ const dir={x:Math.cos(beta),y:-Math.sin(beta)};
+ const I={x:B.x+r/Math.tan(beta/2),y:B.y-r};
+ const D={x:(I.x+C.x)/2,y:(I.y+C.y)/2},Rci=Math.hypot(C.x-I.x,C.y-I.y)/2;
+ // intersection circles center I r and D Rci => tangent points
+ const dx=D.x-I.x,dy=D.y-I.y,dist=Math.hypot(dx,dy),aa=(r*r-Rci*Rci+dist*dist)/(2*dist),h=Math.sqrt(Math.max(0,r*r-aa*aa));
+ const xm=I.x+aa*dx/dist,ym=I.y+aa*dy/dist;
+ const T1={x:xm+h*-dy/dist,y:ym+h*dx/dist},T2={x:xm-h*-dy/dist,y:ym-h*dx/dist};
+ const T=T1.y<I.y?T1:T2;
+ // line CT with ray B
+ const den=dir.x*(T.y-C.y)-dir.y*(T.x-C.x);
+ const tt=((C.x-B.x)*(T.y-C.y)-(C.y-B.y)*(T.x-C.x))/den;
+ const A={x:B.x+tt*dir.x,y:B.y+tt*dir.y};
+ let q=[line(B,C,"given"),pt(B,"B"),pt(C,"C")];
+ if(s>=0)q.push(line(B,{x:B.x+550*dir.x,y:B.y+550*dir.y},"help",true),arcPath(B.x,B.y,65,-beta,0),txt(195,435,"β"));
+ if(s>=1)q.push(line(B,{x:B.x+420*Math.cos(beta/2),y:B.y-420*Math.sin(beta/2)},"help",true),txt(250,400,"osa úhlu"));
+ if(s>=2)q.push(line({x:60,y:I.y},{x:760,y:I.y},"help",true),pt(I,"I"));
+ if(s>=3)q.push(circle(I,r,"given"));
+ if(s>=4)q.push(circle(D,Rci,"help",true),pt(T,"T"),line(C,T,"help"));
+ if(s>=5)q.push(pt(A,"A","final"),line(A,B,"final"),line(A,C,"final"),line(B,C,"final"));
+ return svg(q);
+};
+renderers.circumSideHeight=(s)=>{
+ const O={x:400,y:300},R=230;
+ const yBC=390,half=Math.sqrt(R*R-(yBC-O.y)*(yBC-O.y)),B={x:400-half,y:yBC},C={x:400+half,y:yBC};
+ const y=175,dx=Math.sqrt(Math.max(0,R*R-(y-O.y)*(y-O.y))),A1={x:O.x-dx,y},A2={x:O.x+dx,y}; let q=[];
+ q.push(circle(O,R,"given"),pt(O,"O"));
+ if(s>=1)q.push(line(B,C,"given"),pt(B,"B"),pt(C,"C"));
+ if(s>=2)q.push(line({x:60,y},{x:760,y},"help",true),txt(70,y-14,"p ∥ BC"));
+ if(s>=3)q.push(pt(A1,"A₁","final"),pt(A2,"A₂","final"));
+ if(s>=4)q.push(line(A1,B,"final"),line(A1,C,"final"),line(A2,B,"final"),line(A2,C,"final"));
+ return svg(q);
+};
+
+renderers.twoSidesHeightOpp=(s)=>{
+ const A={x:400,y:155}, y=455, rC=382.5, rB=340;
+ const xB=Math.sqrt(Math.max(0,rB*rB-(y-A.y)*(y-A.y)));
+ const xC=Math.sqrt(Math.max(0,rC*rC-(y-A.y)*(y-A.y)));
+ const B1={x:A.x-xB,y},B2={x:A.x+xB,y},C1={x:A.x-xC,y},C2={x:A.x+xC,y}; let q=[pt(A,"A")];
+ if(s>=0){q.push(line({x:65,y},{x:735,y},"help",true),line(A,{x:A.x,y},"help",true),txt(A.x+12,315,"vₐ"));}
+ if(s>=1)q.push(circle(A,rB,"help",true),pt(B1,"B₁"),pt(B2,"B₂"),txt(95,120,"k₁(A;c)"));
+ if(s>=2)q.push(circle(A,rC,"help",true),pt(C1,"C₁"),pt(C2,"C₂"),txt(585,120,"k₂(A;b)"));
+ if(s>=3)q.push(line(B1,C2,"final"),line(A,B1,"final"),line(A,C2,"final"));
+ if(s>=4)q.push(txt(400,540,"Další přípustné dvojice vzniknou volbou ostatních průsečíků.","middle"));
+ return svg(q);
+};
+renderers.twoSidesMedianOpp=(s)=>{
+ const A={x:265,y:155},D={x:535,y:445},M={x:400,y:300},rA=315,rD=350;
+ const dx=D.x-A.x,dy=D.y-A.y,dist=Math.hypot(dx,dy),aa=(rA*rA-rD*rD+dist*dist)/(2*dist),h=Math.sqrt(Math.max(0,rA*rA-aa*aa));
+ const xm=A.x+aa*dx/dist,ym=A.y+aa*dy/dist;
+ const B={x:xm+h*-dy/dist,y:ym+h*dx/dist}; const C={x:2*M.x-B.x,y:2*M.y-B.y}; let q=[];
+ if(s>=0)q.push(line(A,D,"given"),pt(A,"A"),pt(D,"D"),txt(400,285,"AD = 2tₐ","middle"));
+ if(s>=1)q.push(circle(A,rA,"help",true),circle(D,rD,"help",true),pt(B,"B","final"));
+ if(s>=2)q.push(pt(M,"M"),line(A,M,"help"),txt(415,245,"AM=tₐ"));
+ if(s>=3)q.push(pt(C,"C","final"),line(B,C,"help",true));
+ if(s>=4)q.push(line(A,B,"final"),line(B,C,"final"),line(C,A,"final"));
+ return svg(q);
+};
+renderers.uuu=(s)=>{
+ const B1={x:115,y:455},C1={x:365,y:455},A1={x:235,y:245};
+ const B2={x:420,y:455},C2={x:745,y:455},A2={x:576,y:182}; let q=[];
+ if(s>=0)q.push(txt(400,80,"α + β + γ = 180°","middle"));
+ if(s>=1)q.push(line(A1,B1,"final"),line(B1,C1,"final"),line(C1,A1,"final"),pt(A1,"A"),pt(B1,"B"),pt(C1,"C"));
+ if(s>=2)q.push(line(A2,B2,"help"),line(B2,C2,"help"),line(C2,A2,"help"),txt(582,520,"stejné úhly, jiná velikost","middle"));
+ if(s>=3)q.push(txt(400,565,"→ nekonečně mnoho podobných trojúhelníků","middle"));
+ return svg(q);
+};
+renderers.dependentCircum=(s)=>{
+ const O={x:400,y:305},R=230,B={x:205,y:427},C={x:595,y:427};
+ const As=[{x:400,y:75},{x:272,y:114},{x:528,y:114}]; let q=[];
+ if(s>=0)q.push(circle(O,R,"given"),pt(O,"O"));
+ if(s>=1)q.push(line(B,C,"given"),pt(B,"B"),pt(C,"C"));
+ if(s>=2)q.push(arcPath(O.x,O.y,R,-2.60,-0.54,"help"),txt(400,95,"A se může pohybovat po oblouku","middle"));
+ if(s>=3)As.forEach((A,i)=>{q.push(pt(A,`A${i+1}`,"final"),line(A,B,"final"),line(A,C,"final"));});
+ if(s>=4)q.push(txt(400,560,"podmínka: a = 2R · sin α","middle"));
+ return svg(q);
+};
+renderers.heightsToAngles=(s)=>{
+ const {B,C}=baseSetup(6), beta=44*Math.PI/180,gamma=39*Math.PI/180;
+ const d1={x:Math.cos(beta),y:-Math.sin(beta)},d2={x:-Math.cos(gamma),y:-Math.sin(gamma)};
+ const den=d1.x*d2.y-d1.y*d2.x, dx=C.x-B.x;
+ const t=dx*d2.y/den,A={x:B.x+t*d1.x,y:B.y+t*d1.y}; let q=[line(B,C,"given"),pt(B,"B"),pt(C,"C")];
+ if(s>=1)q.push(`<rect x="80" y="80" width="180" height="120" fill="none" stroke="#e99800" stroke-width="3"/><path d="M80 200 L260 200 L260 80" fill="none" stroke="#e99800" stroke-width="3"/>`,txt(170,225,"sin β = v_c / a","middle"));
+ if(s>=2)q.push(`<rect x="540" y="80" width="180" height="120" fill="none" stroke="#e99800" stroke-width="3"/><path d="M540 200 L720 200 L720 80" fill="none" stroke="#e99800" stroke-width="3"/>`,txt(630,225,"sin γ = v_b / a","middle"));
+ if(s>=3)q.push(line(B,{x:B.x+500*d1.x,y:B.y+500*d1.y},"help",true),line(C,{x:C.x+500*d2.x,y:C.y+500*d2.y},"help",true));
+ if(s>=4)q.push(pt(A,"A","final"),line(A,B,"final"),line(A,C,"final"));
+ return svg(q);
+};
+
+renderFilters(); renderAll();
+</script>
+</body>
+</html>
