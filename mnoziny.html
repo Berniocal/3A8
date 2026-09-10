@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlas množin bodů daných vlastností</title>
+<style>
+:root{
+  --bg:#f5f7f8;
+  --paper:#ffffff;
+  --ink:#172126;
+  --muted:#62717a;
+  --accent:#00796b;
+  --accent2:#009688;
+  --line:#263238;
+  --guide:#90a4ae;
+  --soft:#e8f4f2;
+  --border:#dbe3e6;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+}
+.app{min-height:100vh;display:grid;grid-template-columns:310px 1fr}
+.sidebar{
+  background:#fff;
+  border-right:1px solid var(--border);
+  padding:22px 16px;
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow:auto;
+}
+.brand h1{font-size:21px;line-height:1.25;margin:0 0 7px;color:var(--accent)}
+.brand p{font-size:13px;color:var(--muted);margin:0 0 18px;line-height:1.4}
+.nav{display:flex;flex-direction:column;gap:7px}
+.nav button{
+  appearance:none;border:1px solid transparent;background:transparent;color:var(--ink);
+  padding:10px 11px;text-align:left;border-radius:10px;cursor:pointer;
+  font-size:14px;line-height:1.3;
+}
+.nav button:hover{background:#f2f7f6}
+.nav button.active{background:var(--soft);border-color:#cfe5e1;color:#005f56;font-weight:650}
+.actions{display:flex;gap:8px;margin-top:18px}
+.actions button,.mobile-top button{
+  border:1px solid var(--border);background:#fff;border-radius:9px;padding:8px 10px;cursor:pointer;color:var(--ink)
+}
+.main{padding:28px;min-width:0}
+.mobile-top{display:none}
+.card{
+  max-width:1050px;margin:0 auto;background:var(--paper);border:1px solid var(--border);
+  border-radius:18px;padding:28px;box-shadow:0 8px 30px rgba(25,50,60,.06)
+}
+.kicker{color:var(--accent);font-weight:700;font-size:14px;margin-bottom:6px}
+h2{font-size:28px;line-height:1.18;margin:0 0 10px}
+.lead{font-size:16px;color:var(--muted);line-height:1.55;margin:0 0 22px}
+.result{
+  background:var(--soft);border-left:5px solid var(--accent);padding:14px 16px;border-radius:10px;
+  font-size:17px;line-height:1.5;margin:18px 0 22px
+}
+.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:24px;align-items:start}
+.figure{
+  border:1px solid var(--border);background:#fbfcfc;border-radius:14px;padding:12px;min-height:390px;
+  display:flex;align-items:center;justify-content:center;overflow:hidden
+}
+svg{width:100%;height:auto;max-height:440px}
+svg text{font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;fill:var(--ink)}
+svg .base{stroke:var(--line);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .locus{stroke:var(--accent2);stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .guide{stroke:var(--guide);stroke-width:2;fill:none;stroke-dasharray:7 7}
+svg .sample{stroke:#546e7a;stroke-width:2.4;fill:none}
+svg .pt{fill:var(--line)}
+svg .ptAccent{fill:var(--accent2)}
+svg .label{font-size:17px;font-weight:650}
+svg .small{font-size:14px;fill:#52636b}
+.info h3{font-size:17px;margin:0 0 8px}
+.info p{margin:0 0 16px;line-height:1.55;color:#33434b}
+.note{
+  font-size:14px;color:#4e5d64;background:#f6f8f9;border:1px solid var(--border);
+  padding:11px 12px;border-radius:10px
+}
+.controls{margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:12px;background:#fff}
+.controls label{font-weight:650;font-size:14px;display:block;margin-bottom:8px}
+.controls input[type=range]{width:100%}
+.value{font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700}
+.footer-nav{display:flex;justify-content:space-between;gap:10px;margin-top:24px}
+.footer-nav button{
+  border:1px solid var(--border);background:#fff;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:600
+}
+.footer-nav button.primary{background:var(--accent);border-color:var(--accent);color:white}
+.hidden{display:none!important}
+
+@media(max-width:820px){
+  .app{display:block}
+  .sidebar{display:none}
+  .main{padding:12px}
+  .mobile-top{
+    display:flex;position:sticky;top:0;z-index:5;background:rgba(245,247,248,.95);
+    backdrop-filter:blur(8px);padding:8px 0 10px;gap:8px;align-items:center
+  }
+  .mobile-top select{flex:1;min-width:0;border:1px solid var(--border);border-radius:9px;padding:9px;background:#fff}
+  .card{padding:18px;border-radius:14px}
+  h2{font-size:23px}
+  .grid{grid-template-columns:1fr}
+  .figure{min-height:310px}
+}
+@media print{
+  body{background:#fff}
+  .sidebar,.mobile-top,.footer-nav,.actions{display:none!important}
+  .app{display:block}
+  .main{padding:0}
+  .card{box-shadow:none;border:0;max-width:none;padding:10mm}
+  .grid{grid-template-columns:1.15fr .85fr}
+  .topic{display:block!important;page-break-after:always}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Atlas množin bodů</h1>
+      <p>Množiny bodů daných vlastností – přehled, náčrt a stručné vysvětlení.</p>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="actions"><button onclick="window.print()">Vytisknout atlas</button></div>
+  </aside>
+
+  <main class="main">
+    <div class="mobile-top">
+      <button id="mPrev" title="Předchozí">←</button>
+      <select id="topicSelect"></select>
+      <button id="mNext" title="Další">→</button>
+    </div>
+
+    <section class="card">
+
+      <article class="topic" data-title="Množina 1 – stejně vzdálené od bodu S">
+        <div class="kicker">Množina 1</div>
+        <h2>Body ve stejné vzdálenosti od bodu S</h2>
+        <p class="lead">Hledáme všechny body P, jejichž vzdálenost od pevného bodu S je stále stejná.</p>
+        <div class="result"><b>Definice:</b> Množina všech bodů roviny, které jsou ve stejné vzdálenosti od bodu S, je kružnice se středem S a poloměrem d.</div>
+        <div class="grid">
+          <div class="figure">
+            <svg viewBox="0 0 640 360" aria-label="Kružnice jako množina bodů stejně vzdálených od bodu S">
+              <circle class="locus" cx="320" cy="180" r="115"/>
+              <line class="guide" x1="320" y1="180" x2="417" y2="118"/>
+              <circle class="pt" cx="320" cy="180" r="5"/>
+              <circle class="ptAccent" cx="417" cy="118" r="5"/>
+              <text class="label" x="333" y="174">S</text>
+              <text class="label" x="429" y="112">P</text>
+              <text class="small" x="366" y="140">d</text>
+            </svg>
+          </div>
+          <div class="info">
+            <h3>Proč?</h3>
+            <p>Kružnice je právě množina všech bodů, které mají od jejího středu stejnou vzdálenost – poloměr.</p>
+            <div class="note">Zápis: <b>|SP| = d</b>.</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="topic hidden" data-title="Množina 2 – stejně vzdálené od dvou bodů">
+        <div class="kicker">Množina 2</div>
+        <h2>Body stejně vzdálené od dvou bodů</h2>
+        <p class="lead">Máme dva různé body A, B a hledáme všechny body P, pro které platí |PA| = |PB|.</p>
+        <div class="result"><b>Definice:</b> Množina všech bodů roviny, které jsou stejně vzdáleny od krajních bodů úsečky AB, je osa úsečky AB.</div>
+        <div class="grid">
+          <div class="figure">
+            <svg viewBox="0 0 640 360" aria-label="Osa úsečky jako množina bodů stejně vzdálených od A a B">
+              <line class="base" x1="190" y1="180" x2="450" y2="180"/>
+              <line class="locus" x1="320" y1="48" x2="320" y2="312"/>
+              <line class="guide" x1="320" y1="82" x2="190" y2="180"/>
+              <line class="guide" x1="320" y1="82" x2="450" y2="180"/>
+              <circle class="pt" cx="190" cy="180" r="5"/>
+              <circle class="pt" cx="450" cy="180" r="5"/>
+              <circle class="ptAccent" cx="320" cy="82" r="5"/>
+              <text class="label" x="174" y="204">A</text>
+              <text class="label" x="456" y="204">B</text>
+              <text class="label" x="333" y="77">P</text>
+              <path class="base" d="M320 180 h18 v-18" style="stroke-width:2"/>
+            </svg>
+          </div>
+          <div class="info">
+            <h3>Proč?</h3>
+            <p>Každý bod na ose úsečky má od obou krajních bodů stejnou vzdálenost. A naopak každý bod stejně vzdálený od A a B leží na ose AB.</p>
+            <div class="note">Osa je kolmá na AB a prochází jejím středem.</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="topic hidden" data-title="Množina 3 – ve stejné vzdálenosti od kružnice">
+        <div class="kicker">Množina 3</div>
+        <h2>Body ve stejné vzdálenosti od kružnice</h2>
+        <p class="lead">Je dána kružnice k se středem S a poloměrem R. Hledáme body, jejichž vzdálenost od kružnice je d.</p>
+        <div class="result"><b>Definice:</b> Množina všech bodů roviny, které mají od kružnice k stejnou vzdálenost d, tvoří soustředné kružnice se středem S a poloměry R + d a (pokud d &lt; R) také R − d.</div>
+        <div class="grid">
+          <div class="figure">
+            <svg id="svg3" viewBox="0 0 640 360" aria-label="Body ve stejné vzdálenosti od kružnice">
+              <circle class="base" cx="320" cy="180" r="90"/>
+              <circle id="outer3" class="locus" cx="320" cy="180" r="125"/>
+              <circle id="inner3" class="locus" cx="320" cy="180" r="55"/>
+              <circle class="pt" cx="320" cy="180" r="5"/>
+              <text class="label" x="331" y="175">S</text>
+              <text class="small" x="397" y="171">k</text>
+              <text class="small" id="label3" x="425" y="58">vzdálenost d = 35</text>
+            </svg>
+          </div>
+          <div class="info">
+            <h3>Jak si to představit?</h3>
+            <p>Od dané kružnice se posuneme o stejnou vzdálenost d směrem ven a – pokud je to možné – také dovnitř.</p>
+            <div class="controls">
+              <label>Vzdálenost d: <span class="value" id="v3">35</span></label>
+              <input id="range3" type="range" min="0" max="125" value="35">
+            </div>
+            <div class="note" id="note3">Pro d &lt; R vzniknou dvě kružnice.</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="topic hidden" data-title="Množina 4 – ve stejné vzdálenosti od přímky">
+        <div class="kicker">Množina 4</div>
+        <h2>Body ve stejné vzdálenosti od přímky</h2>
+        <p class="lead">Od pevné přímky p mají mít všechny hledané body kolmou vzdálenost d.</p>
+        <div class="result"><b>Definice:</b> Množina všech bodů roviny, které jsou ve vzdálenosti d od přímky p, tvoří dvě přímky rovnoběžné s p, každou ve vzdálenosti d.</div>
+        <div class="grid">
+          <div class="figure">
+            <svg id="svg4" viewBox="0 0 640 360" aria-label="Dvě rovnoběžky ve stejné vzdálenosti od přímky">
+              <line class="base" x1="80" y1="180" x2="560" y2="180"/>
+              <line id="up4" class="locus" x1="80" y1="110" x2="560" y2="110"/>
+              <line id="down4" class="locus" x1="80" y1="250" x2="560" y2="250"/>
+              <line id="dist4" class="guide" x1="470" y1="180" x2="470" y2="110"/>
+              <text class="label" x="565" y="185">p</text>
+              <text class="small" id="label4" x="480" y="150">d = 70</text>
+            </svg>
+          </div>
+          <div class="info">
+            <h3>Proč dvě?</h3>
+            <p>Od přímky můžeme jít o vzdálenost d na jednu i na druhou stranu.</p>
+            <div class="controls">
+              <label>Vzdálenost d: <span class="value" id="v4">70</span></label>
+              <input id="range4" type="range" min="25" max="120" value="70">
+            </div>
+            <div class="note">Vzdálenost bodu od přímky se vždy měří kolmo k přímce.</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="topic hidden" data-title="Množina 5 – úsečka viděná pod pravým úhlem">
+        <div class="kicker">Množina 5</div>
+        <h2>Body, ze kterých je vidět úsečka pod pravým úhlem</h2>
+        <p class="lead">Máme úsečku AB. Hledáme body P, pro které je ∠APB = 90°.</p>
+        <div class="result"><b>Definice:</b> Množina všech bodů, ze kterých je úsečka AB vidět pod pravým úhlem, je kružnice s průměrem AB bez bodů A a B.</div>
+        <div class="grid">
+          <div class="figure">
+            <svg viewBox="0 0 640 360" aria-label="Thaletova kružnice">
+              <circle class="locus" cx="320" cy="180" r="130"/>
+              <line class="base" x1="190" y1="180" x2="450" y2="180"/>
+              <line class="sample" x1="190" y1="180" x2="320" y2="50"/>
+              <line class="sample" x1="320" y1="50" x2="450" y2="180"/>
+              <path class="base" d="M308 62 L320 74 L332 62" style="stroke-width:2"/>
+              <circle class="pt" cx="190" cy="180" r="5"/>
+              <circle class="pt" cx="450" cy="180" r="5"/>
+              <circle class="ptAccent" cx="320" cy="50" r="5"/>
+              <text class="label" x="173" y="204">A</text>
+              <text class="label" x="456" y="204">B</text>
+              <text class="label" x="332" y="47">P</text>
+            </svg>
+          </div>
+          <div class="info">
+            <h3>Thaletova věta</h3>
+            <p>Vrchol pravého úhlu leží na kružnici, jejímž průměrem je protější strana pravoúhlého trojúhelníku.</p>
+            <div class="note">Krajní body A, B do hledané množiny nepatří, protože v nich úhel APB není definován.</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="topic hidden" data-title="Množina 6 – stejně vzdálené od ramen úhlu">
+        <div class="kicker">Množina 6</div>
+        <h2>Body stejně vzdálené od ramen úhlu</h2>
+        <p class="lead">Uvnitř daného úhlu hledáme body se stejnou kolmou vzdáleností od obou ramen.</p>
+        <div class="result"><b>Definice:</b> Množina všech bodů uvnitř úhlu, které jsou stejně vzdáleny od jeho ramen, je osa úhlu.</div>
+        <div class="grid">
+          <div class="figure">
+            <svg viewBox="0 0 640 360" aria-label="Osa úhlu jako množina bodů stejně vzdálených od jeho ramen">
+              <line class="base" x1="120" y1="180" x2="530" y2="65"/>
+              <line class="base" x1="120" y1="180" x2="530" y2="295"/>
+              <line class="locus" x1="120" y1="180" x2="555" y2="180"/>
+              <circle class="pt" cx="120" cy="180" r="5"/>
+              <circle class="ptAccent" cx="360" cy="180" r="5"/>
+              <line class="guide" x1="360" y1="180" x2="338" y2="102"/>
+              <line class="guide" x1="360" y1="180" x2="338" y2="258"/>
+              <text class="label" x="102" y="204">V</text>
+              <text class="label" x="370" y="174">P</text>
+            </svg>
+          </div>
+          <div class="info">
+            <h3>Proč?</h3>
+            <p>Každý bod na ose úhlu má stejnou kolmou vzdálenost od obou ramen úhlu.</p>
+            <div class="note">Zde uvažujeme body <b>uvnitř úhlu</b>. Pokud bychom pracovali s celými nositelkami ramen v celé rovině, dostali bychom obě osy vzniklých úhlů.</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="topic hidden" data-title="Množina 7 – stejně vzdálené od rovnoběžek">
+        <div class="kicker">Množina 7</div>
+        <h2>Body stejně vzdálené od rovnoběžných přímek</h2>
+        <p class="lead">Jsou dány dvě různé rovnoběžné přímky p a q. Hledáme body, které mají od obou stejnou vzdálenost.</p>
+        <div class="result"><b>Definice:</b> Množina všech bodů roviny, které jsou stejně vzdáleny od dvou rovnoběžných přímek p a q, je přímka rovnoběžná s p a q ležící přesně uprostřed mezi nimi.</div>
+        <div class="grid">
+          <div class="figure">
+            <svg viewBox="0 0 640 360" aria-label="Střední rovnoběžka">
+              <line class="base" x1="80" y1="100" x2="560" y2="100"/>
+              <line class="base" x1="80" y1="260" x2="560" y2="260"/>
+              <line class="locus" x1="80" y1="180" x2="560" y2="180"/>
+              <line class="guide" x1="420" y1="100" x2="420" y2="260"/>
+              <circle class="ptAccent" cx="420" cy="180" r="5"/>
+              <text class="label" x="566" y="105">p</text>
+              <text class="label" x="566" y="265">q</text>
+              <text class="label" x="431" y="174">P</text>
+            </svg>
+          </div>
+          <div class="info">
+            <h3>Jak ji najít?</h3>
+            <p>Stačí vzít libovolnou kolmici k oběma přímkám, najít střed úsečky mezi jejich průsečíky a tímto středem vést rovnoběžku.</p>
+            <div class="note">Hledaná přímka je od p i q vzdálena o polovinu jejich vzájemné vzdálenosti.</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="topic hidden" data-title="Množina 8 – středy kružnic s vnitřním dotykem">
+        <div class="kicker">Množina 8</div>
+        <h2>Středy kružnic s vnitřním dotykem k dané kružnici</h2>
+        <p class="lead">Je dána kružnice k(S; R). Hledáme všechny středy M kružnic o pevném poloměru r, které mají s k vnitřní dotyk.</p>
+        <div class="result"><b>Definice:</b> Množina všech středů kružnic o poloměru r, které mají s kružnicí k(S; R) vnitřní dotyk, je kružnice se středem S a poloměrem R − r.</div>
+        <div class="grid">
+          <div class="figure">
+            <svg id="svg8" viewBox="0 0 640 360" aria-label="Množina středů kružnic s vnitřním dotykem">
+              <circle class="base" cx="320" cy="180" r="130"/>
+              <circle id="locus8" class="locus" cx="320" cy="180" r="82"/>
+              <circle class="pt" cx="320" cy="180" r="5"/>
+              <text class="label" x="330" y="174">S</text>
+
+              <g id="samples8"></g>
+              <text class="small" id="label8" x="430" y="57">R = 130, r = 48</text>
+            </svg>
+          </div>
+          <div class="info">
+            <h3>Proč?</h3>
+            <p>Při vnitřním dotyku leží středy S, M a bod dotyku na jedné přímce a vzdálenost středů je rozdíl poloměrů:</p>
+            <p style="font-size:20px;font-weight:750;text-align:center;color:var(--accent)">|SM| = R − r</p>
+            <div class="controls">
+              <label>Poloměr malé kružnice r: <span class="value" id="v8">48</span></label>
+              <input id="range8" type="range" min="20" max="110" value="48">
+            </div>
+            <div class="note">Poloměr r musí být menší než R. Bez zadaného poloměru r by tato úloha neměla jednu kružnici jako výslednou množinu.</div>
+          </div>
+        </div>
+      </article>
+
+      <div class="footer-nav">
+        <button id="prev">← Předchozí</button>
+        <button class="primary" id="next">Další →</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const topics=[...document.querySelectorAll('.topic')];
+const nav=document.getElementById('nav');
+const select=document.getElementById('topicSelect');
+let current=0;
+
+topics.forEach((t,i)=>{
+  const b=document.createElement('button');
+  b.textContent=t.dataset.title;
+  b.onclick=()=>show(i);
+  nav.appendChild(b);
+
+  const o=document.createElement('option');
+  o.value=i; o.textContent=t.dataset.title;
+  select.appendChild(o);
+});
+
+function show(i){
+  current=(i+topics.length)%topics.length;
+  topics.forEach((t,j)=>t.classList.toggle('hidden',j!==current));
+  [...nav.children].forEach((b,j)=>b.classList.toggle('active',j===current));
+  select.value=current;
+  document.getElementById('prev').disabled=current===0;
+  document.getElementById('next').disabled=current===topics.length-1;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('prev').onclick=()=>{if(current>0)show(current-1)};
+document.getElementById('next').onclick=()=>{if(current<topics.length-1)show(current+1)};
+document.getElementById('mPrev').onclick=()=>show(current-1);
+document.getElementById('mNext').onclick=()=>show(current+1);
+select.onchange=e=>show(+e.target.value);
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight' && current<topics.length-1) show(current+1);
+  if(e.key==='ArrowLeft' && current>0) show(current-1);
+});
+show(0);
+
+// Množina 3
+const R3=90, range3=document.getElementById('range3');
+function upd3(){
+  const d=+range3.value;
+  document.getElementById('v3').textContent=d;
+  document.getElementById('outer3').setAttribute('r',R3+d);
+  const inner=document.getElementById('inner3');
+  if(d<R3){
+    inner.style.display='';
+    inner.setAttribute('r',R3-d);
+    document.getElementById('note3').innerHTML='Pro d &lt; R vzniknou dvě kružnice.';
+  }else if(d===R3){
+    inner.style.display='none';
+    document.getElementById('note3').innerHTML='Pro d = R je vnitřní částí množiny už jen střed S; druhou částí je vnější kružnice.';
+  }else{
+    inner.style.display='none';
+    document.getElementById('note3').innerHTML='Pro d &gt; R existuje už jen vnější kružnice s poloměrem R + d.';
+  }
+  document.getElementById('label3').textContent='vzdálenost d = '+d;
+}
+range3.oninput=upd3; upd3();
+
+// Množina 4
+const range4=document.getElementById('range4');
+function upd4(){
+  const d=+range4.value, y=180;
+  document.getElementById('v4').textContent=d;
+  document.getElementById('up4').setAttribute('y1',y-d);
+  document.getElementById('up4').setAttribute('y2',y-d);
+  document.getElementById('down4').setAttribute('y1',y+d);
+  document.getElementById('down4').setAttribute('y2',y+d);
+  document.getElementById('dist4').setAttribute('y2',y-d);
+  document.getElementById('label4').setAttribute('y',y-d/2+5);
+  document.getElementById('label4').textContent='d = '+d;
+}
+range4.oninput=upd4; upd4();
+
+// Množina 8
+const R8=130, range8=document.getElementById('range8');
+function circle(cx,cy,r,cls){
+  return `<circle class="${cls}" cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${r.toFixed(2)}"/>`;
+}
+function line(x1,y1,x2,y2,cls){
+  return `<line class="${cls}" x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}"/>`;
+}
+function upd8(){
+  const r=+range8.value, rho=R8-r, cx=320, cy=180;
+  document.getElementById('v8').textContent=r;
+  document.getElementById('locus8').setAttribute('r',rho);
+  document.getElementById('label8').textContent=`R = ${R8}, r = ${r}`;
+
+  const angles=[-35,55,170];
+  let s='';
+  for(const aDeg of angles){
+    const a=aDeg*Math.PI/180;
+    const mx=cx+rho*Math.cos(a), my=cy+rho*Math.sin(a);
+    const tx=cx+R8*Math.cos(a), ty=cy+R8*Math.sin(a);
+    s+=line(cx,cy,tx,ty,'guide');
+    s+=circle(mx,my,r,'sample');
+    s+=circle(mx,my,4.5,'ptAccent');
+  }
+  document.getElementById('samples8').innerHTML=s;
+}
+range8.oninput=upd8; upd8();
+</script>
+</body>
+</html>
