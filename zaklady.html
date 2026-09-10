@@ -1,0 +1,1136 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atlas množin bodů dané vlastnosti</title>
+<style>
+:root{
+  --bg:#f6f7fb;--ink:#172033;--muted:#64748b;--line:#dbe2ea;
+  --accent:#315efb;--soft:#eef3ff;--known:#138a4b;--help:#e99800;
+  --danger:#c2410c
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button,input{font:inherit}
+.app{min-height:100vh;display:grid;grid-template-columns:330px 1fr}
+aside{background:#0f172a;color:white;padding:22px 16px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{font-size:22px;font-weight:850;line-height:1.15}
+.brand small{display:block;color:#cbd5e1;font-size:13px;font-weight:500;margin-top:7px;line-height:1.45}
+.search{width:100%;margin:16px 0 10px;border:0;border-radius:11px;padding:11px 12px;background:#1e293b;color:white;outline:none}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.filters button{border:1px solid #334155;background:#172033;color:#cbd5e1;border-radius:999px;padding:6px 9px;cursor:pointer;font-size:12px}
+.filters button.active{background:white;color:#0f172a;border-color:white}
+.problem-list{display:grid;gap:6px}
+.problem-item{width:100%;text-align:left;border:0;background:transparent;color:#dbeafe;padding:9px 10px;border-radius:9px;cursor:pointer}
+.problem-item:hover{background:#1e293b}
+.problem-item.active{background:#315efb;color:white}
+.problem-item b{display:block;font-size:14px}
+.problem-item span{font-size:12px;color:#94a3b8}
+.problem-item.active span{color:#dbeafe}
+
+main{padding:28px;min-width:0}
+.topbar{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-bottom:18px}
+.navbtn{border:1px solid var(--line);background:white;border-radius:10px;padding:9px 12px;cursor:pointer}
+.navbtn:disabled{opacity:.4;cursor:default}
+.progress{color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:minmax(360px,1fr) minmax(420px,1.15fr);gap:20px;align-items:start}
+.card{background:white;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 4px 18px rgba(15,23,42,.04)}
+.eyebrow{font-size:12px;font-weight:850;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+h1{font-size:29px;line-height:1.15;margin:6px 0 10px}
+.lead{color:var(--muted);line-height:1.6;margin:0 0 16px}
+.badges{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 18px}
+.badge{background:var(--soft);color:#2448bd;border-radius:999px;padding:6px 9px;font-size:12px;font-weight:750}
+.badge.tool{background:#ecfdf5;color:#166534}
+.kv{display:grid;grid-template-columns:135px 1fr;gap:8px 12px;margin:12px 0}
+.kv dt{color:var(--muted);font-weight:750}
+.kv dd{margin:0}
+.notice{border-left:4px solid var(--accent);background:#f8faff;padding:12px 14px;border-radius:10px;line-height:1.55;margin:15px 0}
+.solution-toggle{width:100%;border:0;background:#138a4b;color:white;padding:12px 14px;border-radius:11px;font-weight:850;cursor:pointer;margin-top:8px}
+.solution{display:none;margin-top:16px}
+.solution.open{display:block}
+.steps{display:grid;gap:9px;margin-top:10px}
+.step{border:1px solid var(--line);border-radius:11px;padding:11px 12px;cursor:pointer}
+.step.active{border-color:#8ca6ff;background:#f7f9ff}
+.step .num{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#e9efff;color:#2448bd;font-weight:850;font-size:12px;margin-right:8px}
+.step strong{font-size:14px}
+.step p{margin:7px 0 0 33px;color:#475569;font-size:14px;line-height:1.5}
+.construction{margin-top:15px;padding:14px;background:#f8fafc;border-radius:11px;border:1px solid var(--line)}
+.construction h3{margin:0 0 8px;font-size:15px}
+.construction ol{margin:0;padding-left:22px;line-height:1.68;color:#334155}
+.sketchbox{margin-top:14px}
+.sketchbox p{margin:8px 0 0;color:#475569;line-height:1.5;font-size:14px}
+.sketch-preview svg{aspect-ratio:16/10;max-height:290px}
+.diagram-card{position:sticky;top:20px}
+.diagram-head{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-bottom:12px}
+.diagram-title{font-size:16px;font-weight:850}
+.step-counter{font-size:13px;color:var(--muted)}
+svg{width:100%;height:auto;aspect-ratio:4/3;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--line);border-radius:14px}
+.diagram-controls{display:flex;gap:8px;margin-top:10px}
+.diagram-controls button{flex:1;border:1px solid var(--line);background:white;border-radius:10px;padding:9px;cursor:pointer}
+.diagram-controls button.primary{background:var(--accent);border-color:var(--accent);color:white}
+.diagram-controls button:disabled{opacity:.4;cursor:default}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;color:var(--muted);font-size:12px}
+.legend i{display:inline-block;width:18px;border-top:3px solid;margin-right:5px;vertical-align:middle}
+.l-known{border-color:var(--known)!important}.l-unknown{border-color:#172033!important}.l-help{border-color:var(--help)!important}
+.angle-chip{display:inline-flex;align-items:center;justify-content:center;min-width:56px;height:34px;border-radius:10px;background:#eff6ff;color:#1d4ed8;font-weight:900}
+.mobile-floating-nav{display:none}
+
+@media(max-width:1000px) and (min-width:701px){
+  .app{grid-template-columns:1fr}
+  aside{position:relative;height:auto}
+  .grid{grid-template-columns:1fr}
+  .diagram-card{position:relative;top:auto}
+}
+@media(max-width:700px){
+  body{background:#f3f6fb}
+  body.mobile-detail{padding-bottom:84px}
+  .app{display:block;min-height:100vh}
+  aside{position:relative;width:100%;height:auto;min-height:100vh;padding:18px 14px 28px;background:#0f172a}
+  .brand{font-size:21px}
+  .search{position:sticky;top:8px;z-index:4;margin:14px 0 10px;box-shadow:0 8px 24px rgba(15,23,42,.25)}
+  .filters{flex-wrap:nowrap;overflow-x:auto;padding:1px 1px 8px;margin-right:-14px;scrollbar-width:none}
+  .filters::-webkit-scrollbar{display:none}
+  .filters button{flex:0 0 auto}
+  .problem-list{gap:8px}
+  .problem-item{background:#172033;border:1px solid #29364b;border-radius:13px;padding:12px 13px;min-height:62px}
+  .problem-item.active{background:#172033;border-color:#3b4c66}
+  .problem-item b{font-size:15px}
+  .problem-item span{display:block;margin-top:5px}
+  main{display:none;padding:0}
+  body.mobile-detail aside{display:none}
+  body.mobile-detail main{display:block;min-height:100vh;padding:12px 12px 24px}
+  body.mobile-detail .topbar{display:none}
+  .mobile-detail-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:16px 14px}
+  .mobile-detail-card h1{font-size:25px}
+  .mobile-assignment{display:grid;gap:10px;padding:13px;border:1px solid var(--line);border-radius:13px;background:#f8fafc}
+  .mobile-assignment-row{display:grid;grid-template-columns:72px 1fr;gap:9px;font-size:14px;line-height:1.45}
+  .mobile-assignment-row>span{color:var(--muted);font-weight:850}
+  .mobile-accordions{display:grid;gap:9px;margin-top:12px}
+  .mobile-accordion{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff}
+  .mobile-accordion-toggle{width:100%;border:0;background:#fff;color:var(--ink);padding:14px 13px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;font-weight:850}
+  .mobile-accordion-toggle .left{display:flex;align-items:center;gap:10px}
+  .mobile-accordion-toggle .icon{width:31px;height:31px;display:grid;place-items:center;border-radius:9px;background:var(--soft);color:#2448bd}
+  .mobile-accordion-toggle .chev{font-size:20px;color:#64748b}
+  .mobile-accordion.open .mobile-accordion-toggle .chev{transform:rotate(180deg)}
+  .mobile-accordion-panel{display:none;border-top:1px solid var(--line);padding:12px;background:#fbfcfe}
+  .mobile-accordion.open .mobile-accordion-panel{display:block}
+  .mobile-sketch-note{margin:9px 2px 2px;color:#475569;font-size:13px}
+  .mobile-procedure-diagram{background:white;border:1px solid var(--line);border-radius:13px;padding:9px;margin-bottom:10px}
+  .mobile-steps{display:grid;gap:7px}
+  .mobile-construction ol{padding-left:23px;line-height:1.75;font-size:14px}
+  .mobile-floating-nav{display:none;position:fixed;z-index:50;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));grid-template-columns:.92fr 1fr 1fr;gap:7px;padding:7px;border:1px solid rgba(203,213,225,.88);border-radius:16px;background:rgba(255,255,255,.94);box-shadow:0 12px 35px rgba(15,23,42,.22);backdrop-filter:blur(12px)}
+  body.mobile-detail .mobile-floating-nav{display:grid}
+  .mobile-floating-nav button{min-height:48px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink);padding:7px 5px;font-weight:850;font-size:12px}
+  .mobile-floating-nav button.mobile-next{border-color:var(--accent);background:var(--accent);color:#fff}
+  .mobile-floating-nav .nav-symbol{display:block;font-size:17px;margin-bottom:3px}
+}
+@media(min-width:701px){body.mobile-detail .mobile-floating-nav{display:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand">⌖ Atlas množin bodů
+      <small>Množiny bodů dané vlastnosti a pomocné konstrukce krok po kroku. Úhly, dělení úseček, poměry a další témata.</small>
+    </div>
+    <input id="search" class="search" placeholder="Hledat: 60°, poměr 2:3, 7/5…">
+    <div id="filters" class="filters"></div>
+    <div id="problemList" class="problem-list"></div>
+  </aside>
+  <main>
+    <div class="topbar">
+      <button class="navbtn" id="prevProblem">← Předchozí</button>
+      <div class="progress" id="progress"></div>
+      <button class="navbtn" id="nextProblem">Další →</button>
+    </div>
+    <div id="content"></div>
+  </main>
+  <div class="mobile-floating-nav">
+    <button id="mobileBackToList"><span class="nav-symbol">↩</span>Zpět</button>
+    <button id="mobilePrevProblem"><span class="nav-symbol">←</span>Předchozí</button>
+    <button id="mobileNextProblem" class="mobile-next"><span class="nav-symbol">→</span>Další příklad</button>
+  </div>
+</div>
+
+<script>
+const P = [
+  {
+    id:"angle-60",cat:"Základní",title:"Úhel 60°",angle:60,difficulty:"1 · základní",method:"Rovnostranný trojúhelník",
+    tags:["60","rovnostranný trojúhelník","kružítko"],
+    given:"Je dána polopřímka OA.",find:"Sestroj polopřímku OB tak, aby ∠AOB = 60°.",
+    idea:"Body O a A použij jako dva vrcholy rovnostranného trojúhelníku. Třetí vrchol vznikne jako průsečík dvou kružnic s poloměrem OA.",
+    helpers:[],
+    steps:[
+      ["Kružnice z O","Sestroj kružnici k₁ se středem O a poloměrem OA."],
+      ["Kružnice z A","Sestroj kružnici k₂ se středem A a stejným poloměrem OA."],
+      ["Průsečík B","Jeden z průsečíků kružnic k₁ a k₂ označ B."],
+      ["Výsledné rameno","Narýsuj polopřímku OB. Platí OA = OB = AB, proto je trojúhelník OAB rovnostranný a ∠AOB = 60°."]
+    ],
+    construction:["k₁(O; OA)","k₂(A; OA)","B ∈ k₁ ∩ k₂","→OB","∠AOB = 60°"],
+    diagram:"base60"
+  },
+  {
+    id:"angle-90",cat:"Základní",title:"Úhel 90°",angle:90,difficulty:"1 · základní",method:"Kolmice v bodě O",
+    tags:["90","kolmice","pravý úhel"],
+    given:"Je dána polopřímka OA.",find:"Sestroj polopřímku OC tak, aby ∠AOC = 90°.",
+    idea:"Doplň k bodu A bod B na opačné straně od O tak, aby OA = OB. Bod O je pak střed úsečky AB a kolmice k AB vedená bodem O dá pravý úhel.",
+    helpers:[],
+    steps:[
+      ["Opačný bod B","Prodluž OA přes bod O na přímku. Kružnice se středem O a poloměrem OA ji na opačné straně protne v bodě B; tedy OA = OB."],
+      ["Oblouk z A","Z bodu A opiš oblouk s poloměrem r > OA."],
+      ["Oblouk z B","Se stejným poloměrem r opiš oblouk z bodu B. Jeden z průsečíků obou oblouků označ C."],
+      ["Kolmice","Narýsuj OC. Protože CA = CB a OA = OB, leží C i O na ose úsečky AB; tedy OC ⟂ AB."],
+      ["Výsledek","Polopřímka OC svírá s OA úhel 90°."]
+    ],
+    construction:["p = ↔OA","k₀(O; OA) ∩ p = {A,B}","k₁(A;r), k₂(B;r), r > OA","C ∈ k₁ ∩ k₂","→OC","∠AOC = 90°"],
+    diagram:"base90"
+  },
+  {
+    id:"angle-30",cat:"Půlení",title:"Úhel 30°",angle:30,difficulty:"1 · snadné",method:"Polovina 60°",
+    tags:["30","půlení","60"],
+    given:"Je dána polopřímka OA.",find:"Sestroj polopřímku OR tak, aby ∠AOR = 30°.",
+    idea:"Nejprve přesně sestroj 60° a potom sestroj osu tohoto úhlu.",
+    helpers:[60],
+    steps:[
+      ["Úhel 60°","Pomocí dvou kružnic s poloměrem OA sestroj polopřímku OB tak, aby ∠AOB = 60°."],
+      ["Body P a Q","Kružnice se středem O protne obě ramena úhlu ve stejně vzdálených bodech P a Q."],
+      ["Průsečík R","Z P a Q opiš stejným poloměrem dva oblouky. Jejich průsečík uvnitř úhlu označ R."],
+      ["Osa úhlu","Narýsuj OR. Protože OP = OQ a RP = RQ, je OR osou úhlu AOB."],
+      ["Výsledek","∠AOR = 60° : 2 = 30°."]
+    ],
+    construction:["∠AOB = 60°","P ∈ →OA, Q ∈ →OB; OP = OQ","k₁(P;s), k₂(Q;s)","R ∈ k₁ ∩ k₂ uvnitř ∠AOB","→OR = osa ∠AOB","∠AOR = 30°"],
+    diagram:"bisect60"
+  },
+  {
+    id:"angle-45",cat:"Půlení",title:"Úhel 45°",angle:45,difficulty:"1 · snadné",method:"Polovina 90°",
+    tags:["45","půlení","90"],
+    given:"Je dána polopřímka OA.",find:"Sestroj polopřímku OR tak, aby ∠AOR = 45°.",
+    idea:"Nejprve přesně sestroj kolmici, tedy 90°, a potom pravý úhel rozpůl.",
+    helpers:[90],
+    steps:[
+      ["Úhel 90°","V bodě O sestroj kolmici OB k OA, takže ∠AOB = 90°."],
+      ["Body P a Q","Kružnice se středem O protne ramena OA a OB ve stejně vzdálených bodech P a Q."],
+      ["Průsečík R","Z P a Q opiš shodné oblouky. Jejich průsečík uvnitř úhlu označ R."],
+      ["Osa úhlu","Narýsuj OR. Je to osa pravého úhlu AOB."],
+      ["Výsledek","∠AOR = 90° : 2 = 45°."]
+    ],
+    construction:["∠AOB = 90°","P ∈ →OA, Q ∈ →OB; OP = OQ","k₁(P;s), k₂(Q;s)","R ∈ k₁ ∩ k₂ uvnitř ∠AOB","→OR = osa ∠AOB","∠AOR = 45°"],
+    diagram:"bisect90"
+  },
+  {
+    id:"angle-120",cat:"Sčítání",title:"Úhel 120°",angle:120,difficulty:"1 · snadné",method:"60° + 60°",
+    tags:["120","sčítání","60+60"],
+    given:"Je dána polopřímka OA.",find:"Sestroj polopřímku OC tak, aby ∠AOC = 120°.",
+    idea:"Na jedné kružnici se středem O dvakrát za sebou odlož tětivu rovnou poloměru. Každá taková tětiva odpovídá středovému úhlu 60°.",
+    helpers:[60],
+    steps:[
+      ["Kružnice k","Sestroj k(O; OA). Bod A leží na k."],
+      ["Prvních 60°","Sestroj k₁(A; OA). Její průsečík s k v horní polorovině označ B; pak ∠AOB = 60°."],
+      ["Dalších 60°","Sestroj k₂(B; OA). Její druhý průsečík s k, odlišný od A, označ C."],
+      ["Výsledné rameno","Narýsuj polopřímku OC."],
+      ["Výsledek","Na kružnici jsou tětivy AB = BC = OA, takže ∠AOB = ∠BOC = 60° a ∠AOC = 120°."]
+    ],
+    construction:["k(O; OA)","k₁(A; OA); B ∈ k ∩ k₁","k₂(B; OA); C je druhý průsečík k a k₂, C ≠ A","→OC","∠AOC = 120°"],
+    diagram:"step120"
+  },
+  {
+    id:"angle-15",cat:"Půlení",title:"Úhel 15°",angle:15,difficulty:"2 · střední",method:"Dvojí půlení 60°",
+    tags:["15","půlení","30","60"],
+    given:"Je dána polopřímka OA.",find:"Sestroj polopřímku OS tak, aby ∠AOS = 15°.",
+    idea:"Sestroj 60°, jeho osu 30° a potom ještě osu vzniklého 30° úhlu.",
+    helpers:[60,30],
+    steps:[
+      ["Úhel 60°","Sestroj polopřímku OB tak, aby ∠AOB = 60°."],
+      ["První osa","Přesnou konstrukcí osy úhlu sestroj OC; tím získáš ∠AOC = 30°."],
+      ["Body na 30° úhlu","Na ramenech OA a OC vyznač kružnicí se středem O stejně vzdálené body P a Q."],
+      ["Druhá osa","Z P a Q opiš shodné oblouky; jejich průsečíkem R veď polopřímku OS."],
+      ["Výsledek","OS je osou úhlu AOC, proto ∠AOS = 30° : 2 = 15°."]
+    ],
+    construction:["∠AOB = 60°","→OC = osa ∠AOB ⇒ ∠AOC = 30°","P ∈ →OA, Q ∈ →OC; OP = OQ","R ∈ k(P;s) ∩ k(Q;s)","→OS = →OR","∠AOS = 15°"],
+    diagram:"bisect15"
+  },
+  {
+    id:"angle-75",cat:"Sčítání",title:"Úhel 75°",angle:75,difficulty:"2 · střední",method:"Osa mezi 60° a 90°",
+    tags:["75","půlení","60","90","60+15","45+30"],
+    given:"Je dána polopřímka OA.",find:"Sestroj polopřímku OR tak, aby ∠AOR = 75°.",
+    idea:"Sestroj z téhož ramene přesně 60° a 90°. Osa úhlu mezi těmito dvěma rameny přidá k 60° polovinu z 30°, tedy 15°.",
+    helpers:[60,90],
+    steps:[
+      ["Pomocná ramena","Sestroj OB pro 60° a OC pro 90°."],
+      ["Body P a Q","Kružnice se středem O protne OB a OC ve stejně vzdálených bodech P a Q."],
+      ["Průsečík R","Z P a Q opiš shodné oblouky; jejich průsečík mezi oběma rameny označ R."],
+      ["Osa mezilehlého úhlu","Narýsuj OR. Je to osa úhlu BOC, který má 30°."],
+      ["Výsledek","∠AOR = 60° + 15° = 75°."]
+    ],
+    construction:["∠AOB = 60°, ∠AOC = 90°","P ∈ →OB, Q ∈ →OC; OP = OQ","R ∈ k(P;s) ∩ k(Q;s) mezi rameny","→OR = osa ∠BOC","∠AOR = 75°"],
+    diagram:"between75"
+  },
+  {
+    id:"angle-105",cat:"Sčítání",title:"Úhel 105°",angle:105,difficulty:"2 · střední",method:"Osa mezi 90° a 120°",
+    tags:["105","půlení","90","120","90+15","60+45"],
+    given:"Je dána polopřímka OA.",find:"Sestroj polopřímku OR tak, aby ∠AOR = 105°.",
+    idea:"Sestroj 90° a 120°. Jejich rozdíl je 30°; jeho osa leží o 15° za pravým úhlem, tedy na 105°.",
+    helpers:[90,120],
+    steps:[
+      ["Pomocná ramena","Sestroj OB pro 90° a OC pro 120°."],
+      ["Body P a Q","Kružnice se středem O protne OB a OC ve stejně vzdálených bodech P a Q."],
+      ["Průsečík R","Z P a Q opiš shodné oblouky; jejich průsečík mezi oběma rameny označ R."],
+      ["Osa mezilehlého úhlu","Narýsuj OR. Je to osa úhlu BOC o velikosti 30°."],
+      ["Výsledek","∠AOR = 90° + 15° = 105°."]
+    ],
+    construction:["∠AOB = 90°, ∠AOC = 120°","P ∈ →OB, Q ∈ →OC; OP = OQ","R ∈ k(P;s) ∩ k(Q;s) mezi rameny","→OR = osa ∠BOC","∠AOR = 105°"],
+    diagram:"between105"
+  },
+  {
+    id:"angle-135",cat:"Sčítání",title:"Úhel 135°",angle:135,difficulty:"2 · střední",method:"Osa mezi 90° a 180°",
+    tags:["135","půlení","90","180","90+45"],
+    given:"Je dána polopřímka OA.",find:"Sestroj polopřímku OR tak, aby ∠AOR = 135°.",
+    idea:"Sestroj kolmici 90° a opačnou polopřímku 180°. Osa pravého úhlu mezi nimi leží na 135°.",
+    helpers:[90,180],
+    steps:[
+      ["Pomocná ramena","Sestroj OB ⟂ OA a opačnou polopřímku OA′."],
+      ["Body P a Q","Kružnice se středem O protne OB a OA′ ve stejně vzdálených bodech P a Q."],
+      ["Průsečík R","Z P a Q opiš shodné oblouky; jejich průsečík uvnitř ∠BOA′ označ R."],
+      ["Osa úhlu","Narýsuj OR. Je to osa pravého úhlu BOA′."],
+      ["Výsledek","∠AOR = 90° + 45° = 135°."]
+    ],
+    construction:["∠AOB = 90°, →OA′ opačná k →OA","P ∈ →OB, Q ∈ →OA′; OP = OQ","R ∈ k(P;s) ∩ k(Q;s)","→OR = osa ∠BOA′","∠AOR = 135°"],
+    diagram:"between135"
+  },
+  {
+    id:"angle-150",cat:"Sčítání",title:"Úhel 150°",angle:150,difficulty:"2 · střední",method:"Osa mezi 120° a 180°",
+    tags:["150","půlení","120","180","180-30","90+60"],
+    given:"Je dána polopřímka OA.",find:"Sestroj polopřímku OR tak, aby ∠AOR = 150°.",
+    idea:"Sestroj 120° a opačnou polopřímku 180°. Úhel mezi nimi má 60°; jeho osa leží přesně na 150°.",
+    helpers:[120,180],
+    steps:[
+      ["Pomocná ramena","Sestroj OB pro 120° a opačnou polopřímku OA′ pro 180°."],
+      ["Body P a Q","Kružnice se středem O protne OB a OA′ ve stejně vzdálených bodech P a Q."],
+      ["Průsečík R","Z P a Q opiš shodné oblouky; jejich průsečík uvnitř úhlu BOA′ označ R."],
+      ["Osa úhlu","Narýsuj OR. Je to osa úhlu BOA′ o velikosti 60°."],
+      ["Výsledek","∠AOR = 120° + 30° = 150°."]
+    ],
+    construction:["∠AOB = 120°, →OA′ opačná k →OA","P ∈ →OB, Q ∈ →OA′; OP = OQ","R ∈ k(P;s) ∩ k(Q;s)","→OR = osa ∠BOA′","∠AOR = 150°"],
+    diagram:"between150"
+  }
+  ,
+  {
+    id:"seg-5", topic:"Dělení a změna délky úsečky", kind:"segment", mode:"divide", n:5,
+    cat:"Dělení na shodné díly", title:"Rozdělení úsečky na 5 shodných dílů", difficulty:"1 · základní",
+    method:"Thaletova věta · rovnoběžky", tags:["úsečka","5 dílů","pětiny","shodné díly","Thaletova věta","rovnoběžky"],
+    given:"Je dána úsečka AB.",
+    find:"Rozděl úsečku AB na 5 shodných dílů.",
+    idea:"Z bodu A veď pomocnou polopřímku, na ní odlož 5 stejných úseků a poslední bod spoj s B. Rovnoběžky vedené prvními čtyřmi body rozdělí AB na pětiny.",
+    steps:[
+      ["Pomocná polopřímka","Z bodu A veď libovolnou polopřímku, která neleží na přímce AB."],
+      ["Pět stejných dílků","Kružítkem na ní od bodu A odlož pět stejných úseků. Vzniknou body P₁, P₂, P₃, P₄, P₅."],
+      ["Spoj P₅ s B","Narýsuj přímku P₅B."],
+      ["Rovnoběžky","Body P₁, P₂, P₃ a P₄ veď rovnoběžky s P₅B."],
+      ["Výsledek","Průsečíky rovnoběžek s AB rozdělí úsečku AB na 5 shodných dílů."]
+    ],
+    construction:["zvol pomocnou polopřímku z A, různou od →AB","AP₁ = P₁P₂ = P₂P₃ = P₃P₄ = P₄P₅","P₅B","P₁X₁ ∥ P₅B, P₂X₂ ∥ P₅B, P₃X₃ ∥ P₅B, P₄X₄ ∥ P₅B","AX₁ = X₁X₂ = X₂X₃ = X₃X₄ = X₄B"],
+    diagram:"segment"
+  },
+  {
+    id:"seg-3", topic:"Dělení a změna délky úsečky", kind:"segment", mode:"divide", n:3,
+    cat:"Dělení na shodné díly", title:"Rozdělení úsečky na 3 shodné díly", difficulty:"1 · snadné",
+    method:"Thaletova věta · 3 dílky", tags:["třetiny","3 díly","úsečka"],
+    given:"Je dána úsečka AB.",
+    find:"Rozděl úsečku AB na tři shodné díly.",
+    idea:"Na pomocné polopřímce odlož tři stejné dílky. Přes první dva dělicí body veď rovnoběžky s přímkou spojující třetí bod s B.",
+    steps:[
+      ["Pomocná polopřímka","Z A veď libovolnou pomocnou polopřímku."],
+      ["Tři stejné dílky","Na ní odlož AP₁ = P₁P₂ = P₂P₃."],
+      ["Spoj P₃ s B","Narýsuj P₃B."],
+      ["Dvě rovnoběžky","Přes P₁ a P₂ veď rovnoběžky s P₃B."],
+      ["Výsledek","Jejich průsečíky X₁, X₂ s AB splňují AX₁ = X₁X₂ = X₂B."]
+    ],
+    construction:["AP₁ = P₁P₂ = P₂P₃","P₃B","P₁X₁ ∥ P₃B","P₂X₂ ∥ P₃B","AX₁ = X₁X₂ = X₂B"],
+    diagram:"segment"
+  },
+  {
+    id:"seg-ratio-2-3", topic:"Dělení a změna délky úsečky", kind:"segment", mode:"ratio", m:2, n:3,
+    cat:"Dělení v poměru", title:"Rozdělení úsečky v poměru 2 : 3", difficulty:"1 · snadné",
+    method:"5 pomocných dílků", tags:["poměr","2:3","vnitřní dělení"],
+    given:"Je dána úsečka AB.",
+    find:"Najdi bod X ∈ AB tak, aby AX : XB = 2 : 3.",
+    idea:"Poměr 2 : 3 znamená celkem 5 stejných dílů. Na pomocné polopřímce proto odlož 5 dílků a z druhého bodu veď rovnoběžku.",
+    steps:[
+      ["Pomocná polopřímka","Z A veď pomocnou polopřímku."],
+      ["Pět dílků","Odlož na ní pět shodných úseků a označ body P₁ až P₅."],
+      ["Spoj P₅ s B","Narýsuj P₅B."],
+      ["Rovnoběžka přes P₂","Přes P₂ veď rovnoběžku s P₅B. Její průsečík s AB označ X."],
+      ["Výsledek","Podle Thaletovy věty je AX : XB = 2 : 3."]
+    ],
+    construction:["AP₁ = P₁P₂ = … = P₄P₅","P₅B","P₂X ∥ P₅B","X ∈ AB","AX : XB = 2 : 3"],
+    diagram:"segment"
+  },
+  {
+    id:"seg-ratio-3-1", topic:"Dělení a změna délky úsečky", kind:"segment", mode:"ratio", m:3, n:1,
+    cat:"Dělení v poměru", title:"Rozdělení úsečky v poměru 3 : 1", difficulty:"1 · snadné",
+    method:"4 pomocné dílky", tags:["poměr","3:1","čtvrtiny"],
+    given:"Je dána úsečka AB.",
+    find:"Najdi bod X ∈ AB tak, aby AX : XB = 3 : 1.",
+    idea:"Celý poměr má 4 díly. Bod X proto odpovídá třetímu ze čtyř stejných pomocných dílků.",
+    steps:[
+      ["Pomocná polopřímka","Z A veď pomocnou polopřímku."],
+      ["Čtyři dílky","Odlož na ní čtyři shodné úseky P₁ až P₄."],
+      ["Spoj P₄ s B","Narýsuj P₄B."],
+      ["Rovnoběžka přes P₃","Přes P₃ veď rovnoběžku s P₄B a průsečík s AB označ X."],
+      ["Výsledek","Platí AX : XB = 3 : 1."]
+    ],
+    construction:["AP₁ = … = P₃P₄","P₄B","P₃X ∥ P₄B","X ∈ AB","AX : XB = 3 : 1"],
+    diagram:"segment"
+  },
+  {
+    id:"seg-scale-7-5", topic:"Dělení a změna délky úsečky", kind:"segment", mode:"scale", num:7, den:5,
+    cat:"Zvětšení a zmenšení", title:"Prodloužení úsečky na 7/5 její délky", difficulty:"2 · střední",
+    method:"Thaletova věta · 7 : 5", tags:["7/5","prodloužení","zvětšení","zlomek"],
+    given:"Je dána úsečka AB délky a.",
+    find:"Sestroj na polopřímce AB bod C tak, aby AC = 7/5 · AB.",
+    idea:"Na pomocné polopřímce odlož 7 stejných dílků. Pátý pomocný bod spoj s B; rovnoběžka vedená sedmým bodem určí C.",
+    steps:[
+      ["Pomocná polopřímka","Z A veď pomocnou polopřímku odlišnou od AB."],
+      ["Sedm dílků","Odlož na ní sedm shodných úseků a označ P₁ až P₇."],
+      ["Pátý bod spoj s B","Narýsuj P₅B. Tím přiřadíš pěti pomocným dílkům délku AB."],
+      ["Rovnoběžka přes P₇","Přes P₇ veď rovnoběžku s P₅B. Protne polopřímku AB v bodě C."],
+      ["Výsledek","Z podobnosti trojúhelníků plyne AC : AB = AP₇ : AP₅ = 7 : 5, tedy AC = 7/5 · AB."]
+    ],
+    construction:["AP₁ = P₁P₂ = … = P₆P₇","P₅B","P₇C ∥ P₅B","C ∈ →AB","AC : AB = 7 : 5"],
+    diagram:"segment"
+  },
+  {
+    id:"seg-scale-3-5", topic:"Dělení a změna délky úsečky", kind:"segment", mode:"scale", num:3, den:5,
+    cat:"Zvětšení a zmenšení", title:"Zkrácení úsečky na 3/5 její délky", difficulty:"1 · snadné",
+    method:"Thaletova věta · 3 : 5", tags:["3/5","zkrácení","zmenšení","zlomek"],
+    given:"Je dána úsečka AB délky a.",
+    find:"Sestroj bod C ∈ AB tak, aby AC = 3/5 · AB.",
+    idea:"Pěti pomocným dílkům přiřaď celou délku AB. Třetí pomocný bod pak pomocí rovnoběžky určí tři pětiny.",
+    steps:[
+      ["Pomocná polopřímka","Z A veď pomocnou polopřímku."],
+      ["Pět dílků","Odlož pět shodných dílků P₁ až P₅."],
+      ["Spoj P₅ s B","Narýsuj P₅B."],
+      ["Rovnoběžka přes P₃","Přes P₃ veď rovnoběžku s P₅B; její průsečík s AB označ C."],
+      ["Výsledek","AC : AB = 3 : 5, tedy AC = 3/5 · AB."]
+    ],
+    construction:["AP₁ = … = P₄P₅","P₅B","P₃C ∥ P₅B","C ∈ AB","AC = 3/5 · AB"],
+    diagram:"segment"
+  },
+  {
+    id:"seg-scale-5-3", topic:"Dělení a změna délky úsečky", kind:"segment", mode:"scale", num:5, den:3,
+    cat:"Zvětšení a zmenšení", title:"Prodloužení úsečky na 5/3 její délky", difficulty:"2 · střední",
+    method:"Thaletova věta · 5 : 3", tags:["5/3","prodloužení","třetiny"],
+    given:"Je dána úsečka AB délky a.",
+    find:"Sestroj bod C na polopřímce AB tak, aby AC = 5/3 · AB.",
+    idea:"Třem pomocným dílkům přiřaď délku AB a pátý dílek přenes rovnoběžkou na přímku AB.",
+    steps:[
+      ["Pomocná polopřímka","Z A veď pomocnou polopřímku."],
+      ["Pět dílků","Odlož pět shodných úseků P₁ až P₅."],
+      ["Třetí bod spoj s B","Narýsuj P₃B."],
+      ["Rovnoběžka přes P₅","Přes P₅ veď rovnoběžku s P₃B. Průsečík s polopřímkou AB označ C."],
+      ["Výsledek","AC : AB = 5 : 3, tedy AC = 5/3 · AB."]
+    ],
+    construction:["AP₁ = … = P₄P₅","P₃B","P₅C ∥ P₃B","C ∈ →AB","AC = 5/3 · AB"],
+    diagram:"segment"
+  },
+  {
+    id:"seg-external-3-2", topic:"Dělení a změna délky úsečky", kind:"segment", mode:"external", m:3, n:2,
+    cat:"Vnější dělení", title:"Vnější rozdělení úsečky v poměru 3 : 2", difficulty:"3 · pokročilé",
+    method:"Vnější dělení · podobnost", tags:["vnější dělení","3:2","poměr","vně úsečky"],
+    given:"Je dána úsečka AB.",
+    find:"Najdi bod X na přímce AB vně úsečky AB tak, aby AX : BX = 3 : 2.",
+    idea:"Je-li X za bodem B, pak AX = AB + BX. Z poměru AX : BX = 3 : 2 vychází AX : AB = 3 : 1. Stačí tedy sestrojit trojnásobek AB.",
+    steps:[
+      ["Převeď poměr","Z AX : BX = 3 : 2 a AX = AB + BX plyne AX : AB = 3 : 1."],
+      ["Pomocná polopřímka","Z A veď pomocnou polopřímku a odlož na ní tři stejné dílky P₁, P₂, P₃."],
+      ["První bod spoj s B","Narýsuj P₁B. Jeden pomocný dílek tak odpovídá délce AB."],
+      ["Rovnoběžka přes P₃","Přes P₃ veď rovnoběžku s P₁B. Protne polopřímku AB v bodě X."],
+      ["Výsledek","AX = 3·AB a BX = 2·AB, proto AX : BX = 3 : 2."]
+    ],
+    construction:["AX : BX = 3 : 2 ⇒ AX : AB = 3 : 1","AP₁ = P₁P₂ = P₂P₃","P₁B","P₃X ∥ P₁B","AX : BX = 3 : 2"],
+    diagram:"segment"
+  }
+
+];
+
+// Podrobné kroky pro úhlové konstrukce. Každý krok odpovídá jednomu
+// skutečnému konstrukčnímu úkonu; pomocný úhel se nikdy neobjeví najednou hotový.
+const ANGLE_STEPS = {
+  "angle-60":[
+    ["Kružnice z O","Sestroj kružnici k₁ se středem O a poloměrem OA."],
+    ["Kružnice z A","Sestroj kružnici k₂ se středem A a stejným poloměrem OA."],
+    ["Průsečík B","Horní průsečík kružnic k₁ a k₂ označ B."],
+    ["Polopřímka OB","Narýsuj polopřímku OB. Vznikne úhel AOB = 60°."],
+  ],
+  "angle-90":[
+    ["Prodluž OA","Prodluž polopřímku OA přes bod O na přímku."],
+    ["Bod B","Kružnice se středem O a poloměrem OA určí na opačné straně bod B, takže OA = OB."],
+    ["Oblouk z A","Z bodu A opiš oblouk s poloměrem větším než OA."],
+    ["Oblouk z B","Se stejným poloměrem opiš oblouk z B. Průsečík oblouků označ C."],
+    ["Polopřímka OC","Narýsuj polopřímku OC. Platí OC ⟂ AB, tedy úhel AOC = 90°."],
+  ],
+  "angle-30":[
+    ["Kružnice z O","Začni konstrukcí 60°: sestroj kružnici se středem O a poloměrem OA."],
+    ["Kružnice z A","Se stejným poloměrem sestroj kružnici se středem A."],
+    ["Průsečík B","Průsečík obou kružnic označ B."],
+    ["Pomocný úhel 60°","Narýsuj polopřímku OB. Úhel AOB má 60°."],
+    ["Body P a Q","Kružnice se středem O protne ramena OA a OB v bodech P a Q."],
+    ["Oblouk z P","Z bodu P opiš oblouk dovnitř úhlu."],
+    ["Oblouk z Q","Se stejným poloměrem opiš oblouk z Q; průsečík označ R."],
+    ["Osa OR","Narýsuj OR. Je to osa úhlu AOB, proto úhel AOR = 30°."],
+  ],
+  "angle-45":[
+    ["Prodluž OA","Začni konstrukcí 90°: prodluž OA přes O na přímku."],
+    ["Bod B","Kružnice se středem O a poloměrem OA určí na opačné straně bod B."],
+    ["Oblouk z A","Z bodu A opiš oblouk s dostatečně velkým poloměrem."],
+    ["Oblouk z B","Se stejným poloměrem opiš oblouk z B; průsečík označ C."],
+    ["Pomocný úhel 90°","Narýsuj OC. Úhel AOC má 90°."],
+    ["Body P a Q","Kružnice se středem O protne ramena OA a OC v bodech P a Q."],
+    ["Oblouk z P","Z bodu P opiš oblouk dovnitř úhlu."],
+    ["Oblouk z Q","Se stejným poloměrem opiš oblouk z Q; průsečík označ R."],
+    ["Osa OR","Narýsuj OR. Úhel AOR = 45°."],
+  ],
+  "angle-120":[
+    ["Kružnice z O","Sestroj kružnici k se středem O a poloměrem OA."],
+    ["Prvních 60°","Kružnice se středem A a poloměrem OA protne k v bodě B."],
+    ["Dalších 60°","Kružnice se středem B a poloměrem OA protne k v dalším bodě C."],
+    ["Polopřímka OC","Narýsuj OC. Dva po sobě odložené středové úhly 60° dávají 120°."],
+  ],
+  "angle-15":[
+    ["Kružnice z O","Začni konstrukcí 60°: kružnice se středem O a poloměrem OA."],
+    ["Kružnice z A","Se stejným poloměrem sestroj kružnici z A."],
+    ["Průsečík B","Průsečík kružnic označ B."],
+    ["Pomocný úhel 60°","Narýsuj OB."],
+    ["Body P₁ a Q₁","Kružnice se středem O protne ramena úhlu 60° v P₁ a Q₁."],
+    ["Oblouk z P₁","Z P₁ opiš oblouk dovnitř úhlu."],
+    ["Oblouk z Q₁","Stejným poloměrem opiš oblouk z Q₁; průsečík označ R₁."],
+    ["Pomocný úhel 30°","Narýsuj OR₁. Je to osa 60° úhlu."],
+    ["Body P₂ a Q₂","Kružnice se středem O protne ramena 30° úhlu v P₂ a Q₂."],
+    ["Oblouk z P₂","Z P₂ opiš oblouk dovnitř 30° úhlu."],
+    ["Oblouk z Q₂","Stejným poloměrem opiš oblouk z Q₂; průsečík označ R₂."],
+    ["Výsledná osa","Narýsuj OR₂. Je to osa 30° úhlu, tedy úhel AOR₂ = 15°."],
+  ],
+  "angle-75":[
+    ["Kružnice z O","Nejprve začni konstrukcí pomocného úhlu 60°."],
+    ["Kružnice z A","Sestroj druhou kružnici se stejným poloměrem."],
+    ["Průsečík B","Průsečík kružnic označ B."],
+    ["Pomocný úhel 60°","Narýsuj OB."],
+    ["Prodluž OA","Pro konstrukci 90° prodluž OA přes O."],
+    ["Opačný bod D","Kružnice se středem O a poloměrem OA určí na opačné straně bod D."],
+    ["Oblouk z A","Z A opiš dostatečně velký oblouk."],
+    ["Oblouk z D","Stejným poloměrem opiš oblouk z D; průsečík označ C."],
+    ["Pomocný úhel 90°","Narýsuj OC."],
+    ["Body P a Q","Kružnice se středem O protne ramena 60° a 90° v P a Q."],
+    ["Oblouk z P","Z P opiš oblouk mezi obě pomocná ramena."],
+    ["Oblouk z Q","Stejným poloměrem opiš oblouk z Q; průsečík označ R."],
+    ["Výsledná osa","Narýsuj OR. Leží přesně mezi 60° a 90°, tedy na 75°."],
+  ],
+  "angle-105":[
+    ["Prodluž OA","Nejprve začni konstrukcí pomocného úhlu 90°: prodluž OA přes O."],
+    ["Opačný bod D","Kružnice se středem O a poloměrem OA určí bod D."],
+    ["Oblouk z A","Z A opiš dostatečně velký oblouk."],
+    ["Oblouk z D","Stejným poloměrem opiš oblouk z D; průsečík označ C."],
+    ["Pomocný úhel 90°","Narýsuj OC."],
+    ["Bod E pro 60°","Kružnice se středem A a poloměrem OA protne kružnici se středem O v bodě E."],
+    ["Bod F pro 120°","Kružnice se středem E a poloměrem OA určí na téže kružnici další bod F."],
+    ["Pomocný úhel 120°","Narýsuj OF."],
+    ["Body P a Q","Kružnice se středem O protne ramena 90° a 120° v P a Q."],
+    ["Oblouk z P","Z P opiš oblouk mezi obě ramena."],
+    ["Oblouk z Q","Stejným poloměrem opiš oblouk z Q; průsečík označ R."],
+    ["Výsledná osa","Narýsuj OR. Leží uprostřed mezi 90° a 120°, tedy na 105°."],
+  ],
+  "angle-135":[
+    ["Prodluž OA","Začni konstrukcí 90°: prodluž OA přes O."],
+    ["Opačný bod D","Kružnice se středem O a poloměrem OA určí bod D."],
+    ["Oblouk z A","Z A opiš dostatečně velký oblouk."],
+    ["Oblouk z D","Stejným poloměrem opiš oblouk z D; průsečík označ C."],
+    ["Pomocný úhel 90°","Narýsuj OC."],
+    ["Opačná polopřímka","Zvýrazni opačnou polopřímku OD, která svírá s OA úhel 180°."],
+    ["Body P a Q","Kružnice se středem O protne ramena 90° a 180° v P a Q."],
+    ["Oblouk z P","Z P opiš oblouk mezi obě ramena."],
+    ["Oblouk z Q","Stejným poloměrem opiš oblouk z Q; průsečík označ R."],
+    ["Výsledná osa","Narýsuj OR. Je osou úhlu mezi 90° a 180°, tedy leží na 135°."],
+  ],
+  "angle-150":[
+    ["Kružnice z O","Začni konstrukcí pomocného úhlu 120°."],
+    ["Bod B pro 60°","Kružnice se středem A a poloměrem OA určí bod B."],
+    ["Bod C pro 120°","Kružnice se středem B a poloměrem OA určí další bod C."],
+    ["Pomocný úhel 120°","Narýsuj OC."],
+    ["Opačná polopřímka","Prodluž OA přes O a použij opačnou polopřímku jako směr 180°."],
+    ["Body P a Q","Kružnice se středem O protne ramena 120° a 180° v P a Q."],
+    ["Oblouk z P","Z P opiš oblouk mezi obě ramena."],
+    ["Oblouk z Q","Stejným poloměrem opiš oblouk z Q; průsečík označ R."],
+    ["Výsledná osa","Narýsuj OR. Je osou úhlu 120°–180°, tedy leží na 150°."],
+  ]
+};
+
+function displaySteps(p){
+  return ANGLE_STEPS[p.id] || p.steps;
+}
+
+let current = 0;
+let filter = "Vše";
+let diagramStep = -1;
+let solutionOpen = false;
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+function getTopic(p){
+  return p.topic || (p.id.startsWith("angle-") ? "Konstrukce úhlů" : "Ostatní");
+}
+function cats(){
+  return ["Vše", ...new Set(P.map(getTopic))];
+}
+function filtered(){
+  const q = $("#search").value.trim().toLocaleLowerCase("cs");
+  return P.filter(p => {
+    const okCat = filter==="Vše" || getTopic(p)===filter;
+    const hay = `${getTopic(p)} ${p.cat||""} ${p.title} ${p.angle||""} ${p.method} ${(p.tags||[]).join(" ")}`.toLocaleLowerCase("cs");
+    return okCat && (!q || hay.includes(q));
+  });
+}
+function renderFilters(){
+  $("#filters").innerHTML = cats().map(c=>`<button class="${c===filter?'active':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+  $("#filters").querySelectorAll("button").forEach(b=>b.onclick=()=>{filter=b.dataset.cat;renderFilters();renderList();});
+}
+function renderList(){
+  const arr=filtered();
+  let lastTopic="";
+  $("#problemList").innerHTML = arr.map(p=>{
+    const i=P.indexOf(p), topic=getTopic(p);
+    const head = (topic!==lastTopic) ? `<div style="margin:14px 8px 5px;color:#94a3b8;font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.08em">${esc(topic)}</div>` : "";
+    lastTopic=topic;
+    return head+`<button class="problem-item ${i===current?'active':''}" data-i="${i}">
+      <b>${esc(p.title)}</b><span>${esc(p.cat||p.method)} · ${esc(p.difficulty)}</span>
+    </button>`;
+  }).join("") || `<div style="color:#94a3b8;padding:12px 6px">Nic nenalezeno.</div>`;
+  $("#problemList").querySelectorAll(".problem-item").forEach(b=>b.onclick=()=>openProblem(+b.dataset.i));
+}
+
+function polar(cx,cy,r,deg){
+  const a=-deg*Math.PI/180;
+  return [cx+r*Math.cos(a), cy+r*Math.sin(a)];
+}
+function line(x1,y1,x2,y2,cls="",dash=""){
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${cls}" ${dash?`stroke-dasharray="${dash}"`:""}/>`;
+}
+function circle(cx,cy,r,cls="",dash=""){
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" class="${cls}" ${dash?`stroke-dasharray="${dash}"`:""}/>`;
+}
+function point(x,y,label,dx=8,dy=-8){
+  return `<circle cx="${x}" cy="${y}" r="4.2" class="pt"/><text x="${x+dx}" y="${y+dy}" class="label">${label}</text>`;
+}
+function arcPath(cx,cy,r,a0,a1,cls="angleArc"){
+  const p0=polar(cx,cy,r,a0), p1=polar(cx,cy,r,a1);
+  const large=Math.abs(a1-a0)>180?1:0;
+  const sweep=0;
+  return `<path d="M ${p0[0]} ${p0[1]} A ${r} ${r} 0 ${large} ${sweep} ${p1[0]} ${p1[1]}" fill="none" class="${cls}"/>`;
+}
+function svgStyle(){
+  return `<style>
+    .known{stroke:#138a4b;stroke-width:3;stroke-linecap:round}
+    .final{stroke:#172033;stroke-width:3.6;stroke-linecap:round}
+    .help{stroke:#e99800;stroke-width:2;stroke-linecap:round}
+    .faint{stroke:#cbd5e1;stroke-width:1.6}
+    .construct{stroke:#e99800;stroke-width:1.7;fill:none;opacity:.86}
+    .pt{fill:#172033}.label{font:700 15px system-ui;fill:#172033;paint-order:stroke fill;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+    .helperLabel{font:700 13px system-ui;fill:#b45309;paint-order:stroke fill;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+    .angleArc{stroke:#315efb;stroke-width:3;fill:none}
+    .angleText{font:900 18px system-ui;fill:#2448bd;paint-order:stroke fill;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+    .hint{font:600 13px system-ui;fill:#64748b;paint-order:stroke fill;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+  </style>`;
+}
+function exactBisectorParts(a0,a1,showCircles=true,labels=["P","Q","R"]){
+  const cx=175,cy=350,rr=118;
+  const d=Math.abs(a1-a0);
+  const rho=Math.max(86, rr*Math.sin(d*Math.PI/360)+48);
+  const P0=polar(cx,cy,rr,a0), Q0=polar(cx,cy,rr,a1);
+  const mid=(a0+a1)/2;
+  const halfChord=rr*Math.sin(d*Math.PI/360);
+  const foot=rr*Math.cos(d*Math.PI/360);
+  const h=Math.sqrt(Math.max(0,rho*rho-halfChord*halfChord));
+  const R0=polar(cx,cy,foot+h,mid);
+  let out=point(P0[0],P0[1],labels[0],7,-8)+point(Q0[0],Q0[1],labels[1],7,-8);
+  if(showCircles) out+=circle(P0[0],P0[1],rho,"construct")+circle(Q0[0],Q0[1],rho,"construct");
+  out+=point(R0[0],R0[1],labels[2],8,-8);
+  return {svg:out,R:R0,P:P0,Q:Q0,mid};
+}
+function rayAt(angle,cls="help",dash="8 7",R=245){
+  const T=polar(175,350,R,angle); return line(175,350,T[0],T[1],cls,dash);
+}
+function rayLabel(angle,text,r=190){
+  const T=polar(175,350,r,angle); return `<text x="${T[0]+5}" y="${T[1]-5}" class="helperLabel">${text}</text>`;
+}
+function bisectorGeom(a0,a1){
+  const cx=175,cy=350,rr=118;
+  const d=Math.abs(a1-a0);
+  const rho=Math.max(86, rr*Math.sin(d*Math.PI/360)+48);
+  const P0=polar(cx,cy,rr,a0), Q0=polar(cx,cy,rr,a1);
+  const mid=(a0+a1)/2;
+  const halfChord=rr*Math.sin(d*Math.PI/360);
+  const foot=rr*Math.cos(d*Math.PI/360);
+  const h=Math.sqrt(Math.max(0,rho*rho-halfChord*halfChord));
+  const R0=polar(cx,cy,foot+h,mid);
+  return {P:P0,Q:Q0,R:R0,rho,mid};
+}
+
+function drawBisector(a0,a1,stage,labels=["P","Q","R"],target=(a0+a1)/2,rayCls="final"){
+  if(stage<0) return "";
+  const cx=175,cy=350,rr=118,b=bisectorGeom(a0,a1);
+  let out="";
+  if(stage>=0){
+    // Jedna kružnice z vrcholu úhlu vytvoří oba stejně vzdálené body P a Q.
+    out+=circle(cx,cy,rr,"construct");
+    out+=point(b.P[0],b.P[1],labels[0],8,a0===0?18:-8);
+    out+=point(b.Q[0],b.Q[1],labels[1],8,-8);
+  }
+  if(stage>=1) out+=circle(b.P[0],b.P[1],b.rho,"construct");
+  if(stage>=2){
+    out+=circle(b.Q[0],b.Q[1],b.rho,"construct");
+    out+=point(b.R[0],b.R[1],labels[2],8,-8);
+  }
+  if(stage>=3) out+=rayAt(target,rayCls,rayCls==="final"?"":"8 7",245);
+  return out;
+}
+
+function draw60(stage,rayCls="final"){
+  if(stage<0) return "";
+  const cx=175,cy=350,r=150;
+  const A=polar(cx,cy,r,0), B=polar(cx,cy,r,60);
+  let out="";
+  if(stage>=0) out+=circle(cx,cy,r,"construct");
+  if(stage>=1) out+=circle(A[0],A[1],r,"construct");
+  if(stage>=2) out+=point(B[0],B[1],"B",8,-8);
+  if(stage>=3) out+=rayAt(60,rayCls,rayCls==="final"?"":"8 7",245);
+  return out;
+}
+
+function draw90(stage,rayCls="final",oppositeLabel="B"){
+  if(stage<0) return "";
+  const cx=175,cy=350,r=150,rho=210;
+  const A=[cx+r,cy], B=[cx-r,cy];
+  const yoff=Math.sqrt(rho*rho-r*r), C=[cx,cy-yoff];
+  let out="";
+  if(stage>=0) out+=line(cx-245,cy,cx+245,cy,"faint");
+  if(stage>=1){
+    out+=circle(cx,cy,r,"construct");
+    out+=point(B[0],B[1],oppositeLabel,-20,20);
+  }
+  if(stage>=2) out+=circle(A[0],A[1],rho,"construct");
+  if(stage>=3){
+    out+=circle(B[0],B[1],rho,"construct");
+    out+=point(C[0],C[1],"C",8,-8);
+  }
+  if(stage>=4) out+=rayAt(90,rayCls,rayCls==="final"?"":"8 7",245);
+  return out;
+}
+
+function draw120(stage,rayCls="final",labels=["B","C"]){
+  if(stage<0) return "";
+  const cx=175,cy=350,r=150,A=polar(cx,cy,r,0),B=polar(cx,cy,r,60),C=polar(cx,cy,r,120);
+  let out="";
+  if(stage>=0) out+=circle(cx,cy,r,"construct");
+  if(stage>=1){ out+=circle(A[0],A[1],r,"construct"); out+=point(B[0],B[1],labels[0],8,-8); }
+  if(stage>=2){ out+=circle(B[0],B[1],r,"construct"); out+=point(C[0],C[1],labels[1],-18,-8); }
+  if(stage>=3) out+=rayAt(120,rayCls,rayCls==="final"?"":"8 7",245);
+  return out;
+}
+
+function generalAngleSVG(p,step,preview=false){
+  const W=640,H=480,cx=175,cy=350,R=245;
+  const steps=displaySteps(p);
+  const s=preview?steps.length-1:step;
+  let body=svgStyle();
+  // Výchozí stav: pouze to, co je skutečně zadáno.
+  body+=rayAt(0,"known","",R);
+  body+=point(cx,cy,"O",-20,20);
+  const A=polar(cx,cy,150,0); body+=point(A[0],A[1],"A",8,18);
+
+  if(p.id==="angle-60"){
+    body+=draw60(s,"final");
+  } else if(p.id==="angle-90"){
+    body+=draw90(s,"final","B");
+  } else if(p.id==="angle-30"){
+    body+=draw60(Math.min(s,3),"help");
+    if(s>=3) body+=rayLabel(60,"60°");
+    if(s>=4) body+=drawBisector(0,60,s-4,["P","Q","R"],30,"final");
+  } else if(p.id==="angle-45"){
+    body+=draw90(Math.min(s,4),"help","B");
+    if(s>=4) body+=rayLabel(90,"90°");
+    if(s>=5) body+=drawBisector(0,90,s-5,["P","Q","R"],45,"final");
+  } else if(p.id==="angle-120"){
+    body+=draw120(s,"final");
+  } else if(p.id==="angle-15"){
+    body+=draw60(Math.min(s,3),"help");
+    if(s>=3) body+=rayLabel(60,"60°");
+    if(s>=4) body+=drawBisector(0,60,Math.min(s-4,3),["P₁","Q₁","R₁"],30,"help");
+    if(s>=7) body+=rayLabel(30,"30°");
+    if(s>=8) body+=drawBisector(0,30,s-8,["P₂","Q₂","R₂"],15,"final");
+  } else if(p.id==="angle-75"){
+    body+=draw60(Math.min(s,3),"help");
+    if(s>=3) body+=rayLabel(60,"60°");
+    if(s>=4) body+=draw90(Math.min(s-4,4),"help","D");
+    if(s>=8) body+=rayLabel(90,"90°");
+    if(s>=9) body+=drawBisector(60,90,s-9,["P","Q","R"],75,"final");
+  } else if(p.id==="angle-105"){
+    body+=draw90(Math.min(s,4),"help","D");
+    if(s>=4) body+=rayLabel(90,"90°");
+    if(s>=5){
+      // Kružnice se středem O už je z konstrukce 90° narýsovaná; pokračujeme po ní od A.
+      const r=150,A0=polar(cx,cy,r,0),E=polar(cx,cy,r,60),F=polar(cx,cy,r,120);
+      body+=circle(A0[0],A0[1],r,"construct")+point(E[0],E[1],"E",8,-8);
+      if(s>=6) body+=circle(E[0],E[1],r,"construct")+point(F[0],F[1],"F",-18,-8);
+      if(s>=7) body+=rayAt(120,"help","8 7",R)+rayLabel(120,"120°");
+    }
+    if(s>=8) body+=drawBisector(90,120,s-8,["P","Q","R"],105,"final");
+  } else if(p.id==="angle-135"){
+    body+=draw90(Math.min(s,4),"help","D");
+    if(s>=4) body+=rayLabel(90,"90°");
+    if(s>=5) body+=rayAt(180,"help","8 7",R)+rayLabel(180,"180°",170);
+    if(s>=6) body+=drawBisector(90,180,s-6,["P","Q","R"],135,"final");
+  } else if(p.id==="angle-150"){
+    body+=draw120(Math.min(s,3),"help");
+    if(s>=3) body+=rayLabel(120,"120°");
+    if(s>=4){
+      body+=rayAt(180,"help","8 7",R)+rayLabel(180,"180°",170);
+    }
+    if(s>=5) body+=drawBisector(120,180,s-5,["P","Q","R"],150,"final");
+  }
+
+  if((s>=steps.length-1)||preview){
+    body+=arcPath(cx,cy,70,0,p.angle,"angleArc");
+    const t=polar(cx,cy,94,p.angle/2); body+=`<text x="${t[0]-14}" y="${t[1]+5}" class="angleText">${p.angle}°</text>`;
+  }
+  const hint = s<0 ? "Výchozí stav – zatím je zobrazena pouze zadaná polopřímka OA." : "Každým krokem přibývá právě další část konstrukce.";
+  body+=`<text x="24" y="40" class="hint">${hint}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Přesná konstrukce úhlu ${p.angle} stupňů">${body}</svg>`;
+}
+
+function segmentData(p){
+  if(p.mode==="divide") return {marks:p.n, ref:p.n, target:null, factor:null};
+  if(p.mode==="ratio") return {marks:p.m+p.n, ref:p.m+p.n, target:p.m, factor:p.m/(p.m+p.n)};
+  if(p.mode==="scale") return {marks:Math.max(p.num,p.den), ref:p.den, target:p.num, factor:p.num/p.den};
+  if(p.mode==="external") return {marks:p.m, ref:p.m-p.n, target:p.m, factor:p.m/(p.m-p.n)};
+  return {marks:5,ref:5,target:null,factor:null};
+}
+function segmentSVG(p,step,preview=false){
+  const W=680,H=470,A={x:92,y:350},d=segmentData(p),s=preview?4:step;
+
+  const factor = d.target==null ? 1 : d.target/d.ref;
+  const maxFactor = Math.max(1,factor);
+  const baseLen = Math.min(300, 455/maxFactor);
+  const B={x:A.x+baseLen,y:A.y};
+
+  const theta=-55*Math.PI/180;
+  const maxMarks=Math.max(1,d.marks);
+  const unit=Math.min(46, 245/maxMarks);
+  const ux=unit*Math.cos(theta), uy=unit*Math.sin(theta);
+  const rayLen = unit*(d.marks+0.72);
+  const nx = -Math.sin(theta), ny = Math.cos(theta);
+  const Q=i=>({x:A.x+i*ux,y:A.y+i*uy});
+  const Xfor=i=>({x:A.x+baseLen*(i/d.ref),y:A.y});
+  const targetX=d.target==null?null:Xfor(d.target);
+  const label = (x,y,t,dx=8,dy=-8,cls='label') => `<text x="${x+dx}" y="${y+dy}" class="${cls}">${t}</text>`;
+  const segTick = (mx,my,len=12) => `<line x1="${mx-nx*len/2}" y1="${my-ny*len/2}" x2="${mx+nx*len/2}" y2="${my+ny*len/2}" class="construct"/>`;
+  const baseTick = (x,y=A.y,len=16,cls='final') => `<line x1="${x}" y1="${y-len/2}" x2="${x}" y2="${y+len/2}" class="${cls}"/>`;
+
+  let body=svgStyle();
+  let labels='';
+
+  const finalEndX = targetX ? targetX.x : B.x;
+  body+=line(A.x-18,A.y,Math.min(W-24,Math.max(B.x,finalEndX)+34),A.y,'faint');
+  body+=line(A.x,A.y,B.x,B.y,'known');
+  labels+=label(A.x,A.y,'A',-18,22);
+  labels+=label(B.x,B.y,'B',8,22);
+  labels+=`<text x="${A.x+baseLen/2-24}" y="${A.y+46}" class="helperLabel">daná úsečka AB</text>`;
+
+  if(s>=0){
+    body+=line(A.x,A.y,A.x+rayLen*Math.cos(theta),A.y+rayLen*Math.sin(theta),'help');
+  }
+
+  if(s>=1){
+    const leaderLabel=(pt,t,dx,dy,cls='helperLabel')=>{ const lx=pt.x+dx, ly=pt.y+dy; return `<line x1="${pt.x}" y1="${pt.y}" x2="${lx-2}" y2="${ly+4}" class="faint"/>` + `<text x="${lx}" y="${ly}" class="${cls}">${t}</text>`; };
+    const pdx = nx*18 + 4;
+    const pdy = ny*18 - 2;
+    for(let i=1;i<=d.marks;i++){
+      const q=Q(i);
+      // Ryska označuje přímo bod P_i. Z jejího středu pak přesně vychází případná rovnoběžka.
+      body+=segTick(q.x,q.y,12);
+      labels+=leaderLabel(q,`P${i}`,pdx,pdy,'helperLabel');
+    }
+  }
+
+  if(s>=2){
+    const qr=Q(d.ref);
+    body+=line(qr.x,qr.y,B.x,B.y,'final');
+  }
+
+  if(s>=3){
+    if(p.mode==='divide'){
+      for(let i=1;i<d.ref;i++){
+        const qi=Q(i), xi=Xfor(i);
+        body+=line(qi.x,qi.y,xi.x,xi.y,'construct');
+        body+=baseTick(xi.x,A.y,12,'construct');
+        labels+=label(xi.x,A.y,`X${i}`,-9,28,'helperLabel');
+      }
+    }else{
+      const qt=Q(d.target);
+      body+=line(qt.x,qt.y,targetX.x,targetX.y,'construct');
+      body+=baseTick(targetX.x,A.y,12,'construct');
+      labels+=label(targetX.x,A.y,p.mode==='external'?'X':'C',8,26,'helperLabel');
+    }
+  }
+
+  if(s>=4){
+    if(p.mode==='divide'){
+      for(let i=0;i<=d.ref;i++) body+=baseTick(Xfor(i).x,A.y,16,'final');
+      labels+=`<text x="${A.x+baseLen/2-55}" y="${A.y-25}" class="angleText">${d.ref} shodných dílů</text>`;
+    }else if(p.mode==='ratio'){
+      const x=targetX.x;
+      body+=line(A.x,A.y,x,A.y,'final');
+      body+=line(x,A.y,B.x,A.y,'final');
+      body+=baseTick(A.x,A.y,16,'final')+baseTick(x,A.y,16,'final')+baseTick(B.x,A.y,16,'final');
+      labels+=`<text x="${A.x+(x-A.x)/2-5}" y="${A.y-25}" class="angleText">${p.m}</text>`;
+      labels+=`<text x="${x+(B.x-x)/2-5}" y="${A.y-25}" class="angleText">${p.n}</text>`;
+    }else if(p.mode==='scale'){
+      body+=line(A.x,A.y,targetX.x,A.y,'final');
+      body+=baseTick(A.x,A.y,16,'final')+baseTick(B.x,A.y,16,'final')+baseTick(targetX.x,A.y,16,'final');
+      labels+=`<text x="${A.x+(targetX.x-A.x)/2-38}" y="${A.y-25}" class="angleText">${p.num}/${p.den} · AB</text>`;
+    }else if(p.mode==='external'){
+      body+=line(A.x,A.y,targetX.x,A.y,'final');
+      body+=baseTick(A.x,A.y,16,'final')+baseTick(B.x,A.y,16,'final')+baseTick(targetX.x,A.y,16,'final');
+      labels+=`<text x="${A.x+55}" y="${A.y-25}" class="helperLabel">AX : BX = ${p.m} : ${p.n}</text>`;
+    }
+  }
+
+  labels += `<text x="22" y="34" class="hint">Bez puntíků a bez obloučků: body P₁, P₂, … jsou označeny krátkými ryskami přímo v místech, odkud vedou rovnoběžky.</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(p.title)}">${body}${labels}</svg>`;
+}
+
+function problemDiagramSVG(p,step,preview=false){
+  return p.kind==="segment" ? segmentSVG(p,step,preview) : generalAngleSVG(p,step,preview);
+}
+
+function segmentSketchSVG(p){
+  const W=520,H=320,A={x:52,y:250},d=segmentData(p);
+  const factor = d.target==null ? 1 : d.target/d.ref;
+  const maxFactor = Math.max(1,factor);
+  const baseLen = Math.min(300, 390/maxFactor);
+  const B={x:A.x+baseLen,y:A.y};
+  const theta=-55*Math.PI/180;
+  const unit=Math.min(34, 175/Math.max(1,d.marks));
+  const ux=unit*Math.cos(theta), uy=unit*Math.sin(theta);
+  const nx=-Math.sin(theta), ny=Math.cos(theta);
+  const rayLen=unit*(d.marks+0.72);
+  const Q=i=>({x:A.x+i*ux,y:A.y+i*uy});
+  const Xfor=i=>({x:A.x+baseLen*(i/d.ref),y:A.y});
+  const targetX=d.target==null?null:Xfor(d.target);
+  const label = (x,y,t,dx=8,dy=-8,cls='helperLabel') => `<text x="${x+dx}" y="${y+dy}" class="${cls}">${t}</text>`;
+  const leaderLabel=(pt,t,dx,dy,cls='helperLabel')=>{
+    const lx=pt.x+dx, ly=pt.y+dy;
+    return `<line x1="${pt.x}" y1="${pt.y}" x2="${lx-2}" y2="${ly+4}" class="faint"/>`+
+           `<text x="${lx}" y="${ly}" class="${cls}">${t}</text>`;
+  };
+  const segTick=(mx,my,len=10)=>`<line x1="${mx-nx*len/2}" y1="${my-ny*len/2}" x2="${mx+nx*len/2}" y2="${my+ny*len/2}" class="construct"/>`;
+  const baseTick=(x,y=A.y,len=14,cls='final')=>`<line x1="${x}" y1="${y-len/2}" x2="${x}" y2="${y+len/2}" class="${cls}"/>`;
+
+  let body=svgStyle();
+  let labels='';
+  const finalEndX = targetX ? targetX.x : B.x;
+  body+=line(A.x-10,A.y,Math.min(W-16,Math.max(B.x,finalEndX)+24),A.y,'faint');
+  body+=line(A.x,A.y,B.x,B.y,'known');
+  body+=line(A.x,A.y,A.x+rayLen*Math.cos(theta),A.y+rayLen*Math.sin(theta),'help');
+  labels+=label(A.x,A.y,'A',-14,20,'label');
+  labels+=label(B.x,B.y,'B',8,20,'label');
+  labels+=`<text x="${A.x+baseLen/2-24}" y="${A.y+40}" class="helperLabel">daná úsečka AB</text>`;
+
+  for(let i=1;i<=d.marks;i++){
+    const q=Q(i);
+    // Stejně jako ve velké konstrukci: ryska leží přímo v bodě P_i.
+    body+=segTick(q.x,q.y,10);
+  }
+
+  const refPt=Q(d.ref);
+  body+=line(refPt.x,refPt.y,B.x,B.y,'final');
+  labels+=leaderLabel(refPt,`P${d.ref}`,14,-12,'helperLabel');
+
+  if(p.mode==='divide'){
+    const last=Xfor(d.ref-1);
+    body+=line(Q(d.ref-1).x,Q(d.ref-1).y,last.x,last.y,'construct');
+    for(let i=0;i<=d.ref;i++) body+=baseTick(Xfor(i).x,A.y,14,'final');
+    labels+=leaderLabel(Q(1),'P1',10,16,'helperLabel');
+    labels+=leaderLabel(Q(d.ref-1),`P${d.ref-1}`,-6,18,'helperLabel');
+    labels+=`<text x="${A.x+baseLen/2-46}" y="${A.y-18}" class="angleText">${d.ref} dílů</text>`;
+  } else if(p.mode==='ratio'){
+    body+=line(Q(d.target).x,Q(d.target).y,targetX.x,targetX.y,'construct');
+    body+=baseTick(A.x,A.y,14,'final')+baseTick(targetX.x,A.y,14,'final')+baseTick(B.x,A.y,14,'final');
+    labels+=leaderLabel(Q(d.target),`P${d.target}`,14,16,'helperLabel');
+    labels+=label(targetX.x,A.y,'X',8,24,'helperLabel');
+  } else if(p.mode==='scale'){
+    body+=line(Q(d.target).x,Q(d.target).y,targetX.x,targetX.y,'construct');
+    body+=baseTick(A.x,A.y,14,'final')+baseTick(B.x,A.y,14,'final')+baseTick(targetX.x,A.y,14,'final');
+    if(d.target !== d.ref) labels+=leaderLabel(Q(d.target),`P${d.target}`,12,-12,'helperLabel');
+    labels+=label(targetX.x,A.y,'C',8,24,'helperLabel');
+  } else if(p.mode==='external'){
+    body+=line(Q(d.target).x,Q(d.target).y,targetX.x,targetX.y,'construct');
+    body+=baseTick(A.x,A.y,14,'final')+baseTick(B.x,A.y,14,'final')+baseTick(targetX.x,A.y,14,'final');
+    labels+=leaderLabel(Q(d.target),`P${d.target}`,12,-12,'helperLabel');
+    labels+=label(targetX.x,A.y,'X',8,24,'helperLabel');
+  }
+
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(p.title)}">${body}${labels}</svg>`;
+}
+function sketchSVG(p){
+  if(p.kind==="segment") return segmentSketchSVG(p);
+  const cx=150,cy=210,R=170,A=polar(cx,cy,R,0),T=polar(cx,cy,R,p.angle);
+  return `<svg viewBox="0 0 480 300" role="img" aria-label="Náčrtek úhlu ${p.angle} stupňů">
+    ${svgStyle()}
+    ${line(cx,cy,A[0],A[1],"known")}
+    ${line(cx,cy,T[0],T[1],"final")}
+    ${arcPath(cx,cy,55,0,p.angle,"angleArc")}
+    ${point(cx,cy,"O",-18,18)}
+    ${point(A[0],A[1],"A",8,18)}
+    <text x="${polar(cx,cy,78,p.angle/2)[0]-12}" y="${polar(cx,cy,78,p.angle/2)[1]+5}" class="angleText">${p.angle}°</text>
+  </svg>`;
+}
+
+function desktopContent(p){
+  const topic=getTopic(p);
+  const shownSteps=displaySteps(p);
+  const isSeg=p.kind==="segment";
+  const targetChip = isSeg ? "" : `<span class="angle-chip">${p.angle}°</span> &nbsp; `;
+  const lead = isSeg
+    ? "Přesná konstrukce poměrů a násobků úseček pomocí rovnoběžek a podobnosti trojúhelníků."
+    : "Přesná konstrukce bez úhloměru. Pracujeme pouze s pravítkem a kružítkem.";
+  const sketchNote = isSeg
+    ? "Popisky jsou odsazené mimo čáry a mají bílé podložení, aby byly čitelné; pomocné body P₁, P₂, … jsou značeny krátkými ryskami přímo v jejich poloze."
+    : "Náčrtek ukazuje pouze cílový úhel. Přesná konstrukce je v řešení.";
+  return `<div class="grid">
+    <section class="card">
+      <div class="eyebrow">${esc(topic)} · ${esc(p.cat)}</div>
+      <h1>${esc(p.title)}</h1>
+      <p class="lead">${lead}</p>
+      <div class="badges">
+        <span class="badge">${esc(p.difficulty)}</span>
+        <span class="badge">${esc(p.method)}</span>
+        <span class="badge tool">pravítko + kružítko</span>
+      </div>
+      <dl class="kv">
+        <dt>Dáno</dt><dd>${esc(p.given)}</dd>
+        <dt>Sestroj</dt><dd>${targetChip}${esc(p.find)}</dd>
+      </dl>
+      <div class="notice"><b>Myšlenka:</b> ${esc(p.idea)}</div>
+      <div class="sketchbox">
+        <div class="eyebrow">Náčrtek</div>
+        <div class="sketch-preview">${sketchSVG(p)}</div>
+        <p>${sketchNote}</p>
+      </div>
+      <button class="solution-toggle" id="solutionToggle">${solutionOpen?'Skrýt řešení':'Zobrazit řešení'}</button>
+      <div class="solution ${solutionOpen?'open':''}" id="solution">
+        <div class="eyebrow">Postup konstrukce</div>
+        <div class="steps">${shownSteps.map((st,i)=>`<div class="step ${i===diagramStep?'active':''}" data-step="${i}">
+          <span class="num">${i+1}</span><strong>${esc(st[0])}</strong>
+          <p>${esc(st[1])}</p>
+        </div>`).join("")}</div>
+        <div class="construction">
+          <h3>Zápis konstrukce</h3>
+          <ol>${p.construction.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>
+        </div>
+      </div>
+    </section>
+    <section class="card diagram-card">
+      <div class="diagram-head"><div class="diagram-title">Konstrukce krok po kroku</div><div class="step-counter">${diagramStep<0?'Zadání':`${diagramStep+1} / ${shownSteps.length}`}</div></div>
+      <div id="diagram">${problemDiagramSVG(p,diagramStep)}</div>
+      <div class="diagram-controls">
+        <button id="stepPrev" ${diagramStep<0?'disabled':''}>← Krok zpět</button>
+        <button id="stepReset">Od začátku</button>
+        <button id="stepNext" class="primary" ${diagramStep===shownSteps.length-1?'disabled':''}>Další krok →</button>
+      </div>
+      <div class="legend">
+        <span><i class="l-known"></i> daný útvar</span>
+        <span><i class="l-help"></i> pomocná konstrukce</span>
+        <span><i class="l-unknown"></i> výsledek</span>
+      </div>
+    </section>
+  </div>`;
+}
+
+function accordion(icon,title,body,open=false,extra=""){
+  return `<div class="mobile-accordion ${open?'open':''}">
+    <button class="mobile-accordion-toggle"><span class="left"><span class="icon">${icon}</span>${title}</span><span class="chev">⌄</span></button>
+    <div class="mobile-accordion-panel ${extra}">${body}</div>
+  </div>`;
+}
+function mobileContent(p){
+  const shownSteps=displaySteps(p);
+  const procedure=`<div class="mobile-procedure-diagram">${problemDiagramSVG(p,shownSteps.length-1,true)}</div>
+    <div class="mobile-steps">${shownSteps.map((st,i)=>`<div class="step"><span class="num">${i+1}</span><strong>${esc(st[0])}</strong><p>${esc(st[1])}</p></div>`).join("")}</div>`;
+  const construction=`<ol>${p.construction.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`;
+  const target = p.kind==="segment" ? esc(p.find) : `<b>${p.angle}°</b> – ${esc(p.find)}`;
+  return `<section class="mobile-detail-card">
+    <div class="eyebrow">${esc(getTopic(p))} · ${esc(p.cat)}</div>
+    <h1>${esc(p.title)}</h1>
+    <div class="badges"><span class="badge">${esc(p.difficulty)}</span><span class="badge">${esc(p.method)}</span></div>
+    <div class="mobile-assignment">
+      <div class="mobile-assignment-row"><span>Dáno</span><div>${esc(p.given)}</div></div>
+      <div class="mobile-assignment-row"><span>Sestroj</span><div>${target}</div></div>
+      <div class="mobile-assignment-row"><span>Myšlenka</span><div>${esc(p.idea)}</div></div>
+    </div>
+    <div class="mobile-accordions">
+      ${accordion("✎","Náčrtek",`${sketchSVG(p)}<p class="mobile-sketch-note">Poměry v konstrukci jsou zachovány přesně.</p>`)}
+      ${accordion("↳","Postup",procedure)}
+      ${accordion("≡","Zápis konstrukce",construction,false,"mobile-construction")}
+    </div>
+  </section>`;
+}
+
+function openProblem(i){
+  current=Math.max(0,Math.min(P.length-1,i));
+  diagramStep=-1;
+  solutionOpen=false;
+  if(innerWidth<=700) document.body.classList.add("mobile-detail");
+  render();
+  if(innerWidth<=700) window.scrollTo({top:0,behavior:"instant"});
+}
+function render(){
+  renderList();
+  const p=P[current];
+  $("#progress").textContent=`${current+1} / ${P.length}`;
+  $("#prevProblem").disabled=current===0;
+  $("#nextProblem").disabled=current===P.length-1;
+  $("#content").innerHTML=innerWidth<=700?mobileContent(p):desktopContent(p);
+
+  if(innerWidth>700){
+    $("#solutionToggle").onclick=()=>{
+      solutionOpen=!solutionOpen;
+      $("#solution").classList.toggle("open",solutionOpen);
+      $("#solutionToggle").textContent=solutionOpen?"Skrýt řešení":"Zobrazit řešení";
+    };
+    document.querySelectorAll(".step").forEach(el=>el.onclick=()=>{diagramStep=+el.dataset.step;render();});
+    $("#stepPrev").onclick=()=>{if(diagramStep>=0){diagramStep--;render();}};
+    $("#stepNext").onclick=()=>{if(diagramStep<displaySteps(p).length-1){diagramStep++;render();}};
+    $("#stepReset").onclick=()=>{diagramStep=-1;render();};
+  }else{
+    document.querySelectorAll(".mobile-accordion-toggle").forEach(btn=>btn.onclick=()=>btn.parentElement.classList.toggle("open"));
+  }
+  $("#mobilePrevProblem").disabled=current===0;
+  $("#mobileNextProblem").disabled=current===P.length-1;
+}
+$("#prevProblem").onclick=()=>openProblem(current-1);
+$("#nextProblem").onclick=()=>openProblem(current+1);
+$("#mobilePrevProblem").onclick=()=>openProblem(current-1);
+$("#mobileNextProblem").onclick=()=>openProblem(current+1);
+$("#mobileBackToList").onclick=()=>{document.body.classList.remove("mobile-detail");window.scrollTo({top:0,behavior:"instant"});renderList();};
+$("#search").addEventListener("input",renderList);
+window.addEventListener("resize",()=>{
+  if(innerWidth>700) document.body.classList.remove("mobile-detail");
+  render();
+});
+
+renderFilters();
+render();
+</script>
+</body>
+</html>
