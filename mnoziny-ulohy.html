@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Množiny bodů – procvičování</title>
+<style>
+body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:system-ui,sans-serif;background:#f5f7fb;color:#18202a}
+p{padding:24px;text-align:center}
+</style>
+</head>
+<body>
+<p>Načítám procvičování…</p>
+<script>
+(async()=>{
+  const files=['mnoziny-ulohy-data-1.txt','mnoziny-ulohy-data-2.txt','mnoziny-ulohy-data-3.txt','mnoziny-ulohy-data-4.txt'];
+  const parts=await Promise.all(files.map(async file=>{
+    const response=await fetch(file,{cache:'no-store'});
+    if(!response.ok) throw new Error(`Nelze načíst ${file}`);
+    return (await response.text()).trim();
+  }));
+  const bytes=Uint8Array.from(atob(parts.join('')),c=>c.charCodeAt(0));
+  if(!('DecompressionStream' in window)) throw new Error('Prohlížeč nepodporuje DecompressionStream.');
+  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+  const html=await new Response(stream).text();
+  document.open();
+  document.write(html);
+  document.close();
+})().catch(err=>{
+  document.body.innerHTML='<p>Nepodařilo se načíst procvičování. Zkus stránku obnovit nebo použít novější prohlížeč.</p>';
+  console.error(err);
+});
+</script>
+</body>
+</html>
