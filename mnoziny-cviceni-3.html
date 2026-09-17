@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Množiny bodů dané vlastnosti – cvičení 3</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#18202a;--muted:#667085;--line:#d6deea;--blue:#1565c0;--blue2:#eaf3ff;--helper:#8a94a3;--green:#147d4e;--shadow:0 10px 28px rgba(24,32,42,.08)}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.52}
+button,select{font:inherit}.app{max-width:1250px;margin:0 auto;padding:18px}.topbar{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:16px}
+h1{font-size:clamp(1.35rem,2.3vw,2rem);margin:0 0 4px}.sub{color:var(--muted);margin:0}.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:16px}.sidebar,.main{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+.sidebar{padding:14px;align-self:start;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}.side-title{font-weight:750;margin:2px 4px 10px}.task-list{display:grid;gap:6px}.task-btn{width:100%;text-align:left;border:1px solid transparent;border-radius:12px;padding:10px 11px;background:transparent;color:var(--ink);cursor:pointer}.task-btn:hover{background:#f2f6fb}.task-btn.active,.task-btn[aria-current="true"]{background:#dcecff;border-color:#5b9be3;color:#0b4f9c;font-weight:800;box-shadow:inset 4px 0 0 var(--blue)}.task-btn:focus{outline:none}.task-btn:focus-visible{outline:2px solid #1565c0;outline-offset:2px}.mobile-select{display:none;width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.main{padding:20px}.eyebrow{color:var(--blue);font-weight:800;font-size:.88rem;text-transform:uppercase;letter-spacing:.06em}.task-title{margin:4px 0 10px;font-size:1.45rem}.statement{font-size:1.05rem;background:#fbfcfe;border:1px solid var(--line);border-radius:14px;padding:14px 15px}.variants{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 2px}.variant-btn{border:1px solid #bfd0e3;background:#fff;border-radius:999px;padding:7px 12px;cursor:pointer}.variant-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.btn{border:1px solid #b9c7d8;background:#fff;border-radius:11px;padding:9px 13px;cursor:pointer}.btn:hover{background:#f4f7fb}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn:disabled{opacity:.45;cursor:not-allowed}.solution{display:none;border-top:1px solid var(--line);padding-top:16px}.solution.open{display:block}.answer-box{background:#eef8f3;border:1px solid #bfe2cf;border-radius:13px;padding:12px 14px;margin:0 0 14px}.answer-box strong{color:var(--green)}
+h3{margin:18px 0 8px;font-size:1.1rem}.construction{background:#fafbfc;border:1px solid var(--line);border-radius:14px;padding:12px 14px}.construction ol{margin:6px 0 0;padding-left:22px}.construction li+li{margin-top:5px}.note{background:#fff8e8;border:1px solid #eed79f;border-radius:12px;padding:10px 12px;margin:12px 0}.diagram-card{margin-top:16px;border:1px solid var(--line);border-radius:16px;overflow:hidden}.diagram-head{padding:12px 14px;background:#f8fafc;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.step-info{color:var(--muted);font-size:.92rem}.diagram-wrap{padding:10px;background:#fff;overflow:hidden}.diagram-wrap svg{display:block;width:100%;height:auto;max-height:560px}.diagram-controls{display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px 14px}.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.88rem;color:var(--muted);padding:0 12px 12px}.legend span{display:inline-flex;align-items:center;gap:6px}.sw{width:22px;height:0;border-top:3px solid #222}.sw.help{border-top:2px solid var(--helper)}.sw.locus{border-top-color:var(--blue)}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:18px}.nav .btn{min-width:130px}.foot{color:var(--muted);font-size:.86rem;margin-top:12px}
+svg text{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;fill:#18202a;font-size:15px}svg .small{font-size:13px}svg .blue-label{fill:#1565c0;font-weight:700}svg .given{stroke:#202833;stroke-width:2.3;fill:none}svg .helper{stroke:#8a94a3;stroke-width:1.7;fill:none;stroke-dasharray:none!important}svg .thin{stroke:#596575;stroke-width:1.5;fill:none}svg .locus{stroke:#1565c0;stroke-width:3;fill:none}svg .target{stroke:#1565c0;stroke-width:2.7;fill:none}svg .point{fill:#202833}svg .point-blue{fill:#1565c0}svg .open-point{fill:#fff;stroke:#1565c0;stroke-width:2.2}svg .tangent{stroke:#147d4e;stroke-width:1.8;fill:none}.diagram-step.hidden{display:none}
+@media(max-width:780px){.app{padding:10px}.layout{grid-template-columns:1fr}.sidebar{position:static;max-height:none;padding:12px}.task-list{display:none}.mobile-select{display:block}.main{padding:15px}.statement{font-size:1rem}.diagram-wrap{padding:4px}.nav{position:sticky;bottom:8px;background:rgba(255,255,255,.94);backdrop-filter:blur(5px);padding:8px;border:1px solid var(--line);border-radius:14px;z-index:3}.nav .btn{min-width:0;flex:1}.topbar{padding:14px}.diagram-controls .btn{flex:1 1 42%;min-height:44px}}
+</style>
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']]},svg:{fontCache:'global'}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <h1>Množiny bodů dané vlastnosti – cvičení 3</h1>
+    <p class="sub">17 konstrukčních úloh. U každé je úplný postup a přesná krokovaná grafická konstrukce.</p>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-title">Vyber úlohu</div>
+      <select id="mobileSelect" class="mobile-select" aria-label="Vyber úlohu"></select>
+      <div id="taskList" class="task-list"></div>
+    </aside>
+    <main class="main">
+      <div class="eyebrow" id="eyebrow"></div>
+      <h2 class="task-title" id="taskTitle"></h2>
+      <div class="statement" id="statement"></div>
+      <div class="variants" id="variants"></div>
+      <div class="toolbar">
+        <button class="btn primary" id="toggleSolution">Rozbalit řešení</button>
+        <button class="btn" id="resetDiagram">Grafiku od začátku</button>
+      </div>
+      <section class="solution" id="solution"></section>
+      <div class="nav">
+        <button class="btn" id="prevTask">← Předchozí</button>
+        <button class="btn" id="nextTask">Další →</button>
+      </div>
+      <div class="foot">Černě je zadání, šedou plnou čarou postup konstrukce a modře hledaný výsledek. Pravý úhel je v grafice značen českým způsobem obloučkem s tečkou.</div>
+    </main>
+  </div>
+</div>
+<script>
+const NS='http://www.w3.org/2000/svg';
+const fmt=n=>Number(n.toFixed(2));
+const P=(x,y)=>({x,y});
+const pt=(p,cls='point',r=4.5)=>`<circle class="${cls}" cx="${fmt(p.x)}" cy="${fmt(p.y)}" r="${r}"/>`;
+const lbl=(p,t,cls='',dx=8,dy=-8)=>`<text x="${fmt(p.x+dx)}" y="${fmt(p.y+dy)}" class="${cls}">${t}</text>`;
+const line=(a,b,cls='given')=>`<line class="${cls}" x1="${fmt(a.x)}" y1="${fmt(a.y)}" x2="${fmt(b.x)}" y2="${fmt(b.y)}"/>`;
+const circ=(c,r,cls='helper')=>`<circle class="${cls}" cx="${fmt(c.x)}" cy="${fmt(c.y)}" r="${fmt(r)}"/>`;
+const txt=(x,y,t,cls='')=>`<text x="${x}" y="${y}" class="${cls}">${t}</text>`;
+const deg=a=>a*Math.PI/180;
+const vec=(ang,len)=>P(Math.cos(deg(ang))*len,-Math.sin(deg(ang))*len);
+const add=(a,b)=>P(a.x+b.x,a.y+b.y);
+const mix=(a,b,t=.5)=>P(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t);
+function cints(c0,r0,c1,r1){const dx=c1.x-c0.x,dy=c1.y-c0.y,d=Math.hypot(dx,dy);if(d>r0+r1+1e-9||d<Math.abs(r0-r1)-1e-9||d===0)return[];const a=(r0*r0-r1*r1+d*d)/(2*d),h2=r0*r0-a*a,h=Math.sqrt(Math.max(0,h2));const xm=c0.x+a*dx/d,ym=c0.y+a*dy/d;const rx=-dy*(h/d),ry=dx*(h/d);if(h<1e-7)return[P(xm,ym)];return[P(xm+rx,ym+ry),P(xm-rx,ym-ry)];}
+function rightCZ(x,y,rot=0,r=12){const a0=deg(rot),a1=deg(rot+90);const p1=P(x+Math.cos(a0)*r,y-Math.sin(a0)*r),p2=P(x+Math.cos(a1)*r,y-Math.sin(a1)*r);const dotAng=deg(rot+45),d=P(x+Math.cos(dotAng)*r*.58,y-Math.sin(dotAng)*r*.58);return `<path class="thin" d="M ${fmt(p1.x)} ${fmt(p1.y)} A ${r} ${r} 0 0 0 ${fmt(p2.x)} ${fmt(p2.y)}"/><circle cx="${fmt(d.x)}" cy="${fmt(d.y)}" r="2.2" fill="#596575"/>`;}
+function svgWrap(steps,view='0 0 640 420'){return `<svg viewBox="${view}" role="img" aria-label="Grafická konstrukce">${steps.map((s,i)=>`<g class="diagram-step" data-step="${i}">${s}</g>`).join('')}</svg>`}
+function lineParallelY(y,cls='helper'){return `<line class="${cls}" x1="40" y1="${fmt(y)}" x2="600" y2="${fmt(y)}"/>`}
+function infiniteLineThrough(o,ang,cls='given',len=700){const v=vec(ang,len);return line(P(o.x-v.x,o.y-v.y),P(o.x+v.x,o.y+v.y),cls)}
+function offsetLine(o,ang,dist,sign=1,cls='helper',len=700){const n=vec(ang+90,dist*sign);const oo=add(o,n);return infiniteLineThrough(oo,ang,cls,len)}
+function footToLine(p,o,ang){const u=P(Math.cos(deg(ang)),-Math.sin(deg(ang)));const vx=p.x-o.x,vy=p.y-o.y,t=vx*u.x+vy*u.y;return P(o.x+t*u.x,o.y+t*u.y)}
+
+const tasks=[
+{
+ n:1,title:'Průsečík dvou kružnic',
+ statement:'Je dána úsečka \\(MN\\) délky \\(4\\,\\mathrm{cm}\\). Sestrojte bod \\(Y\\), který má od bodu \\(M\\) vzdálenost \\(3\\,\\mathrm{cm}\\) a od bodu \\(N\\) vzdálenost:',
+ variants:[['a)','2 cm'],['b)','1 cm'],['c)','7 cm'],['d)','8 cm']],
+ getSolution(v){const r=[2,1,7,8][v];const counts=[2,1,1,0];const why=[
+ 'Kružnice se protínají ve dvou bodech.',
+ 'Kružnice se zvenku dotýkají v jediném bodě.',
+ 'Kružnice se zevnitř dotýkají v jediném bodě.',
+ 'Kružnice nemají společný bod.'
+ ][v];return `<div class="answer-box"><strong>Výsledek:</strong> ${counts[v]===0?'úloha nemá řešení':counts[v]===1?'1 řešení':'2 řešení'}. ${why}</div><p>Bod \\(Y\\) musí současně ležet na kružnici se středem \\(M\\) a poloměrem 3 cm a na kružnici se středem \\(N\\) a poloměrem ${String(r).replace('.',',')} cm.</p><div class="construction"><h4>Konstrukce</h4><ol><li>Sestroj úsečku \\(MN=4\\,\\mathrm{cm}\\).</li><li>Sestroj kružnici \\(k(M;3\\,\\mathrm{cm})\\).</li><li>Sestroj kružnici \\(l(N;${String(r).replace('.',',')}\\,\\mathrm{cm})\\).</li><li>${counts[v]?`Jejich ${counts[v]===1?'společný bod':'průsečíky'} označ \\(Y${counts[v]===2?'_1,Y_2':''}\\).`:'Protože se kružnice neprotínají ani nedotýkají, hledaný bod neexistuje.'}</li></ol></div>`},
+ diagram(v){const M=P(220,200),N=P(340,200),s=30,rM=90,rN=[60,30,210,240][v],ints=cints(M,rM,N,rN);return svgWrap([
+   `${line(M,N,'given')}${pt(M)}${pt(N)}${lbl(M,'M')}${lbl(N,'N')}${txt(256,188,'4 cm','small')}`,
+   `${circ(M,rM,'helper')}${txt(128,94,'k(M; 3 cm)','small')}`,
+   `${circ(N,rN,'helper')}${txt(370,48,`l(N; ${[2,1,7,8][v]} cm)`,'small')}`,
+   ints.length?ints.map((q,i)=>`${pt(q,'point-blue',6)}${lbl(q,ints.length===1?'Y':`Y${i+1}`,'blue-label',8,-8)}`).join(''):`${txt(382,370,'Žádný společný bod','blue-label')}`
+ ],'0 0 640 400')}
+},
+{
+ n:2,title:'Vzdálenost od přímky a od bodu',
+ statement:'Narýsujte přímku \\(f\\) a zvolte na ní bod \\(F\\). Sestrojte bod \\(X\\), který má od přímky \\(f\\) vzdálenost \\(1{,}3\\,\\mathrm{cm}\\) a od bodu \\(F\\) vzdálenost \\(2\\,\\mathrm{cm}\\).',
+ getSolution(){return `<div class="answer-box"><strong>Výsledek:</strong> 4 řešení.</div><p>Body ve vzdálenosti 1,3 cm od přímky \\(f\\) leží na dvou rovnoběžkách s \\(f\\). Body ve vzdálenosti 2 cm od \\(F\\) leží na kružnici se středem \\(F\\).</p><div class="construction"><h4>Konstrukce</h4><ol><li>Na obou stranách přímky \\(f\\) sestroj rovnoběžku ve vzdálenosti 1,3 cm.</li><li>Sestroj kružnici \\(k(F;2\\,\\mathrm{cm})\\).</li><li>Všechny průsečíky kružnice s oběma rovnoběžkami jsou hledané body \\(X_1,X_2,X_3,X_4\\).</li></ol></div>`},
+ diagram(){const F=P(320,210),r=120,d=78,ys=[210-d,210+d];let xs=[];ys.forEach(y=>{const dx=Math.sqrt(r*r-(y-F.y)**2);xs.push(P(F.x-dx,y),P(F.x+dx,y));});return svgWrap([
+ `${line(P(50,210),P(590,210),'given')}${pt(F)}${lbl(F,'F')}${txt(560,198,'f')}`,
+ `${lineParallelY(ys[0])}${lineParallelY(ys[1])}${txt(54,ys[0]-8,'1,3 cm','small')}${txt(54,ys[1]-8,'1,3 cm','small')}`,
+ `${circ(F,r,'helper')}${txt(402,108,'2 cm','small')}`,
+ xs.map((q,i)=>`${pt(q,'point-blue',5.5)}${lbl(q,`X${i+1}`,'blue-label')}`).join('')
+ ])}
+},
+{
+ n:3,title:'Vzdálenost od dvou rovnoběžek',
+ statement:'Jsou dány rovnoběžky <i>e</i>, <i>f</i> vzdálené <strong>2,3 cm</strong>. Sestrojte bod <i>D</i>, který má od přímky <i>e</i> vzdálenost <strong>1,2 cm</strong> a od přímky <i>f</i> vzdálenost:',
+ variants:[['a)','3,5 cm'],['b)','1,5 cm'],['c)','1,1 cm']],
+ getSolution(v){const result=['nekonečně mnoho řešení – celá jedna rovnoběžka','žádné řešení','nekonečně mnoho řešení – celá jedna rovnoběžka'][v];const r=['3,5','1,5','1,1'][v];return `<div class="answer-box"><strong>Výsledek:</strong> ${result}.</div><p>Nejprve sestrojíme dvě rovnoběžky ve vzdálenosti 1,2 cm od <i>e</i>. Potom dvě rovnoběžky ve vzdálenosti ${r} cm od <i>f</i>. Hledáme, zda některá přímka z první dvojice splývá s některou přímkou z druhé dvojice.</p><div class="construction"><h4>Konstrukce</h4><ol><li>Sestroj obě rovnoběžky s <i>e</i> ve vzdálenosti 1,2 cm.</li><li>Sestroj obě rovnoběžky s <i>f</i> ve vzdálenosti ${r} cm.</li><li>${v===1?'Žádná z nových přímek nesplývá s přímkou z první dvojice, proto žádný bod nevyhovuje.':'Jedna přímka z první dvojice přesně splývá s jednou přímkou z druhé dvojice. Každý její bod je řešením.'}</li></ol></div>`},
+ diagram(v){const ye=120,yf=235,offsE=60,offsF=[175,75,55][v];const E=[ye-offsE,ye+offsE],F=[yf-offsF,yf+offsF];const common=E.find(y=>F.some(z=>Math.abs(y-z)<1e-6));return svgWrap([
+ `${line(P(50,ye),P(590,ye),'given')}${line(P(50,yf),P(590,yf),'given')}${txt(560,ye-9,'e')}${txt(560,yf-9,'f')}${txt(70,185,'2,3 cm','small')}`,
+ `${lineParallelY(E[0])}${lineParallelY(E[1])}${txt(70,E[0]-6,'1,2 cm','small')}${txt(70,E[1]-6,'1,2 cm','small')}`,
+ `${lineParallelY(F[0])}${lineParallelY(F[1])}${txt(430,F[0]-6,`${[3.5,1.5,1.1][v]} cm`,'small')}${txt(430,F[1]-6,`${[3.5,1.5,1.1][v]} cm`,'small')}`,
+ common!==undefined?`${line(P(55,common),P(585,common),'locus')}${txt(220,common-10,'všechny body této přímky','blue-label')}`:`${txt(225,370,'Žádná společná přímka','blue-label')}`
+ ],'0 0 640 420')}
+},
+{
+ n:4,title:'Vzdálenost od dvou různoběžek',
+ statement:'Narýsujte různoběžky \\(a,b\\), které svírají úhel \\(75^\\circ\\). Sestrojte takový bod \\(A\\), jehož vzdálenost od přímky \\(a\\) je \\(3{,}2\\,\\mathrm{cm}\\) a od přímky \\(b\\) je \\(1\\,\\mathrm{cm}\\).',
+ getSolution(){return `<div class="answer-box"><strong>Výsledek:</strong> 4 řešení.</div><p>Podmínka vzdálenosti od každé přímky vytvoří dvě rovnoběžky. Každá z dvojice rovnoběžek s \\(a\\) protne každou z dvojice rovnoběžek s \\(b\\).</p><div class="construction"><h4>Konstrukce</h4><ol><li>Sestroj dvě rovnoběžky s \\(a\\) ve vzdálenosti 3,2 cm.</li><li>Sestroj dvě rovnoběžky s \\(b\\) ve vzdálenosti 1 cm.</li><li>Jejich čtyři průsečíky označ \\(A_1,A_2,A_3,A_4\\).</li></ol></div>`},
+ diagram(){const O=P(320,210),ang=75,dA=112,dB=35;const ys=[O.y-dA,O.y+dA];const sols=[];for(const y of ys){for(const sb of [-1,1]){const nx=-Math.sin(deg(ang)),ny=-Math.cos(deg(ang));/* screen-normal for direction ang */const rhs=sb*dB;const dy=y-O.y;const dx=(rhs-ny*dy)/nx;sols.push(P(O.x+dx,y));}}return svgWrap([
+ `${infiniteLineThrough(O,0,'given')}${infiniteLineThrough(O,75,'given')}${pt(O)}${txt(570,198,'a')}${txt(430,72,'b')}${txt(352,182,'75°','small')}`,
+ `${offsetLine(O,0,dA,1,'helper')}${offsetLine(O,0,dA,-1,'helper')}${txt(55,90,'3,2 cm','small')}`,
+ `${offsetLine(O,75,dB,1,'helper')}${offsetLine(O,75,dB,-1,'helper')}${txt(470,112,'1 cm','small')}`,
+ sols.map((q,i)=>`${pt(q,'point-blue',5.5)}${lbl(q,`A${i+1}`,'blue-label')}`).join('')
+ ])}
+},
+{
+ n:5,title:'Bod na přímce stejně vzdálený od X a Y',
+ statement:'Narýsujte úsečku \\(XY\\) délky \\(6\\,\\mathrm{cm}\\). Zvolte na ní bod \\(Z\\) tak, aby \\(|XZ|=1\\,\\mathrm{cm}\\). Bodem \\(Z\\) veďte různoběžku \\(z\\) s přímkou \\(XY\\). Najděte na ní bod \\(Q\\), který je stejně vzdálen od bodů \\(X,Y\\).',
+ getSolution(){return `<div class="answer-box"><strong>Výsledek:</strong> průsečík přímky \\(z\\) s osou úsečky \\(XY\\).</div><p>Všechny body stejně vzdálené od \\(X\\) a \\(Y\\) leží na ose úsečky \\(XY\\).</p><div class="construction"><h4>Konstrukce</h4><ol><li>Sestroj úsečku \\(XY=6\\,\\mathrm{cm}\\) a na ní bod \\(Z\\) tak, aby \\(|XZ|=1\\,\\mathrm{cm}\\).</li><li>Bodem \\(Z\\) veď zvolenou různoběžku \\(z\\).</li><li>Sestroj osu úsečky \\(XY\\).</li><li>Její průsečík s \\(z\\) označ \\(Q\\).</li></ol></div><div class="note"><strong>Pozor:</strong> kdyby byla zvolená přímka \\(z\\) kolmá k \\(XY\\), byla by s osou \\(XY\\) rovnoběžná a řešení by neexistovalo. V grafice je proto zvolena šikmá různoběžka.</div>`},
+ diagram(){const X=P(100,230),Y=P(520,230),Z=P(170,230),mid=P(310,230),Q=P(310,230+Math.tan(deg(35))*(310-170));return svgWrap([
+ `${line(X,Y,'given')}${pt(X)}${pt(Y)}${pt(Z)}${lbl(X,'X')}${lbl(Y,'Y')}${lbl(Z,'Z')}${txt(122,216,'1 cm','small')}${txt(280,216,'6 cm','small')}`,
+ `${infiniteLineThrough(Z,-35,'given')}${txt(548,394,'z')}`,
+ `${line(P(mid.x,55),P(mid.x,390),'helper')}${pt(mid)}${lbl(mid,'S','small')}${rightCZ(mid.x,mid.y,0)}`,
+ `${pt(Q,'point-blue',6)}${lbl(Q,'Q','blue-label')}${line(X,Q,'thin')}${line(Y,Q,'thin')}`
+ ])}
+},
+{
+ n:6,title:'Kružnice a rovnoběžky s přímkou',
+ statement:'Je dána přímka \\(p\\) a bod \\(K\\) tak, že:',
+ variants:[['a)','|Kp| = 1,5 cm'],['b)','|Kp| = 3 cm'],['c)','|Kp| = 5 cm'],['d)','|Kp| = 0,5 cm']],
+ getSolution(v){const d=['1{,}5','3','5','0{,}5'][v],count=[2,1,0,4][v];return `<div class="answer-box"><strong>Výsledek:</strong> ${count===0?'žádné řešení':count===1?'1 řešení':`${count} řešení`}.</div><p>Bod \\(M\\) musí ležet na kružnici \\(k(K;2\\,\\mathrm{cm})\\) a zároveň na jedné ze dvou rovnoběžek s \\(p\\) ve vzdálenosti 1 cm.</p><div class="construction"><h4>Konstrukce</h4><ol><li>Sestroj dvě rovnoběžky s \\(p\\) ve vzdálenosti 1 cm.</li><li>Sestroj kružnici \\(k(K;2\\,\\mathrm{cm})\\).</li><li>${count?`Průsečíky kružnice s rovnoběžkami jsou hledané body. V tomto případě jsou ${count}.`:'Kružnice neprotne ani jednu z rovnoběžek, proto řešení neexistuje.'}</li></ol></div>`},
+ diagram(v){const pY=300,s=45,d=[1.5,3,5,.5][v],K=P(320,pY-d*s),r=90,ys=[pY-45,pY+45],sol=[];ys.forEach(y=>{const dy=y-K.y;if(Math.abs(dy)<=r+1e-9){const dx=Math.sqrt(Math.max(0,r*r-dy*dy));sol.push(P(K.x-dx,y));if(dx>1e-7)sol.push(P(K.x+dx,y));}});return svgWrap([
+ `${line(P(50,pY),P(590,pY),'given')}${pt(K)}${lbl(K,'K')}${txt(560,pY-10,'p')}${txt(350,(K.y+pY)/2,`${d} cm`,'small')}`,
+ `${lineParallelY(ys[0])}${lineParallelY(ys[1])}${txt(55,ys[0]-8,'1 cm','small')}${txt(55,ys[1]-8,'1 cm','small')}`,
+ `${circ(K,r,'helper')}${txt(404,K.y-55,'2 cm','small')}`,
+ sol.length?sol.map((q,i)=>`${pt(q,'point-blue',5.5)}${lbl(q,sol.length===1?'M':`M${i+1}`,'blue-label')}`).join(''):`${txt(240,395,'Žádný průsečík','blue-label')}`
+ ],'0 0 640 430')}
+},
+{
+ n:7,title:'Osa strany trojúhelníku a kružnice',
+ statement:'Je dán trojúhelník \\(ABC\\) o stranách \\(a=9{,}5\\,\\mathrm{cm},\\ b=6\\,\\mathrm{cm},\\ c=4\\,\\mathrm{cm}\\). Sestrojte bod \\(D\\), který má stejné vzdálenosti od vrcholů \\(B,C\\) a jehož vzdálenost od vrcholu \\(A\\) je:',
+ variants:[['a)','3 cm'],['b)','0,5 cm']],
+ getSolution(v){const r=v===0?'3':'0{,}5';const count=v===0?2:0;return `<div class="answer-box"><strong>Výsledek:</strong> ${count?`${count} řešení`:'žádné řešení'}.</div><p>Body stejně vzdálené od \\(B\\) a \\(C\\) leží na ose úsečky \\(BC\\). Podmínka vzdálenosti od \\(A\\) dává kružnici se středem \\(A\\).</p><div class="construction"><h4>Konstrukce</h4><ol><li>Sestroj trojúhelník \\(ABC\\) podle věty sss.</li><li>Sestroj osu strany \\(BC\\).</li><li>Sestroj kružnici \\(k(A;${r}\\,\\mathrm{cm})\\).</li><li>${count?'Její dva průsečíky s osou \\(BC\\) jsou hledané body \\(D_1,D_2\\).':'Kružnice osu \\(BC\\) neprotne, proto bod \\(D\\) neexistuje.'}</li></ol></div>`},
+ diagram(v){const s=50,B=P(80,300),C=P(555,300),a=9.5*s,b=6*s,c=4*s;const x=(c*c-b*b+a*a)/(2*a),h=Math.sqrt(Math.max(0,c*c-x*x)),A=P(B.x+x,B.y-h),mid=mix(B,C),r=(v===0?3:.5)*s;const ints=[];const dx=mid.x-A.x;if(r>=Math.abs(dx)){const dy=Math.sqrt(Math.max(0,r*r-dx*dx));ints.push(P(mid.x,A.y-dy));if(dy>1e-7)ints.push(P(mid.x,A.y+dy));}return svgWrap([
+ `${line(A,B,'given')}${line(B,C,'given')}${line(C,A,'given')}${pt(A)}${pt(B)}${pt(C)}${lbl(A,'A')}${lbl(B,'B')}${lbl(C,'C')}${txt(240,318,'a = 9,5 cm','small')}`,
+ `${line(P(mid.x,30),P(mid.x,405),'helper')}${pt(mid)}${lbl(mid,'S','small')}`,
+ `${circ(A,r,'helper')}${txt(A.x+r*.6,A.y-r*.55,`${v===0?3:'0,5'} cm`,'small')}`,
+ ints.length?ints.map((q,i)=>`${pt(q,'point-blue',5.5)}${lbl(q,`D${i+1}`,'blue-label')}`).join(''):`${txt(350,90,'Bez průsečíku','blue-label')}`
+ ],'0 0 640 430')}
+},
+{
+ n:8,title:'Kružnice s daným bodem dotyku',
+ statement:'Je dána přímka \\(p\\) a na ní bod \\(Q\\). Sestrojte kružnici, která se dotýká přímky \\(p\\) v bodě \\(Q\\) a má poloměr \\(2{,}6\\,\\mathrm{cm}\\).',
+ getSolution(){return `<div class="answer-box"><strong>Výsledek:</strong> 2 kružnice, jedna na každé straně přímky \\(p\\).</div><p>Poloměr vedený do bodu dotyku je kolmý na tečnu. Střed proto leží na kolmici k \\(p\\) vedené bodem \\(Q\\), ve vzdálenosti 2,6 cm od \\(Q\\).</p><div class="construction"><h4>Konstrukce</h4><ol><li>Bodem \\(Q\\) sestroj kolmici k \\(p\\).</li><li>Na kolmici od bodu \\(Q\\) odměř na obě strany 2,6 cm. Získej středy \\(S_1,S_2\\).</li><li>Sestroj kružnice \\(k_1(S_1;2{,}6\\,\\mathrm{cm})\\) a \\(k_2(S_2;2{,}6\\,\\mathrm{cm})\\).</li></ol></div>`},
+ diagram(){const Q=P(320,250),r=110,S1=P(320,140),S2=P(320,360);return svgWrap([
+ `${line(P(55,250),P(585,250),'given')}${pt(Q)}${lbl(Q,'Q')}${txt(560,238,'p')}`,
+ `${line(P(320,25),P(320,475),'helper')}${rightCZ(320,250,0)}`,
+ `${pt(S1,'point-blue')}${pt(S2,'point-blue')}${lbl(S1,'S₁','blue-label')}${lbl(S2,'S₂','blue-label')}${txt(330,198,'2,6 cm','small')}`,
+ `${circ(S1,r,'target')}${circ(S2,r,'target')}`
+ ],'0 0 640 500')}
+},
+{
+ n:9,title:'Kružnice daného poloměru dvěma body',
+ statement:'Jsou dány dva body \\(X,Y\\) vzdálené \\(3{,}4\\,\\mathrm{cm}\\). Sestrojte kružnici \\(k\\) o poloměru \\(2\\,\\mathrm{cm}\\), která těmito body prochází.',
+ getSolution(){return `<div class="answer-box"><strong>Výsledek:</strong> 2 kružnice.</div><p>Střed hledané kružnice musí být 2 cm od \\(X\\) i od \\(Y\\). Je tedy průsečíkem dvou kružnic se stejným poloměrem 2 cm.</p><div class="construction"><h4>Konstrukce</h4><ol><li>Sestroj kružnici \\(m(X;2\\,\\mathrm{cm})\\).</li><li>Sestroj kružnici \\(n(Y;2\\,\\mathrm{cm})\\).</li><li>Jejich průsečíky označ \\(S_1,S_2\\).</li><li>Sestroj kružnice \\(k_1(S_1;2\\,\\mathrm{cm})\\) a \\(k_2(S_2;2\\,\\mathrm{cm})\\). Obě procházejí body \\(X,Y\\).</li></ol></div>`},
+ diagram(){const X=P(230,220),Y=P(400,220),r=100,ints=cints(X,r,Y,r);return svgWrap([
+ `${pt(X)}${pt(Y)}${lbl(X,'X')}${lbl(Y,'Y')}${line(X,Y,'given')}${txt(292,206,'3,4 cm','small')}`,
+ `${circ(X,r,'helper')}${circ(Y,r,'helper')}`,
+ ints.map((q,i)=>`${pt(q,'point-blue',5.5)}${lbl(q,`S${i+1}`,'blue-label')}`).join(''),
+ ints.map(q=>circ(q,r,'target')).join('')
+ ])}
+},
+{
+ n:10,title:'Kružnice ve vnitřku úhlu',
+ statement:'Narýsujte úhel \\(KVL\\) o velikosti \\(65^\\circ\\). Sestrojte v něm kružnici \\(h\\) o poloměru \\(2{,}2\\,\\mathrm{cm}\\) tak, aby se dotýkala obou jeho ramen.',
+ getSolution(){return `<div class="answer-box"><strong>Výsledek:</strong> 1 kružnice uvnitř daného úhlu.</div><p>Střed kružnice musí mít od obou ramen vzdálenost 2,2 cm. Uvnitř úhlu tedy sestrojíme rovnoběžku s každým ramenem právě v této vzdálenosti. Jejich průsečík je střed.</p><div class="construction"><h4>Konstrukce</h4><ol><li>Uvnitř úhlu sestroj rovnoběžku s ramenem \\(VK\\) ve vzdálenosti 2,2 cm.</li><li>Uvnitř úhlu sestroj rovnoběžku s ramenem \\(VL\\) ve vzdálenosti 2,2 cm.</li><li>Jejich průsečík označ \\(S\\).</li><li>Sestroj kružnici \\(h(S;2{,}2\\,\\mathrm{cm})\\).</li></ol></div>`},
+ diagram(){const V=P(145,340),r=77,half=32.5,R=r/Math.sin(deg(half)),S=add(V,vec(half,R));return svgWrap([
+ `${line(V,add(V,vec(0,470)),'given')}${line(V,add(V,vec(65,430)),'given')}${pt(V)}${lbl(V,'V')}${txt(570,327,'K')}${txt(300,48,'L')}${txt(205,312,'65°','small')}`,
+ `${offsetLine(V,0,r,1,'helper')}${offsetLine(V,65,r,-1,'helper')}`,
+ `${pt(S,'point-blue',5.5)}${lbl(S,'S','blue-label')}`,
+ `${circ(S,r,'target')}`
+ ])}
+},
+{
+ n:11,title:'Kružnice dotýkající se přímky a polopřímky',
+ statement:'Narýsujte přímku \\(AB\\) a polopřímku \\(BX\\) tak, aby \\(\\angle XBA=140^\\circ\\). Sestrojte kružnici \\(k\\) o poloměru \\(1{,}6\\,\\mathrm{cm}\\), která se dotýká přímky \\(AB\\) i polopřímky \\(BX\\).',
+ getSolution(){return `<div class="answer-box"><strong>Výsledek:</strong> 2 kružnice.</div><p>Střed musí být 1,6 cm od přímky \\(AB\\) i od přímky, na které leží polopřímka \\(BX\\). Z průsečíků příslušných rovnoběžek ponecháme jen ty, jejichž kolmý průmět na druhou přímku leží opravdu na polopřímce \\(BX\\), ne na její opačné části.</p><div class="construction"><h4>Konstrukce</h4><ol><li>Sestroj rovnoběžky s \\(AB\\) ve vzdálenosti 1,6 cm.</li><li>Sestroj rovnoběžky s přímkou \\(BX\\) ve vzdálenosti 1,6 cm.</li><li>Z jejich průsečíků vyber dva středy \\(S_1,S_2\\), jejichž body dotyku leží na polopřímce \\(BX\\).</li><li>Se středy \\(S_1,S_2\\) sestroj kružnice o poloměru 1,6 cm.</li></ol></div>`},
+ diagram(){const B=P(300,290),r=64;const R1=r/Math.sin(deg(70)),R2=r/Math.sin(deg(20));const S1=add(B,vec(70,R1)),S2=add(B,vec(160,R2));const T1=footToLine(S1,B,140),T2=footToLine(S2,B,140);return svgWrap([
+ `${infiniteLineThrough(B,0,'given')}${line(B,add(B,vec(140,350)),'given')}${pt(B)}${lbl(B,'B')}${txt(555,278,'A')}${txt(72,90,'X')}${txt(340,254,'140°','small')}`,
+ `${offsetLine(B,0,r,1,'helper')}${offsetLine(B,0,r,-1,'helper')}${offsetLine(B,140,r,1,'helper')}${offsetLine(B,140,r,-1,'helper')}`,
+ `${pt(S1,'point-blue')}${pt(S2,'point-blue')}${lbl(S1,'S₁','blue-label')}${lbl(S2,'S₂','blue-label')}${pt(T1,'open-point',4)}${pt(T2,'open-point',4)}`,
+ `${circ(S1,r,'target')}${circ(S2,r,'target')}`
+ ],'0 0 640 420')}
+},
+{
+ n:12,title:'Kružnice dotýkající se dvou přímek',
+ statement:'Jsou dány různoběžky \\(a,b\\), které svírají úhel \\(60^\\circ\\). Sestrojte kružnici \\(m\\) o poloměru \\(2{,}5\\,\\mathrm{cm}\\), která se přímek \\(a,b\\) dotýká.',
+ getSolution(){return `<div class="answer-box"><strong>Výsledek:</strong> 4 kružnice.</div><p>Střed každé hledané kružnice je ve vzdálenosti 2,5 cm od obou přímek. Ke každé z přímek proto sestrojíme dvě rovnoběžky v této vzdálenosti.</p><div class="construction"><h4>Konstrukce</h4><ol><li>Sestroj obě rovnoběžky s \\(a\\) ve vzdálenosti 2,5 cm.</li><li>Sestroj obě rovnoběžky s \\(b\\) ve vzdálenosti 2,5 cm.</li><li>Čtyři průsečíky těchto rovnoběžek jsou středy \\(S_1,S_2,S_3,S_4\\).</li><li>Se všemi čtyřmi středy sestroj kružnice o poloměru 2,5 cm.</li></ol></div>`},
+ diagram(){const O=P(320,210),r=70,ang=60,sol=[];for(const sa of [-1,1]){const y=O.y+sa*r;for(const sb of [-1,1]){const nx=-Math.sin(deg(ang)),ny=-Math.cos(deg(ang));const dx=(sb*r-ny*(y-O.y))/nx;sol.push(P(O.x+dx,y));}}return svgWrap([
+ `${infiniteLineThrough(O,0,'given')}${infiniteLineThrough(O,60,'given')}${pt(O)}${txt(565,198,'a')}${txt(432,52,'b')}${txt(352,184,'60°','small')}`,
+ `${offsetLine(O,0,r,1,'helper')}${offsetLine(O,0,r,-1,'helper')}${offsetLine(O,60,r,1,'helper')}${offsetLine(O,60,r,-1,'helper')}`,
+ sol.map((q,i)=>`${pt(q,'point-blue',5)}${lbl(q,`S${i+1}`,'blue-label')}`).join(''),
+ sol.map(q=>circ(q,r,'target')).join('')
+ ],'0 0 640 420')}
+},
+{
+ n:13,title:'Kružnice dotýkající se přímky a procházející bodem',
+ statement:'Je dána přímka \\(m\\) a bod \\(M\\) tak, že \\(|Mm|=1{,}8\\,\\mathrm{cm}\\). Sestrojte kružnici \\(h\\) o poloměru \\(3\\,\\mathrm{cm}\\), která se dotýká přímky \\(m\\) a prochází bodem \\(M\\).',
+ getSolution(){return `<div class="answer-box"><strong>Výsledek:</strong> 2 kružnice.</div><p>Střed hledané kružnice musí být 3 cm od přímky \\(m\\) a zároveň 3 cm od bodu \\(M\\). První podmínka dává dvě rovnoběžky, druhá kružnici se středem \\(M\\).</p><div class="construction"><h4>Konstrukce</h4><ol><li>Sestroj obě rovnoběžky s \\(m\\) ve vzdálenosti 3 cm.</li><li>Sestroj pomocnou kružnici \\(c(M;3\\,\\mathrm{cm})\\).</li><li>Pomocná kružnice protne pouze rovnoběžku na stejné straně přímky jako bod \\(M\\), a to ve dvou bodech \\(S_1,S_2\\).</li><li>Sestroj kružnice \\(h_1(S_1;3\\,\\mathrm{cm})\\) a \\(h_2(S_2;3\\,\\mathrm{cm})\\).</li></ol></div>`},
+ diagram(){const mY=300,M=P(320,228),r=120,ys=[180,420],sol=[];ys.forEach(y=>{const dy=y-M.y;if(Math.abs(dy)<=r){const dx=Math.sqrt(r*r-dy*dy);sol.push(P(M.x-dx,y),P(M.x+dx,y));}});return svgWrap([
+ `${line(P(50,mY),P(590,mY),'given')}${pt(M)}${lbl(M,'M')}${txt(560,mY-10,'m')}${txt(340,270,'1,8 cm','small')}`,
+ `${lineParallelY(ys[0])}${lineParallelY(ys[1])}`,
+ `${circ(M,r,'helper')}`,
+ `${sol.map((q,i)=>`${pt(q,'point-blue')}${lbl(q,`S${i+1}`,'blue-label')}${circ(q,r,'target')}`).join('')}`
+ ],'0 0 640 450')}
+},
+{
+ n:14,title:'Vnější dotyk dvou kružnic a dotyk s přímkou',
+ statement:'Je dána kružnice \\(k(S;3{,}5\\,\\mathrm{cm})\\) a přímka \\(q\\). Sestrojte kružnici \\(l\\) o poloměru \\(1{,}4\\,\\mathrm{cm}\\), která se dotýká přímky \\(q\\) a má s kružnicí \\(k\\) vnější dotyk. Vzdálenost středu \\(S\\) od přímky \\(q\\) je:',
+ variants:[['a)','2 cm'],['b)','4 cm']],
+ getSolution(v){const count=v===0?4:2;return `<div class="answer-box"><strong>Výsledek:</strong> ${count} řešení.</div><p>Při vnějším dotyku je vzdálenost středů rovna součtu poloměrů: \\(3{,}5+1{,}4=4{,}9\\,\\mathrm{cm}\\). Střed \\(L\\) proto leží na kružnici \\(c(S;4{,}9\\,\\mathrm{cm})\\). Zároveň musí být 1,4 cm od přímky \\(q\\), tedy na jedné ze dvou rovnoběžek.</p><div class="construction"><h4>Konstrukce</h4><ol><li>Sestroj dvě rovnoběžky s \\(q\\) ve vzdálenosti 1,4 cm.</li><li>Sestroj pomocnou kružnici \\(c(S;4{,}9\\,\\mathrm{cm})\\).</li><li>Její průsečíky s rovnoběžkami jsou možné středy hledané kružnice. V tomto případě jich je ${count}.</li><li>V každém středu sestroj kružnici o poloměru 1,4 cm.</li></ol></div>`},
+ diagram(v){const qY=330,s=40,d=v===0?2:4,S=P(320,qY-d*s),R=140,r=56,helper=196,ys=[qY-r,qY+r],sol=[];ys.forEach(y=>{const dy=y-S.y;if(Math.abs(dy)<=helper){const dx=Math.sqrt(helper*helper-dy*dy);sol.push(P(S.x-dx,y));if(dx>1e-7)sol.push(P(S.x+dx,y));}});return svgWrap([
+ `${line(P(45,qY),P(595,qY),'given')}${circ(S,R,'given')}${pt(S)}${lbl(S,'S')}${txt(558,qY-10,'q')}${txt(357,S.y-R+20,'k','small')}`,
+ `${lineParallelY(ys[0])}${lineParallelY(ys[1])}${txt(55,ys[0]-8,'1,4 cm','small')}`,
+ `${circ(S,helper,'helper')}${txt(350,S.y-helper+24,'4,9 cm','small')}`,
+ sol.map((q,i)=>`${pt(q,'point-blue',4.5)}${lbl(q,`L${i+1}`,'blue-label')}${circ(q,r,'target')}`).join('')
+ ],'0 0 640 470')}
+},
+{
+ n:15,title:'Vnitřní dotyk dvou kružnic a dotyk s přímkou',
+ statement:'Je dána kružnice \\(l(O;5\\,\\mathrm{cm})\\) a její sečna \\(m\\). Sestrojte kružnici \\(k\\) o poloměru \\(1{,}6\\,\\mathrm{cm}\\), která se dotýká přímky \\(m\\) a která má s kružnicí \\(l\\) vnitřní dotyk. Vzdálenost středu \\(O\\) od přímky \\(m\\) je:',
+ variants:[['a)','1 cm'],['b)','1,8 cm']],
+ getSolution(v){const count=v===0?4:3;return `<div class="answer-box"><strong>Výsledek:</strong> ${count} řešení.</div><p>Při vnitřním dotyku je vzdálenost středů rovna rozdílu poloměrů: \\(5-1{,}6=3{,}4\\,\\mathrm{cm}\\). Střed hledané kružnice tedy leží na pomocné kružnici \\(c(O;3{,}4\\,\\mathrm{cm})\\). Zároveň musí být 1,6 cm od přímky \\(m\\).</p><div class="construction"><h4>Konstrukce</h4><ol><li>Sestroj dvě rovnoběžky s \\(m\\) ve vzdálenosti 1,6 cm.</li><li>Sestroj pomocnou kružnici \\(c(O;3{,}4\\,\\mathrm{cm})\\).</li><li>Průsečíky pomocné kružnice s rovnoběžkami jsou středy hledaných kružnic. V tomto případě jich je ${count}.</li><li>V každém středu sestroj kružnici o poloměru 1,6 cm.</li></ol></div>`},
+ diagram(v){const mY=300,s=40,d=v===0?1:1.8,O=P(320,mY-d*s),R=200,r=64,helper=136,ys=[mY-r,mY+r],sol=[];ys.forEach(y=>{const dy=y-O.y;if(Math.abs(dy)<=helper+1e-9){const dx=Math.sqrt(Math.max(0,helper*helper-dy*dy));sol.push(P(O.x-dx,y));if(dx>1e-7)sol.push(P(O.x+dx,y));}});return svgWrap([
+ `${circ(O,R,'given')}${line(P(35,mY),P(605,mY),'given')}${pt(O)}${lbl(O,'O')}${txt(570,mY-10,'m')}${txt(460,82,'l','small')}`,
+ `${lineParallelY(ys[0])}${lineParallelY(ys[1])}`,
+ `${circ(O,helper,'helper')}${txt(350,O.y-helper+20,'3,4 cm','small')}`,
+ sol.map((q,i)=>`${pt(q,'point-blue',4.5)}${lbl(q,`S${i+1}`,'blue-label')}${circ(q,r,'target')}`).join('')
+ ],'0 0 640 470')}
+},
+{
+ n:16,title:'Kružnice dotýkající se dvou polopřímek a strany trojúhelníku',
+ statement:'Sestrojte trojúhelník \\(ABC\\) o stranách \\(a=5\\,\\mathrm{cm},\\ b=7\\,\\mathrm{cm},\\ c=6\\,\\mathrm{cm}\\). Pak sestrojte kružnici \\(h\\), která se dotýká polopřímek \\(AB,AC\\) a strany \\(BC\\) trojúhelníku \\(ABC\\).',
+ getSolution(){return `<div class="answer-box"><strong>Výsledek:</strong> 2 kružnice.</div><p>Střed musí být stejně vzdálený od přímek \\(AB\\) a \\(AC\\), a protože body dotyku mají ležet na polopřímkách \\(AB,AC\\), leží střed na <strong>vnitřní ose úhlu \\(A\\)</strong>. Současně musí být stejně vzdálený od přímky \\(BC\\).</p><p>Na vnitřní ose úhlu \\(A\\) vyjdou dva vhodné středy: střed vepsané kružnice a střed protější připsané kružnice. U tohoto trojúhelníku se obě dotýkají přímo úsečky \\(BC\\) a obou polopřímek \\(AB,AC\\).</p><div class="construction"><h4>Konstrukce</h4><ol><li>Sestroj trojúhelník \\(ABC\\) podle věty sss.</li><li>Sestroj vnitřní osu úhlu \\(A\\).</li><li>V bodě \\(B\\) sestroj vnitřní i vnější osu úhlu tvořeného přímkami \\(BA\\) a \\(BC\\).</li><li>Průsečík vnitřních os označ \\(I\\); průsečík osy úhlu \\(A\\) s vnější osou u \\(B\\) označ \\(I_a\\).</li><li>Z obou středů spusť kolmici na \\(AB\\); její délka je poloměr příslušné kružnice.</li><li>Sestroj obě kružnice. Jedna je vepsaná, druhá je připsaná proti vrcholu \\(A\\).</li></ol></div>`},
+ diagram(){const s=35,A=P(100,340),B=P(310,340),x=5*s,h=Math.sqrt((7*s)**2-x*x),C=P(A.x+x,A.y-h);const a=5,b=7,c=6;const I=P((a*A.x+b*B.x+c*C.x)/(a+b+c),(a*A.y+b*B.y+c*C.y)/(a+b+c));const Ia=P((-a*A.x+b*B.x+c*C.x)/(-a+b+c),(-a*A.y+b*B.y+c*C.y)/(-a+b+c));const rI=Math.abs(I.y-A.y),rIa=Math.abs(Ia.y-A.y);const unit=v=>{const n=Math.hypot(v.x,v.y);return P(v.x/n,v.y/n)},sum=(u,v)=>P(u.x+v.x,u.y+v.y),sub=(u,v)=>P(u.x-v.x,u.y-v.y),ray=(o,d,L=520,cls='helper')=>line(P(o.x-d.x*L,o.y-d.y*L),P(o.x+d.x*L,o.y+d.y*L),cls);const uAB=unit(P(B.x-A.x,B.y-A.y)),uAC=unit(P(C.x-A.x,C.y-A.y)),dA=unit(sum(uAB,uAC));const uBA=unit(P(A.x-B.x,A.y-B.y)),uBC=unit(P(C.x-B.x,C.y-B.y)),dBin=unit(sum(uBA,uBC)),dBex=unit(sub(uBC,uBA));return svgWrap([
+ `${line(A,B,'given')}${pt(A)}${pt(B)}${lbl(A,'A')}${lbl(B,'B')}${txt(180,330,'c = 6 cm','small')}`,
+ `${circ(A,7*s,'helper')}${circ(B,5*s,'helper')}${pt(C,'point-blue',5)}${lbl(C,'C','blue-label')}`,
+ `${line(A,C,'given')}${line(B,C,'given')}${txt(126,226,'b = 7 cm','small')}${txt(285,225,'a = 5 cm','small')}`,
+ `${ray(A,dA,560,'helper')}${txt(195,270,'osa ∠A','small')}`,
+ `${ray(B,dBin,420,'helper')}${ray(B,dBex,420,'helper')}`,
+ `${pt(I,'point-blue',5)}${pt(Ia,'point-blue',5)}${lbl(I,'I','blue-label')}${lbl(Ia,'Iₐ','blue-label')}`,
+ `${line(I,P(I.x,A.y),'thin')}${line(Ia,P(Ia.x,A.y),'thin')}${rightCZ(I.x,A.y,90)}${rightCZ(Ia.x,A.y,90)}`,
+ `${circ(I,rI,'target')}${circ(Ia,rIa,'target')}`
+ ],'0 0 640 440')}
+},
+{
+ n:17,title:'Kružnice tečná k jedné rovnoběžce a s danou tětivou na druhé',
+ statement:'Jsou dány dvě rovnoběžky \\(p,q\\) vzdálené \\(3\\,\\mathrm{cm}\\) a bod \\(A\\in p\\). Sestrojte kružnici \\(k\\), která se dotýká přímky \\(p\\) v bodě \\(A\\) a na přímce \\(q\\) vytíná tětivu délky \\(2\\,\\mathrm{cm}\\).',
+ getSolution(){return `<div class="answer-box"><strong>Výsledek:</strong> 1 kružnice.</div><p>Protože se kružnice dotýká \\(p\\) v bodě \\(A\\), její střed \\(S\\) leží na kolmici k \\(p\\) vedené bodem \\(A\\). Stejná kolmice protne \\(q\\) v bodě \\(H\\). Bod \\(H\\) je střed požadované tětivy.</p><p>Tětiva má délku 2 cm, proto od \\(H\\) na \\(q\\) odměříme 1 cm a získáme její krajní bod \\(T\\). Hledaný střed \\(S\\) musí splňovat \\(|SA|=|ST|\\): poloměr je totiž zároveň vzdálenost středu od bodu dotyku \\(A\\) i od bodu \\(T\\) na kružnici. Proto \\(S\\) leží na ose úsečky \\(AT\\).</p><div class="construction"><h4>Konstrukce</h4><ol><li>Bodem \\(A\\) sestroj kolmici k \\(p\\); její průsečík s \\(q\\) označ \\(H\\).</li><li>Na přímce \\(q\\) od bodu \\(H\\) odměř 1 cm a označ bod \\(T\\).</li><li>Sestroj osu úsečky \\(AT\\).</li><li>Její průsečík s kolmicí \\(AH\\) označ \\(S\\).</li><li>Sestroj kružnici \\(k(S;SA)\\). Na \\(q\\) protne body \\(T,T'\\), jejichž vzdálenost je přesně 2 cm.</li></ol></div>`},
+ diagram(){const pY=320,qY=170,A=P(320,pY),H=P(320,qY),T=P(370,qY),Tp=P(270,qY),S=P(320,236.6667),r=83.3333;const midAT=mix(A,T);const dx=T.x-A.x,dy=T.y-A.y;const perp=P(-dy,dx);const norm=Math.hypot(perp.x,perp.y),u=P(perp.x/norm,perp.y/norm);return svgWrap([
+ `${line(P(55,pY),P(585,pY),'given')}${line(P(55,qY),P(585,qY),'given')}${pt(A)}${lbl(A,'A')}${txt(560,pY-10,'p')}${txt(560,qY-10,'q')}${txt(68,247,'3 cm','small')}`,
+ `${line(P(320,65),P(320,390),'helper')}${pt(H)}${lbl(H,'H','small')}${rightCZ(320,pY,0)}${rightCZ(320,qY,180)}`,
+ `${pt(T,'point-blue',4.5)}${lbl(T,'T','blue-label')}${txt(337,158,'1 cm','small')}`,
+ `${line(P(midAT.x-u.x*240,midAT.y-u.y*240),P(midAT.x+u.x*240,midAT.y+u.y*240),'helper')}${pt(midAT)}${lbl(midAT,'M','small')}`,
+ `${pt(S,'point-blue',5.5)}${lbl(S,'S','blue-label')}`,
+ `${circ(S,r,'target')}${pt(Tp,'point-blue',4.5)}${lbl(Tp,"T'",'blue-label')}${line(Tp,T,'locus')}${txt(285,148,'2 cm','blue-label')}`
+ ],'0 0 640 420')}
+}
+];
+
+let current=0,variant=0,diagramStep=0,solutionOpen=false,typesetTicket=0;
+const $=id=>document.getElementById(id);
+function syncActiveTask(){
+  const cur=String(Number(current));
+  document.querySelectorAll('#taskList .task-btn').forEach(b=>{
+    const active=b.dataset.index===cur;
+    b.classList.toggle('active',active);
+    if(active) b.setAttribute('aria-current','true'); else b.removeAttribute('aria-current');
+  });
+  $('mobileSelect').value=cur;
+}
+function buildTaskList(){
+  const list=$('taskList'),sel=$('mobileSelect');
+  list.innerHTML='';sel.innerHTML='';
+  tasks.forEach((t,i)=>{
+    const b=document.createElement('button');
+    b.type='button';b.className='task-btn';b.dataset.index=String(i);b.textContent=`${t.n}. ${t.title}`;
+    b.addEventListener('click',()=>go(i));list.appendChild(b);
+    const o=document.createElement('option');o.value=String(i);o.textContent=`${t.n}. ${t.title}`;sel.appendChild(o);
+  });
+  sel.addEventListener('change',e=>go(Number(e.target.value)));
+  syncActiveTask();
+}
+function clearMath(){if(window.MathJax?.typesetClear){try{MathJax.typesetClear([$('statement'),$('solution')])}catch(e){}}}
+function render(){clearMath();const t=tasks[Number(current)];$('eyebrow').textContent=`Úloha ${t.n} z ${tasks.length}`;$('taskTitle').textContent=t.title;$('statement').innerHTML=t.statement;const vs=$('variants');vs.innerHTML='';if(t.variants){t.variants.forEach((v,i)=>{const b=document.createElement('button');b.className='variant-btn'+(i===variant?' active':'');b.innerHTML=`<strong>${v[0]}</strong> ${v[1]}`;b.onclick=()=>{variant=i;diagramStep=0;render()};vs.appendChild(b)})}
+ const sol=t.getSolution?t.getSolution(variant):'';const svg=t.diagram?t.diagram(variant):'';$('solution').innerHTML=`${sol}<div class="diagram-card"><div class="diagram-head"><strong>Grafická konstrukce</strong><span class="step-info" id="stepInfo"></span></div><div class="diagram-wrap" id="diagramWrap">${svg}</div><div class="diagram-controls"><button class="btn" id="stepPrev">← Předchozí krok</button><button class="btn" id="stepNext">Další krok →</button><button class="btn" id="stepAll">Zobrazit vše</button></div><div class="legend"><span><i class="sw"></i> zadání</span><span><i class="sw help"></i> postup</span><span><i class="sw locus"></i> hledané</span></div></div>`;$('solution').classList.toggle('open',solutionOpen);$('toggleSolution').textContent=solutionOpen?'Skrýt řešení':'Rozbalit řešení';$('prevTask').disabled=Number(current)===0;$('nextTask').disabled=Number(current)===tasks.length-1;syncActiveTask();bindDiagram();typeset();}
+function bindDiagram(){const steps=[...document.querySelectorAll('#diagramWrap .diagram-step')];if(!steps.length)return;diagramStep=Math.max(0,Math.min(diagramStep,steps.length-1));const apply=()=>{steps.forEach((g,i)=>g.classList.toggle('hidden',i>diagramStep));$('stepInfo').textContent=`Krok ${diagramStep+1} / ${steps.length}`;$('stepPrev').disabled=diagramStep===0;$('stepNext').disabled=diagramStep===steps.length-1;};$('stepPrev').onclick=()=>{diagramStep=Math.max(0,diagramStep-1);apply()};$('stepNext').onclick=()=>{diagramStep=Math.min(steps.length-1,diagramStep+1);apply()};$('stepAll').onclick=()=>{diagramStep=steps.length-1;apply()};apply();}
+function go(i){current=Number(i);variant=0;diagramStep=0;solutionOpen=false;window.scrollTo({top:0,behavior:'smooth'});render()}
+let mathQueue=Promise.resolve();
+function typeset(){
+  const ticket=++typesetTicket;
+  const attempt=()=>{
+    if(ticket!==typesetTicket)return;
+    if(!window.MathJax?.typesetPromise){setTimeout(attempt,120);return;}
+    mathQueue=mathQueue.catch(()=>{}).then(async()=>{
+      if(ticket!==typesetTicket)return;
+      try{if(MathJax.typesetClear)MathJax.typesetClear([$('statement'),$('solution')]);}catch(e){}
+      await MathJax.typesetPromise([$('statement'),$('solution')]);
+    }).catch(err=>console.warn('MathJax:',err));
+  };
+  requestAnimationFrame(attempt);
+}
+$('toggleSolution').onclick=()=>{solutionOpen=!solutionOpen;$('solution').classList.toggle('open',solutionOpen);$('toggleSolution').textContent=solutionOpen?'Skrýt řešení':'Rozbalit řešení';if(solutionOpen){bindDiagram();typeset();}};
+$('resetDiagram').onclick=()=>{diagramStep=0;bindDiagram()};$('prevTask').onclick=()=>current>0&&go(current-1);$('nextTask').onclick=()=>current<tasks.length-1&&go(current+1);
+document.addEventListener('keydown',e=>{if(e.target.matches('button,select,input,textarea'))return;if(e.key==='ArrowLeft'&&current>0)go(current-1);if(e.key==='ArrowRight'&&current<tasks.length-1)go(current+1)});
+buildTaskList();
+render();
+</script>
+</body>
+</html>
