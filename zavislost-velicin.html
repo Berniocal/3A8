@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Závislost veličin – 3A8</title>
+<style>
+:root{--bg:#f5f7fb;--paper:#fff;--ink:#19243b;--muted:#607088;--border:#dce4ee;--blue:#315efb;--blueSoft:#ebf0ff;--green:#16735b}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+button,input,select{font:inherit}button{cursor:pointer}.app{display:grid;grid-template-columns:278px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;background:white;border-right:1px solid var(--border);padding:22px 14px;overflow:auto}
+.home{color:var(--blue);text-decoration:none;font-weight:750;font-size:14px}.side h1{font-size:24px;line-height:1.16;margin:21px 8px 5px}
+.side p{font-size:13px;color:var(--muted);margin:0 8px 22px}
+nav{display:grid;gap:6px}nav button{text-align:left;width:100%;border:1px solid transparent;border-radius:11px;background:transparent;padding:12px 11px;color:var(--ink);font-weight:630}
+nav button:hover{background:#f4f7ff}nav button.active{background:var(--blueSoft);border-color:#c9d7ff;color:#264ccc}
+main{max-width:1080px;width:100%;padding:30px 30px 65px;margin:auto;align-self:start}
+.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:18px}
+.badge{background:var(--blueSoft);color:#264ccc;font-size:12px;letter-spacing:.07em;text-transform:uppercase;padding:7px 11px;border-radius:999px;font-weight:800}
+.print{background:#fff;border:1px solid var(--border);border-radius:10px;padding:8px 13px}
+.mobile-nav{display:none}.panel{display:none}.panel.active{display:block}
+.sheet{background:var(--paper);border:1px solid var(--border);border-radius:18px;padding:28px 30px;box-shadow:0 6px 26px #1a2a4510}
+.eyebrow{color:var(--blue);font-size:14px;font-weight:800;margin-bottom:4px}
+h2{font-size:clamp(25px,3vw,34px);line-height:1.18;margin:0 0 14px}h3{font-size:19px;margin:26px 0 10px}p{margin:10px 0}.lead{font-size:17px;color:#45566e;margin:0 0 22px}
+.callout{background:var(--blueSoft);border-left:5px solid var(--blue);padding:14px 17px;border-radius:10px;margin:19px 0}
+.formula{font-size:23px;font-weight:800;display:inline-block;letter-spacing:.01em;background:#f0f5ff;color:#2141ba;padding:11px 19px;border-radius:12px;margin:6px 0}
+.tiny{color:var(--muted);font-size:14px}.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,.75fr);gap:20px;align-items:start}
+figure{margin:14px 0 0}.graphBox{border:1px solid var(--border);background:#fcfdff;border-radius:13px;padding:8px}
+svg{display:block;width:100%;height:auto;overflow:visible}svg text{font-size:13px;fill:#44526c;font-family:inherit}
+.figcaption,figcaption{color:var(--muted);font-size:13px;margin:8px 0 4px}
+table{border-collapse:collapse;width:100%;margin:10px 0 15px;font-size:15px}
+th,td{border:1px solid var(--border);padding:9px 11px;text-align:center;font-variant-numeric:tabular-nums}
+th{background:#eef3ff;text-align:left;white-space:nowrap}td{background:#fff}
+.scroll{overflow-x:auto}ol,ul{padding-left:23px}li{margin:5px 0}
+.steps{counter-reset:step;list-style:none;padding:0}.steps li{position:relative;counter-increment:step;padding:9px 8px 9px 44px;border-bottom:1px solid #edf1f7}
+.steps li:before{content:counter(step);position:absolute;left:3px;top:8px;display:grid;place-items:center;background:var(--blueSoft);color:#2846ca;border-radius:50%;width:29px;height:29px;font-weight:800}
+.control{background:#f7f9fe;border:1px solid var(--border);border-radius:12px;padding:15px;margin:15px 0}
+.control label{font-weight:720;display:block;margin-bottom:8px}.control input{width:100%;accent-color:var(--blue)}
+.value{font-size:24px;font-weight:800;color:var(--blue);font-variant-numeric:tabular-nums}
+.tag{font-size:12px;background:#eaf7f1;color:#136e52;border-radius:8px;padding:4px 8px;font-weight:800}
+.box{border:1px solid var(--border);border-radius:12px;padding:13px 16px;background:#fbfcff}
+.example{border-top:1px solid var(--border);margin-top:23px;padding-top:13px}
+details{border:1px solid var(--border);background:#fff;border-radius:12px;margin:12px 0;overflow:hidden}
+summary{cursor:pointer;padding:13px 16px;font-weight:700;background:#f8faff}
+details>div{padding:12px 16px 15px}.answer{font-weight:750;color:var(--green)}
+.footer{display:flex;justify-content:space-between;margin:22px 0;gap:12px}
+.footer button{border:1px solid var(--border);border-radius:10px;background:white;padding:10px 15px;color:var(--ink);font-weight:750}
+.footer .next{background:var(--blue);border-color:var(--blue);color:white}
+.footer button:disabled{opacity:.35;cursor:not-allowed}
+@media(max-width:850px){.app{display:block}.side{display:none}main{padding:15px 12px 45px}.mobile-nav{display:flex;gap:8px;margin-bottom:13px;align-items:center}.mobile-nav select{flex:1;min-width:0;background:white;border:1px solid var(--border);border-radius:10px;padding:10px}
+.mobile-nav button{border:1px solid var(--border);background:white;border-radius:10px;padding:9px 12px}
+.grid{grid-template-columns:1fr}.sheet{padding:18px 15px;border-radius:14px}.top{margin-bottom:12px}}
+@media print{body{background:white}.side,.mobile-nav,.top .print,.footer,.control input{display:none!important}.app{display:block}main{max-width:none;padding:0}.panel,.panel.active{display:block!important;break-after:page}.sheet{border:0;box-shadow:none;padding:9mm 6mm}.graphBox{break-inside:avoid}details>div{display:block!important}details{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+<a class="home" href="index.html">← Zpět na rozcestník 3A8</a>
+<h1>Závislost veličin</h1><p>Zápis, vzorové příklady a interaktivní grafy</p>
+<nav id="nav"></nav>
+</aside>
+<main>
+<div class="top"><span class="badge">3A8 · matematika</span><button class="print" type="button" onclick="window.print()">⎙ Tisk</button></div>
+<div class="mobile-nav"><button type="button" id="mobilePrev" aria-label="Předchozí téma">←</button><select id="select" aria-label="Vyber téma"></select><button type="button" id="mobileNext" aria-label="Další téma">→</button></div>
+
+<section class="panel active" data-title="1. Co je závislost?">
+<div class="sheet">
+<div class="eyebrow">Zápis do sešitu · 1/6</div><h2>Závislost veličin</h2>
+<p class="lead">Závislost vyjadřuje, jak se hodnota jedné veličiny mění v souvislosti se změnou jiné veličiny.</p>
+<div class="callout"><strong>Závislost veličin</strong> = vztah, kdy hodnotě jedné veličiny odpovídá hodnota jiné veličiny. Např. cena nákupu závisí na počtu koupených rohlíků.</div>
+<h3>Jak vyjadřujeme závislost?</h3>
+<ol class="steps"><li><b>Tabulkou</b> – zapisujeme dvojice odpovídajících si hodnot.</li>
+<li><b>Grafem</b> – dvojice hodnot zobrazujeme jako body soustavy souřadnic.</li>
+<li><b>Vzorcem</b> – pravidlem pro výpočet jedné veličiny z druhé, pokud ho známe.</li></ol>
+<h3>Graf závislosti</h3>
+<p>Na <b>vodorovnou osu</b> zapisujeme nezávislou veličinu (obvykle <b>x</b>), na <b>svislou osu</b> závislou veličinu (obvykle <b>y</b>). Každou dvojici zapisujeme jako bod <b>[x; y]</b>.</p>
+<div class="box"><b>Pozor:</b> Osy musí mít popisky, vhodné měřítko a u fyzikálních veličin také jednotky. Ne každou závislost lze popsat jednoduchým vzorcem.</div>
+<h3>Dva druhy situací</h3>
+<p><span class="tag">Jednotlivé hodnoty</span> Počet rohlíků může být 0, 1, 2, 3… Graf tvoří <b>samostatné body</b>.</p>
+<p><span class="tag">Plynulé hodnoty</span> Čas jízdy může nabývat i zlomků hodin. Při konstantní rychlosti je grafem dráhy <b>souvislá čára</b>.</p>
+</div></section>
+
+<section class="panel" data-title="2. Rohlíky – tabulka a graf">
+<div class="sheet">
+<div class="eyebrow">Vzorový příklad 1 · 2/6</div><h2>Cena nákupu rohlíků</h2>
+<p class="lead">Jeden rohlík stojí 1,40 Kč. Jak souvisí počet rohlíků <b>p</b> a celková cena <b>c</b>?</p>
+<p><b>Vzorec:</b></p><div class="formula">c = 1,40 · p</div>
+<p class="tiny">p – počet rohlíků (bez jednotky), c – cena v Kč</p>
+<div class="scroll"><table><thead><tr><th>p</th><td>0</td><td>1</td><td>2</td><td>3</td><td>5</td><td>10</td><td>15</td><td>20</td></tr></thead>
+<tbody><tr><th>c (Kč)</th><td>0</td><td>1,40</td><td>2,80</td><td>4,20</td><td>7,00</td><td>14,00</td><td>21,00</td><td>28,00</td></tr></tbody></table></div>
+<div class="grid"><div><figure><div class="graphBox"><svg id="rollChart" viewBox="0 0 690 370" role="img" aria-label="Graf ceny podle počtu rohlíků – samostatné body"></svg></div><figcaption>Jednotlivé body – mezi dvěma sousedními počty rohlíků nenakupujeme „část bodu“.</figcaption></figure></div>
+<div><div class="control"><label for="rollRange">Počet rohlíků: <output id="rollCount">6</output></label><input id="rollRange" type="range" min="0" max="20" step="1" value="6"><p>Celková cena: <span class="value" id="rollPrice">8,40 Kč</span></p></div>
+<div class="box"><b>Výpočet pro 6 rohlíků:</b><br>c = 1,40 · 6 = <b>8,40 Kč</b></div>
+<p>Graf obsahuje <b>jen body pro celá nezáporná čísla</b> p. Body nepropojujeme.</p></div></div>
+<div class="example"><h3>Vzorově řešená úloha</h3><p><b>Zadání:</b> Kolik stojí 13 rohlíků?</p>
+<ol class="steps"><li>Zapíšeme známé hodnoty: p = 13, cena jednoho rohlíku 1,40 Kč.</li><li>Dosadíme do vzorce: c = 1,40 · 13.</li><li>Vypočítáme: <b>c = 18,20 Kč</b>.</li></ol></div>
+</div></section>
+
+<section class="panel" data-title="3. Auto – souvislá závislost">
+<div class="sheet">
+<div class="eyebrow">Vzorový příklad 2 · 3/6</div><h2>Dráha auta při stálé rychlosti</h2>
+<p class="lead">Auto jede stále rychlostí 90 km/h. Jak závisí ujetá dráha <b>s</b> na čase <b>t</b>?</p>
+<div class="formula">s = 90 · t</div><p class="tiny">t je v hodinách, s je v kilometrech.</p>
+<div class="scroll"><table><thead><tr><th>t (h)</th><td>0</td><td>¼</td><td>½</td><td>1</td><td>1½</td><td>2</td></tr></thead>
+<tbody><tr><th>s (km)</th><td>0</td><td>22,5</td><td>45</td><td>90</td><td>135</td><td>180</td></tr></tbody></table></div>
+<div class="grid"><div><figure><div class="graphBox"><svg id="carChart" viewBox="0 0 690 370" role="img" aria-label="Graf dráhy v závislosti na čase – souvislá přímka"></svg></div><figcaption>Mezi body lze volit jakýkoli čas – proto zakreslíme spojenou čáru.</figcaption></figure></div>
+<div><div class="control"><label for="carRange">Čas jízdy: <output id="carTime">1 h 00 min</output></label><input type="range" id="carRange" min="0" max="24" step="1" value="12"><p>Ujetá dráha: <span class="value" id="carDist">90 km</span></p></div>
+<div class="box"><b>Důležité:</b> Přímka prochází počátkem [0; 0]. Čím delší čas, tím větší dráha – <i>pouze pokud je rychlost stále stejná</i>.</div></div></div>
+<div class="example"><h3>Vzorově řešená úloha</h3><p><b>Zadání:</b> Kolik kilometrů ujede auto za 1 h 20 min?</p>
+<ol class="steps"><li>Čas převedeme na hodiny: 1 h 20 min = 1 + 20/60 h = <b>4/3 h</b>.</li><li>Dosadíme do vztahu: s = 90 · 4/3.</li><li>Dostaneme: <b>s = 120 km</b>.</li></ol></div>
+</div></section>
+
+<section class="panel" data-title="4. Teplota – odečítání grafu">
+<div class="sheet">
+<div class="eyebrow">Vzorový příklad 3 · 4/6</div><h2>Teplota během dne</h2>
+<p class="lead">Každou celou hodinu od 8:00 do 18:00 byla změřena venkovní teplota.</p>
+<div class="scroll"><table><thead><tr><th>Čas (h)</th><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td></tr></thead>
+<tbody><tr><th>Teplota (°C)</th><td>8</td><td>10</td><td>12</td><td>18</td><td>18</td><td>19</td><td>20</td><td>22</td><td>20</td><td>18</td><td>16</td></tr></tbody></table></div>
+<div class="grid"><div><figure><div class="graphBox"><svg id="tempChart" viewBox="0 0 690 370" role="img" aria-label="Graf teploty od osmi do osmnácti hodin"></svg></div><figcaption>Body jsou naměřené hodnoty, spojnice pomáhají sledovat přibližný vývoj.</figcaption></figure></div>
+<div><div class="control"><label for="tempRange">Vyber hodinu: <output id="tempHour">15:00</output></label><input type="range" id="tempRange" min="8" max="18" value="15" step="1"><p>Naměřená teplota: <span class="value" id="tempVal">22 °C</span></p></div>
+<p>Ve 15 hodin bylo <b>22 °C</b> – nejvyšší naměřená teplota.</p>
+<p class="tiny">Spojnice nepředstavuje přesné měření mezi celými hodinami. Hodnoty mezi měřeními pouze odhadujeme.</p></div></div>
+<div class="example"><h3>Vzorově řešená úloha</h3>
+<p><b>Zadání:</b> O kolik stupňů vzrostla teplota mezi 10:00 a 15:00?</p>
+<ol class="steps"><li>Z tabulky odečteme: v 10:00 bylo 12 °C a v 15:00 bylo 22 °C.</li><li>Vypočítáme rozdíl: 22 − 12 = <b>10 °C</b>.</li><li>Odpověď: Teplota vzrostla o <b>10 °C</b>.</li></ol>
+<p><b>Pozor:</b> Tady nemáme jednoduchý vzorec jako u auta; teplota neroste celou dobu stejně.</p></div>
+</div></section>
+
+<section class="panel" data-title="5. Další závislost – odmocnina">
+<div class="sheet">
+<div class="eyebrow">Vzorový příklad 4 · 5/6</div><h2>Závislost y = √x</h2>
+<p class="lead">Pro x = 1, 2, …, 10 vypočítáme druhou odmocninu a zaokrouhlíme ji na desetiny.</p>
+<div class="formula">y = √x</div>
+<div class="scroll"><table><thead><tr><th>x</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td></tr></thead>
+<tbody><tr><th>y ≈ √x</th><td>1,0</td><td>1,4</td><td>1,7</td><td>2,0</td><td>2,2</td><td>2,4</td><td>2,6</td><td>2,8</td><td>3,0</td><td>3,2</td></tr></tbody></table></div>
+<div class="grid"><div><figure><div class="graphBox"><svg id="rootChart" viewBox="0 0 690 370" role="img" aria-label="Graf funkce druhá odmocnina z x"></svg></div><figcaption>Křivka roste, ale postupně stále pomaleji.</figcaption></figure></div>
+<div><div class="control"><label for="rootRange">Vyber x: <output id="rootX">4</output></label><input type="range" id="rootRange" min="1" max="10" value="4" step="1"><p>Odmocnina: <span class="value" id="rootVal">2,0</span></p></div>
+<div class="box"><b>Jak vypočítat bod?</b><br>Pro x = 4 dostaneme y = √4 = 2. Do grafu patří bod <b>[4; 2]</b>.</div></div></div>
+<div class="example"><h3>Co si zapamatovat?</h3><p>Ne každá závislost má graf přímky. Například vztah y = √x vytváří <b>křivku</b>. Pro x = 2 je √2 ≈ 1,4, do grafu tedy zakreslíme bod [2; 1,4].</p></div>
+</div></section>
+
+<section class="panel" data-title="6. Samostatné procvičování">
+<div class="sheet">
+<div class="eyebrow">Procvičování · 6/6</div><h2>Vyzkoušej si to</h2>
+<p class="lead">Vypočítej nebo odečti hodnoty. Řešení otevři až po vlastním pokusu.</p>
+<details><summary>1. Rohlíky: Kolik stojí 18 rohlíků po 1,40 Kč?</summary><div>c = 1,40 · 18 = <span class="answer">25,20 Kč</span>.</div></details>
+<details><summary>2. Rohlíky: Kolik kusů dostaneš za 14 Kč?</summary><div>p = 14 : 1,40 = <span class="answer">10 rohlíků</span>.</div></details>
+<details><summary>3. Auto: Jak daleko dojede za 40 minut při 90 km/h?</summary><div>40 min = 2/3 h.<br>s = 90 · 2/3 = <span class="answer">60 km</span>.</div></details>
+<details><summary>4. Auto: Za kolik minut ujede 45 km?</summary><div>t = 45 : 90 = 0,5 h = <span class="answer">30 minut</span>.</div></details>
+<details><summary>5. Teplota: V kolik hodin bylo naměřeno 20 °C?</summary><div>V tabulce najdeme 20 °C ve <span class="answer">14:00 a 16:00</span>.</div></details>
+<details><summary>6. Teplota: O kolik °C klesla teplota od 15:00 do 18:00?</summary><div>22 − 16 = <span class="answer">6 °C</span>.</div></details>
+<details><summary>7. Odmocnina: Jaké je přibližně y pro x = 7? Zapiš bod.</summary><div>√7 ≈ 2,6. Bod <span class="answer">[7; 2,6]</span>.</div></details>
+<details><summary>8. Tabulka: x = 0, 1, 2, 3 a y = 2, 5, 8, 11. Najdi vzorec.</summary><div>Za každý krok x se y zvýší o 3; pro x = 0 je y = 2. Vzorec je <span class="answer">y = 3x + 2</span>.</div></details>
+<details><summary>9. Můžeme spojit body v grafu počtu rohlíků a jejich ceny?</summary><div><span class="answer">Ne</span>, protože počet rohlíků je zde celé nezáporné číslo. Mezi 4 a 5 rohlíky v tomto modelu neexistuje nákup 4,5 rohlíku.</div></details>
+<div class="callout"><b>Shrnutí:</b> Závislost vyjádříme <b>tabulkou, grafem nebo vzorcem</b>. Z grafu čteme dvojice odpovídajících si hodnot. Vždy sledujeme význam a jednotky veličin.</div>
+</div></section>
+
+<div class="footer"><button type="button" id="prev">← Předchozí</button><button type="button" class="next" id="next">Další →</button></div>
+</main>
+</div>
+<script>
+(function(){
+'use strict';
+var panels=Array.from(document.querySelectorAll('.panel')), index=0;
+var nav=document.getElementById('nav'), sel=document.getElementById('select');
+panels.forEach(function(p,i){
+ var b=document.createElement('button'); b.textContent=p.getAttribute('data-title');b.type='button';b.addEventListener('click',function(){show(i)});nav.appendChild(b);
+ var o=document.createElement('option');o.value=i;o.textContent=p.getAttribute('data-title');sel.appendChild(o);
+});
+function show(i){index=Math.max(0,Math.min(panels.length-1,i));panels.forEach(function(p,j){p.classList.toggle('active',j===index)});
+ Array.from(nav.children).forEach(function(b,j){b.classList.toggle('active',j===index);b.setAttribute('aria-current',j===index?'page':'false')});
+ sel.value=String(index);document.getElementById('prev').disabled=index===0;document.getElementById('next').disabled=index===panels.length-1;
+ document.getElementById('mobilePrev').disabled=index===0;document.getElementById('mobileNext').disabled=index===panels.length-1;window.scrollTo(0,0);
+}
+sel.addEventListener('change',function(){show(Number(this.value))});
+document.getElementById('prev').addEventListener('click',function(){show(index-1)});
+document.getElementById('next').addEventListener('click',function(){show(index+1)});
+document.getElementById('mobilePrev').addEventListener('click',function(){show(index-1)});
+document.getElementById('mobileNext').addEventListener('click',function(){show(index+1)});
+function cz(n,dec){return Number(n).toLocaleString('cs-CZ',{minimumFractionDigits:dec||0,maximumFractionDigits:dec===undefined?2:dec})}
+var NS='http://www.w3.org/2000/svg';
+function node(el,tag,attrs,label){var e=document.createElementNS(NS,tag);Object.keys(attrs||{}).forEach(function(k){e.setAttribute(k,attrs[k])});if(label!==undefined)e.textContent=label;el.appendChild(e);return e}
+function graph(id,cfg){
+var svg=document.getElementById(id);while(svg.firstChild)svg.removeChild(svg.firstChild);
+var L=71,T=31,W=566,H=277,B=T+H,R=L+W;
+function X(x){return L+(x-cfg.minX)*W/(cfg.maxX-cfg.minX)}
+function Y(y){return B-(y-cfg.minY)*H/(cfg.maxY-cfg.minY)}
+cfg.xticks.forEach(function(x){node(svg,'line',{x1:X(x),y1:T,x2:X(x),y2:B,stroke:'#e7edf5','stroke-width':1});
+node(svg,'text',{x:X(x),y:B+23,'text-anchor':'middle'},cz(x))});
+cfg.yticks.forEach(function(y){node(svg,'line',{x1:L,y1:Y(y),x2:R,y2:Y(y),stroke:'#e7edf5','stroke-width':1});
+node(svg,'text',{x:L-10,y:Y(y)+4,'text-anchor':'end'},cz(y))});
+node(svg,'line',{x1:L,y1:B,x2:R+8,y2:B,stroke:'#263755','stroke-width':2});
+node(svg,'path',{d:'M '+(R+8)+' '+B+' l -9 -5 v 10 Z',fill:'#263755'});
+node(svg,'line',{x1:L,y1:B,x2:L,y2:T-11,stroke:'#263755','stroke-width':2});
+node(svg,'path',{d:'M '+L+' '+(T-11)+' l -5 9 h 10 Z',fill:'#263755'});
+node(svg,'text',{x:L,y:15,'font-weight':'700'},cfg.yname);
+node(svg,'text',{x:R+4,y:353,'text-anchor':'end','font-weight':'700'},cfg.xname);
+if(cfg.path){var d=cfg.path.map(function(p,i){return (i?'L':'M')+X(p[0]).toFixed(2)+' '+Y(p[1]).toFixed(2)}).join(' ');
+node(svg,'path',{d:d,fill:'none',stroke:'#315efb','stroke-width':3.5,'stroke-linecap':'round','stroke-linejoin':'round'})}
+(cfg.points||[]).forEach(function(p){if(p[0]<cfg.minX||p[0]>cfg.maxX||p[1]<cfg.minY||p[1]>cfg.maxY)return;
+var circle=node(svg,'circle',{cx:X(p[0]),cy:Y(p[1]),r:cfg.dotR||5,fill:'#315efb',stroke:'white','stroke-width':1.5});
+node(circle,'title',{},'['+cz(p[0])+'; '+cz(p[1],cfg.pointDecimals)+']')});
+if(cfg.hi){var x=cfg.hi[0],y=cfg.hi[1];node(svg,'line',{x1:X(x),y1:Y(y),x2:X(x),y2:B,stroke:'#ef9540','stroke-width':2,'stroke-dasharray':'5 5'});
+node(svg,'line',{x1:L,y1:Y(y),x2:X(x),y2:Y(y),stroke:'#ef9540','stroke-width':2,'stroke-dasharray':'5 5'});
+node(svg,'circle',{cx:X(x),cy:Y(y),r:8,fill:'#ec8732',stroke:'white','stroke-width':2.5});
+}}
+var rp=Array.from({length:21},function(_,i){return [i,1.4*i]});
+var r=document.getElementById('rollRange');
+function roll(){var p=Number(r.value),c=1.4*p;
+document.getElementById('rollCount').textContent=p;document.getElementById('rollPrice').textContent=cz(c,2)+' Kč';
+graph('rollChart',{minX:0,maxX:20,minY:0,maxY:28,xticks:[0,5,10,15,20],yticks:[0,7,14,21,28],xname:'počet rohlíků p',yname:'cena c (Kč)',points:rp,dotR:4.5,hi:[p,c],pointDecimals:2})}
+r.addEventListener('input',roll);roll();
+var car=document.getElementById('carRange');
+function drive(){var m=Number(car.value)*5,t=m/60,s=90*t;
+document.getElementById('carTime').textContent=Math.floor(m/60)+' h '+String(m%60).padStart(2,'0')+' min';
+document.getElementById('carDist').textContent=cz(s,1)+' km';
+graph('carChart',{minX:0,maxX:2,minY:0,maxY:180,xticks:[0,.5,1,1.5,2],yticks:[0,45,90,135,180],xname:'čas t (h)',yname:'dráha s (km)',path:[[0,0],[2,180]],points:[[0,0],[.25,22.5],[.5,45],[1,90],[1.5,135],[2,180]],hi:[t,s]})}
+car.addEventListener('input',drive);drive();
+var temps=[8,10,12,18,18,19,20,22,20,18,16],timeData=temps.map(function(y,i){return [i+8,y]});
+var tempRange=document.getElementById('tempRange');
+function temp(){var t=Number(tempRange.value),v=temps[t-8];document.getElementById('tempHour').textContent=t+':00';
+document.getElementById('tempVal').textContent=v+' °C';
+graph('tempChart',{minX:8,maxX:18,minY:0,maxY:25,xticks:[8,10,12,14,16,18],yticks:[0,5,10,15,20,25],xname:'čas (h)',yname:'teplota (°C)',path:timeData,points:timeData,hi:[t,v]})}
+tempRange.addEventListener('input',temp);temp();
+var rootRange=document.getElementById('rootRange');
+function root(){var x=Number(rootRange.value),y=Math.sqrt(x);
+document.getElementById('rootX').textContent=x;document.getElementById('rootVal').textContent=cz(y,1);
+var smooth=Array.from({length:201},function(_,i){var v=i/20;return [v,Math.sqrt(v)]});
+var pts=Array.from({length:10},function(_,i){return [i+1,Math.sqrt(i+1)]});
+graph('rootChart',{minX:0,maxX:10,minY:0,maxY:3.5,xticks:[0,2,4,6,8,10],yticks:[0,1,2,3],xname:'x',yname:'y = √x',path:smooth,points:pts,hi:[x,y],pointDecimals:1})}
+rootRange.addEventListener('input',root);root();
+show(0);
+})();
+</script>
+</body></html>
