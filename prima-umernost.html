@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Přímá úměrnost – matematika 3A8</title>
+<style>
+:root{--bg:#f5f7fb;--paper:#fff;--ink:#19243b;--muted:#617088;--border:#dce4ee;--blue:#315efb;--pale:#ebf0ff;--green:#136d50;--red:#be3e44}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+button,select,input{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #9db0ff;outline-offset:2px}
+.app{display:grid;grid-template-columns:270px minmax(0,1fr);min-height:100vh}
+.sidebar{background:#fff;border-right:1px solid var(--border);padding:24px 15px;position:sticky;top:0;height:100vh;overflow:auto}
+.back{font-size:14px;font-weight:800;color:var(--blue);text-decoration:none}
+.sidebar h1{font-size:24px;line-height:1.2;margin:24px 8px 7px}
+.sidebar p{font-size:13px;color:var(--muted);margin:0 8px 22px}
+nav{display:grid;gap:6px}nav button{background:transparent;border:1px solid transparent;padding:12px 10px;text-align:left;color:var(--ink);border-radius:10px;font-weight:650;width:100%}
+nav button.active{background:var(--pale);color:#2346b6;border-color:#c6d5ff}nav button:hover{background:#f4f6fd}
+main{max-width:1030px;width:100%;padding:28px 28px 64px;margin:0 auto;min-width:0}
+.top{display:flex;gap:12px;justify-content:space-between;align-items:center;margin-bottom:17px}
+.kicker{display:inline-block;padding:6px 12px;border-radius:99px;background:var(--pale);color:#294ebc;font-size:12px;font-weight:850;letter-spacing:.065em;text-transform:uppercase}
+.print{border:1px solid var(--border);border-radius:9px;background:white;padding:8px 14px;font-size:14px;font-weight:750}
+.mobile{display:none}
+.panel{display:none}.panel.active{display:block}
+.sheet{border:1px solid var(--border);box-shadow:0 7px 26px #24334910;background:var(--paper);border-radius:18px;padding:28px 30px}
+.chapter{color:#315efb;font-weight:800;font-size:14px}
+h2{font-size:clamp(25px,4vw,33px);margin:3px 0 15px;line-height:1.2}h3{margin:22px 0 8px;font-size:19px}h4{margin:15px 0 6px;font-size:16px}
+p{margin:10px 0}.lead{font-size:17px;color:#465872}
+.callout{border-left:5px solid var(--blue);background:var(--pale);padding:15px 18px;border-radius:12px;margin:19px 0}
+.warn{border-left:5px solid #e39a4c;background:#fff8ee;padding:13px 16px;border-radius:11px;margin:14px 0}
+.good{color:var(--green);font-weight:800}.bad{color:var(--red);font-weight:800}
+.math{font-size:23px;color:#284dbd;font-weight:850;background:#f0f4ff;padding:8px 17px;border-radius:12px;display:inline-block;margin:4px 0}
+.mathline{font-size:19px;white-space:normal}
+.grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(245px,.8fr);gap:19px;align-items:start}
+.tablewrap{overflow:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;background:white;white-space:nowrap;font-size:14px}
+td,th{text-align:center;border:1px solid var(--border);padding:8px 12px;font-variant-numeric:tabular-nums}
+th{background:#edf2ff;color:#223b75;text-align:left}
+.mini{color:var(--muted);font-size:13px}
+.steps{counter-reset:s;list-style:none;padding:0}.steps li{counter-increment:s;position:relative;padding:9px 9px 10px 42px;border-bottom:1px solid #ebeff5}
+.steps li::before{content:counter(s);position:absolute;left:2px;top:10px;background:#eaf0ff;width:29px;height:29px;display:grid;place-items:center;border-radius:50%;font-weight:800;color:#2d50c7}
+.box{border:1px solid var(--border);background:#fbfcff;padding:13px 16px;border-radius:12px;margin:14px 0}
+.exercise{padding:14px 17px;border:1px solid var(--border);border-radius:12px;margin:13px 0;background:#fff}
+.exercise p:first-child{margin-top:0}
+details{margin:11px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+summary{padding:13px 15px;cursor:pointer;background:#f8faff;font-weight:730}
+.solution{padding:12px 17px 16px}
+.solution p{margin:5px 0}
+.control{border:1px solid var(--border);background:#f7f9ff;padding:15px;border-radius:12px;margin:14px 0}
+.control label{font-size:14px;font-weight:760;display:block;margin:9px 0 5px}
+input[type=range]{width:100%;accent-color:var(--blue)}
+input[type=number]{width:90px;max-width:100%;padding:6px;border:1px solid #cad5e6;border-radius:8px}
+select{border-radius:9px;padding:7px 10px;border:1px solid #d0dbec;background:white;max-width:100%}
+fieldset{margin:13px 0;padding:10px 14px;border:1px solid var(--border);border-radius:12px}
+legend{font-size:14px;font-weight:800}fieldset label{display:inline-flex;align-items:center;gap:6px;margin-right:14px}
+.value{color:var(--blue);font-weight:850;font-size:23px;font-variant-numeric:tabular-nums}
+svg{width:100%;height:auto;display:block;background:#fcfdff}
+.chartbox{border:1px solid var(--border);border-radius:14px;padding:10px;margin:11px 0;overflow:hidden}
+figcaption{font-size:13px;color:var(--muted);margin:4px 0 0}
+figure{margin:0}
+.pill{display:inline-block;background:#e6f6ed;color:var(--green);padding:2px 8px;border-radius:9px;font-size:12px;font-weight:800}
+.buttons{display:flex;flex-wrap:wrap;gap:9px;margin:11px 0}
+.buttons button{border:1px solid #cbd6ec;padding:8px 12px;background:#fff;border-radius:9px;font-weight:750}
+.buttons button.on{background:#eaf0ff;color:#2546ae;border-color:#abbfff}
+.res{min-height:26px;font-weight:760}
+.footer{display:flex;justify-content:space-between;gap:10px;margin:21px 0}.footer button{background:white;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-weight:750}.footer button.next{background:var(--blue);color:white;border-color:var(--blue)}button:disabled{opacity:.35;cursor:not-allowed}
+@media(max-width:800px){.app{display:block}.sidebar{display:none}main{padding:12px 11px 50px}.sheet{padding:18px 15px;border-radius:13px}.grid{grid-template-columns:1fr}.mobile{display:flex;gap:8px;margin:0 0 13px}.mobile select{flex:1;min-width:0}.mobile button{background:white;border:1px solid var(--border);border-radius:9px;padding:9px 12px}.top{margin:3px 0 14px}}
+@media print{.sidebar,.top .print,.mobile,.footer,.control input,.buttons{display:none!important}.app{display:block}main{max-width:none;padding:0}.panel{display:block!important;page-break-after:always}.sheet{padding:8mm 6mm;box-shadow:none;border:none}.chartbox,table,details{break-inside:avoid}.solution{display:block}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<a class="back" href="index.html">← Rozcestník 3A8</a>
+<h1>Přímá úměrnost</h1>
+<p>Zápis · vzorová řešení · interaktivní grafy · procvičování</p>
+<nav id="nav" aria-label="Kapitoly"></nav>
+</aside>
+<main>
+<div class="top"><span class="kicker">3A8 · MATEMATIKA · kapitola 5</span><button type="button" class="print" onclick="window.print()">⎙ Tisk</button></div>
+<div class="mobile"><button id="mPrev" type="button" aria-label="Předchozí část">←</button><select id="picker" aria-label="Výběr části"></select><button id="mNext" type="button" aria-label="Další část">→</button></div>
+
+<section class="panel active" data-title="1. Co je přímá úměrnost?">
+<div class="sheet">
+<div class="chapter">Zápis do sešitu · 1/7</div>
+<h2>5. Přímá úměrnost</h2>
+<div class="callout"><b>Přímá úměrnost</b> je závislost dvou veličin, při které platí: <b>Kolikrát se zvětší (zmenší) hodnota jedné veličiny, tolikrát se zvětší (zmenší) hodnota druhé veličiny.</b></div>
+<h3>Příklady</h3>
+<p>Jedna houska stojí 4 Kč. Dvakrát více housek stojí dvakrát více peněz. Pětkrát více housek stojí pětkrát více peněz.</p>
+<p>Auto jede stálou rychlostí. Za dvojnásobný čas ujede dvojnásobnou dráhu.</p>
+<h3>Jak poznáme přímou úměrnost?</h3>
+<p>Podíl odpovídajících si hodnot dvou přímo úměrných veličin je <b>stále stejný</b>:</p>
+<div class="math">y : x = k</div>
+<p>Číslo <b>k</b> se nazývá <b>koeficient přímé úměrnosti</b>. Nezáleží na tom, kterou dvojici nenulových odpovídajících si hodnot vybereme – vždy získáme stejné číslo k.</p>
+<h3>Vzorec přímé úměrnosti</h3>
+<div class="math">y = k · x</div>
+<div class="box"><b>x</b> – nezávislá veličina<br><b>y</b> – závislá veličina<br><b>k</b> – koeficient přímé úměrnosti</div>
+<div class="warn"><b>Pozor!</b> Ne každá závislost, při které s rostoucím x roste také y, je přímou úměrností. Rozhoduje <b>stálý podíl y/x</b>, nikoliv pouze růst.</div>
+<p class="mini">V příkladech z učebnice používáme především kladné hodnoty veličin a kladné koeficienty.</p>
+</div></section>
+
+<section class="panel" data-title="2. Tabulka a koeficient k">
+<div class="sheet">
+<div class="chapter">Vzorově řešený příklad 1 · 2/7</div>
+<h2>Poznání přímé úměrnosti z tabulky</h2>
+<p class="lead">Rozhodni, zda veličiny x a y jsou přímo úměrné. Pokud ano, urči koeficient k.</p>
+<div class="tablewrap"><table><tr><th>x</th><td>2</td><td>4</td><td>6</td><td>8</td><td>10</td></tr><tr><th>y</th><td>6</td><td>12</td><td>18</td><td>24</td><td>30</td></tr></table></div>
+<ol class="steps">
+<li>Vybereme odpovídající si hodnoty x a y v jednom sloupci.</li>
+<li>Vypočítáme podíly <b>y : x</b>: 6 : 2 = 3; 12 : 4 = 3; 18 : 6 = 3; 24 : 8 = 3; 30 : 10 = 3.</li>
+<li>Podíl je vždy stejný, proto <b>jde o přímou úměrnost</b>.</li>
+<li>Koeficient <b>k = 3</b>. Výsledný vzorec: <b>y = 3x</b>.</li>
+</ol>
+<div class="callout"><b>Pravidlo:</b> V tabulce přímé úměrnosti mají všechny nenulové sloupce stejný podíl <b>y/x = k</b>.</div>
+<h3>A když podíly nejsou stejné?</h3>
+<div class="tablewrap"><table><tr><th>x</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr><tr><th>y</th><td>2</td><td>4</td><td>6</td><td>10</td><td>20</td></tr></table></div>
+<p>Například 2 : 1 = 2, ale 10 : 4 = 2,5. Proto <b>nejde o přímou úměrnost</b>.</p>
+<h3>Interaktivní porovnání tabulek</h3>
+<div class="buttons" id="examples">
+<button type="button" data-ex="0" class="on">Tabulka A</button>
+<button type="button" data-ex="1">Tabulka B</button>
+<button type="button" data-ex="2">Tabulka C</button></div>
+<div id="tableDemo" class="tablewrap"></div>
+<div id="tableVerdict" class="box" aria-live="polite"></div>
+</div></section>
+
+<section class="panel" data-title="3. Výpočet neznámých hodnot">
+<div class="sheet">
+<div class="chapter">Vzorově řešený příklad 2 · 3/7</div>
+<h2>Doplňování tabulky přímé úměrnosti</h2>
+<p class="lead">Veličiny x, y jsou přímo úměrné. Doplň prázdná políčka:</p>
+<div class="tablewrap"><table><tr><th>x</th><td>1</td><td>2</td><td>?</td><td>7</td><td>10</td><td>?</td><td>40</td></tr><tr><th>y</th><td>?</td><td>10</td><td>20</td><td>?</td><td>?</td><td>40</td><td>?</td></tr></table></div>
+<ol class="steps">
+<li>Ze známé dvojice x = 2, y = 10 určíme <b>k = y/x = 10/2 = 5</b>.</li>
+<li>Napíšeme vzorec: <b>y = 5x</b>.</li>
+<li>Pokud známe x, spočítáme <b>y = 5x</b>. Například x = 7 ⇒ y = 35.</li>
+<li>Pokud známe y, spočítáme <b>x = y/5</b>. Například y = 20 ⇒ x = 4.</li>
+</ol>
+<details><summary>Zobrazit doplněnou tabulku</summary><div class="solution"><div class="tablewrap"><table><tr><th>x</th><td>1</td><td>2</td><td>4</td><td>7</td><td>10</td><td>8</td><td>40</td></tr><tr><th>y</th><td>5</td><td>10</td><td>20</td><td>35</td><td>50</td><td>40</td><td>200</td></tr></table></div></div></details>
+<h3>Samostatný pokus</h3>
+<p>Je dáno <b>y = 1,5x</b>. Doplň tabulku pro x = 3, 5, 7, 9.</p>
+<div class="tablewrap"><table><tr><th>x</th><td>3</td><td>5</td><td>7</td><td>9</td></tr><tr><th>y</th><td>?</td><td>?</td><td>?</td><td>?</td></tr></table></div>
+<details><summary>Řešení samostatného pokusu</summary><div class="solution">y = 1,5 · x. Výsledné hodnoty: <b>4,5; 7,5; 10,5; 13,5</b>.</div></details>
+</div></section>
+
+<section class="panel" data-title="4. Graf a živý model">
+<div class="sheet">
+<div class="chapter">Interaktivní vysvětlení · 4/7</div>
+<h2>Jak vypadá graf přímé úměrnosti?</h2>
+<div class="callout">Body grafu <b>y = kx</b> leží na přímce, která prochází počátkem soustavy souřadnic <b>[0; 0]</b>. Při spojité závislosti tvoří graf celou přímku, polopřímku nebo její část podle přípustných hodnot x; u počtu kusů jsou grafem jen jednotlivé body.</div>
+<div class="grid">
+<div><figure><div class="chartbox"><svg id="graph" viewBox="0 0 680 390" role="img" aria-label="Interaktivní graf přímé úměrnosti"></svg></div><figcaption>Stejné měřítko os zůstává i při změně koeficientu k, aby bylo vidět, jak se mění sklon.</figcaption></figure></div>
+<div>
+<div class="control">
+<label for="kSlider">Koeficient k = <output id="kOut">2</output></label>
+<input id="kSlider" type="range" min="0.5" max="5" step="0.25" value="2">
+<label for="xSlider">Hodnota x = <output id="xOut">4</output></label>
+<input id="xSlider" type="range" min="0" max="8" step="0.5" value="4">
+<fieldset><legend>Typ závislosti</legend>
+<label><input type="radio" name="model" value="continuous" checked> Souvislá (např. dráha)</label><br>
+<label><input type="radio" name="model" value="discrete"> Počet kusů</label>
+</fieldset>
+<p>Vzorec: <span class="value" id="eq">y = 2x</span></p>
+<p>Vybraný bod: <span class="value" id="pt">[4; 8]</span></p>
+</div>
+<div class="box" id="graphNote">Závislost probíhá souvisle. Mezi dvěma hodnotami x jsou možné i mezihodnoty.</div></div></div>
+<p><b>Pozor na důležitý rozdíl:</b> U rohlíků body nespojujeme, protože lze koupit jen celočíselný počet. Přesto všechny jejich body leží na přímce procházející počátkem.</p>
+<h3>Jak získat předpis z grafu?</h3>
+<p>Pokud na grafu přímé úměrnosti leží bod <b>[2; 6]</b>, pak k = 6 : 2 = 3, tedy <b>y = 3x</b>.</p>
+</div></section>
+
+<section class="panel" data-title="5. Předpis z grafu">
+<div class="sheet">
+<div class="chapter">Vzorově řešený příklad 3 · 5/7</div>
+<h2>Určení vzorce přímé úměrnosti z grafu</h2>
+<p class="lead">Grafem přímé úměrnosti prochází bod <b>A[4; 2]</b>. Urči její předpis.</p>
+<div class="grid"><div><figure><div class="chartbox"><svg id="reading" viewBox="0 0 680 390" role="img" aria-label="Graf y rovná se polovina x s bodem A čtyři dva"></svg></div></figure></div>
+<div><ol class="steps"><li>Víme, že graf přímé úměrnosti má tvar <b>y = kx</b>.</li><li>Odečteme bod <b>A[4; 2]</b>, tedy x = 4 a y = 2.</li><li>Vypočítáme <b>k = y/x = 2/4 = 0,5</b>.</li><li><b>Výsledek: y = 0,5x</b>.</li></ol></div></div>
+<div class="callout">K určení koeficientu stačí jediný bod grafu <b>mimo počátek</b>, pokud víme, že jde o přímou úměrnost.</div>
+<h3>Vzorově řešený příklad 4 – spotřeba vody</h3>
+<p>Čerpadlo přečerpá za minutu 0,63 m³ vody. Kolik vody přečerpá za 4 hodiny, jestliže pracuje stále stejným výkonem?</p>
+<ol class="steps"><li>Čas: 4 h = 4 · 60 = <b>240 min</b>.</li><li>Vzorec: <b>V = 0,63 · t</b>, kde t je v minutách a V v m³.</li><li>Dosazení: <b>V = 0,63 · 240 = 151,2 m³</b>.</li></ol>
+</div></section>
+
+<section class="panel" data-title="6. Pozor na falešnou úměrnost">
+<div class="sheet">
+<div class="chapter">Častá chyba · 6/7</div>
+<h2>Rostoucí tabulka nemusí být přímá úměrnost</h2>
+<p class="lead">U obou tabulek se y zvětšuje, když se zvětšuje x. Jen jedna však představuje přímou úměrnost.</p>
+<div class="grid">
+<div><h3>A – přímá úměrnost</h3>
+<div class="tablewrap"><table><tr><th>x</th><td>5</td><td>10</td><td>15</td><td>20</td><td>25</td></tr><tr><th>y</th><td>20</td><td>40</td><td>60</td><td>80</td><td>100</td></tr></table></div>
+<p>Podíl: 20/5 = 40/10 = 60/15 = 80/20 = 100/25 = <b>4</b>.</p><div class="box good">Ano: y = 4x.</div></div>
+<div><h3>B – není přímá úměrnost</h3>
+<div class="tablewrap"><table><tr><th>x</th><td>5</td><td>10</td><td>15</td><td>20</td><td>25</td></tr><tr><th>y</th><td>15</td><td>20</td><td>25</td><td>30</td><td>35</td></tr></table></div>
+<p>Podíl: 15/5 = <b>3</b>, ale 20/10 = <b>2</b>. Podíly jsou různé.</p><div class="box bad">Ne: y = x + 10 není přímá úměrnost.</div></div>
+</div>
+<div class="warn"><b>Zapamatuj si:</b> Přímá úměrnost = <b>stálý podíl</b>, nikoliv stálý rozdíl.</div>
+<h3>Kontrolní otázka</h3>
+<p>Platí vztah y = 2x + 3. Je to přímá úměrnost?</p>
+<details><summary>Zobrazit vysvětlení</summary><div class="solution">Ne. Při x = 0 vychází y = 3, graf tedy neprochází počátkem. Navíc podíl y/x není konstantní. Pro přímou úměrnost musí být vzorec <b>y = kx</b>.</div></details>
+</div></section>
+
+<section class="panel" data-title="7. Samostatné procvičování">
+<div class="sheet">
+<div class="chapter">Procvičování · 7/7</div>
+<h2>Vyzkoušej si to</h2><p class="lead">Nejprve vypočítej sám, poté rozbal řešení.</p>
+<details><summary>1. Rozhodni: x = 10, 20, 30, 40, 50; y = 3, 6, 9, 12, 15.</summary><div class="solution">Podíly y/x jsou 3/10 = 6/20 = 9/30 = 12/40 = 15/50 = <b>0,3</b>. Ano, je to přímá úměrnost a její předpis je <b>y = 0,3x</b>.</div></details>
+<details><summary>2. Doplň: y = ¼x pro x = 4, 12, 20, 24, 36.</summary><div class="solution">Vypočítáme čtvrtinu každého x: <b>1; 3; 5; 6; 9</b>.</div></details>
+<details><summary>3. Rozhodni: x = 3, 6, 9, 12, 15; y = 12, 24, 36, 48, 60.</summary><div class="solution">Poměr je stále y/x = <b>4</b>. Přímá úměrnost, vzorec <b>y = 4x</b>.</div></details>
+<details><summary>4. Rozhodni: x = 5, 10, 15, 20, 25; y = 15, 20, 25, 30, 35.</summary><div class="solution">15/5 = 3, ale 20/10 = 2. Podíly nejsou stejné ⇒ <b>není</b> přímá úměrnost.</div></details>
+<details><summary>5. Je dána y = 1,5x. Vypočítej y pro x = 3, 5, 7, 9.</summary><div class="solution">Postupně: <b>4,5; 7,5; 10,5; 13,5</b>.</div></details>
+<details><summary>6. Čerpadlo přečerpá 0,63 m³ za minutu. Kolik přečerpá za 4 hodiny?</summary><div class="solution">4 h = 240 min; V = 0,63 · 240 = <b>151,2 m³</b>.</div></details>
+<details><summary>7. Graf přímé úměrnosti prochází bodem A[4; 2]. Najdi vzorec.</summary><div class="solution">k = 2/4 = 0,5. Vzorec <b>y = 0,5x</b>.</div></details>
+<details><summary>8. Graf přímé úměrnosti prochází bodem B[0,1; 3]. Najdi vzorec.</summary><div class="solution">k = 3/0,1 = 30. Vzorec <b>y = 30x</b>.</div></details>
+<details><summary>9. Ověř, zda y = 3x + 2 vyjadřuje přímou úměrnost.</summary><div class="solution"><b>Ne</b>. Má nenulový absolutní člen, pro x = 0 je y = 2. Graf neprochází počátkem.</div></details>
+<details><summary>10. Při přímé úměrnosti je x = 12 a y = 18. Jaké x odpovídá y = 30?</summary><div class="solution">k = 18/12 = 1,5. Potom x = 30/1,5 = <b>20</b>.</div></details>
+<div class="callout"><b>Shrnutí do sešitu:</b> Přímá úměrnost má vzorec <b>y = kx</b>. Pro všechny nenulové hodnoty x platí <b>y/x = k</b>. Její graf leží na přímce procházející počátkem soustavy souřadnic.</div>
+<p class="mini"><a href="zavislost-velicin.html">← Předchozí kapitola: Závislost veličin</a></p>
+</div></section>
+<div class="footer"><button type="button" id="prev">← Předchozí</button><button type="button" class="next" id="next">Další →</button></div>
+</main>
+</div>
+<script>
+(function(){
+'use strict';
+var sections=Array.from(document.querySelectorAll('.panel'));
+var nav=document.getElementById('nav'),picker=document.getElementById('picker'),idx=0;
+sections.forEach(function(s,i){
+ var b=document.createElement('button');b.type='button';b.textContent=s.dataset.title;b.addEventListener('click',function(){show(i)});nav.appendChild(b);
+ var o=document.createElement('option');o.value=i;o.textContent=s.dataset.title;picker.appendChild(o);
+});
+function show(i){
+ idx=Math.min(sections.length-1,Math.max(0,i));
+ sections.forEach(function(s,j){s.classList.toggle('active',j===idx)});
+ Array.from(nav.children).forEach(function(b,j){b.classList.toggle('active',j===idx);b.setAttribute('aria-current',j===idx?'page':'false')});
+ picker.value=String(idx);
+ document.getElementById('prev').disabled=idx===0;
+ document.getElementById('mPrev').disabled=idx===0;
+ document.getElementById('next').disabled=idx===sections.length-1;
+ document.getElementById('mNext').disabled=idx===sections.length-1;
+ window.scrollTo(0,0);
+}
+document.getElementById('prev').addEventListener('click',function(){show(idx-1)});
+document.getElementById('next').addEventListener('click',function(){show(idx+1)});
+document.getElementById('mPrev').addEventListener('click',function(){show(idx-1)});
+document.getElementById('mNext').addEventListener('click',function(){show(idx+1)});
+picker.addEventListener('change',function(){show(Number(this.value))});
+function fmt(v){return Number(v.toFixed(3)).toLocaleString('cs-CZ',{maximumFractionDigits:3})}
+var svgNS='http://www.w3.org/2000/svg';
+function add(parent,tag,a,label){
+ var n=document.createElementNS(svgNS,tag);
+ Object.keys(a||{}).forEach(function(key){n.setAttribute(key,a[key])});
+ if(label!==undefined)n.textContent=label;
+ parent.appendChild(n);return n;
+}
+function chart(id,k,selected,mode,opts){
+ var svg=document.getElementById(id);
+ while(svg.firstChild)svg.removeChild(svg.firstChild);
+ var L=64,R=626,T=32,B=332,XMAX=8,YMAX=40;
+ function px(x){return L+x/XMAX*(R-L)}
+ function py(y){return B-y/YMAX*(B-T)}
+ [0,1,2,3,4,5,6,7,8].forEach(function(x){
+ add(svg,'line',{x1:px(x),y1:T,x2:px(x),y2:B,stroke:'#e7edf7','stroke-width':1});
+ add(svg,'text',{x:px(x),y:B+23,'text-anchor':'middle'},String(x));
+ });
+ [0,10,20,30,40].forEach(function(y){
+ add(svg,'line',{x1:L,y1:py(y),x2:R,y2:py(y),stroke:'#e5ebf5','stroke-width':1});
+ add(svg,'text',{x:L-13,y:py(y)+4,'text-anchor':'end'},String(y));
+ });
+ add(svg,'line',{x1:L,y1:B,x2:R+8,y2:B,stroke:'#263653','stroke-width':2});
+ add(svg,'path',{d:'M '+(R+9)+' '+B+' l -9 -5 v 10 Z',fill:'#263653'});
+ add(svg,'line',{x1:L,y1:B,x2:L,y2:T-12,stroke:'#263653','stroke-width':2});
+ add(svg,'path',{d:'M '+L+' '+(T-13)+' l -5 9 h 10 Z',fill:'#263653'});
+ add(svg,'text',{x:640,y:366,'text-anchor':'end','font-weight':'700'},'x');
+ add(svg,'text',{x:44,y:22,'font-weight':'700'},'y');
+ var endX=Math.min(XMAX,YMAX/k),d='M '+px(0)+' '+py(0)+' L '+px(endX)+' '+py(k*endX);
+ if(mode==='continuous'){
+ add(svg,'path',{d:d,fill:'none',stroke:'#315efb','stroke-width':3.5,'stroke-linecap':'round'});
+ } else{
+ for(var x=0;x<=8;x++)add(svg,'circle',{cx:px(x),cy:py(k*x),r:5.2,fill:'#315efb',stroke:'#fff','stroke-width':1.4});
+ }
+ if(selected!==undefined){
+ var y=k*selected;
+ add(svg,'line',{x1:px(selected),y1:py(y),x2:px(selected),y2:B,stroke:'#ea9239','stroke-width':2,'stroke-dasharray':'6 6'});
+ add(svg,'line',{x1:L,y1:py(y),x2:px(selected),y2:py(y),stroke:'#ea9239','stroke-width':2,'stroke-dasharray':'6 6'});
+ add(svg,'circle',{cx:px(selected),cy:py(y),r:8,fill:'#eb8732',stroke:'white','stroke-width':3});
+ var tx=Math.min(px(selected)+12,px(7.1)), ty=Math.max(py(y)-12,44);
+ add(svg,'text',{x:tx,y:ty,'font-weight':'700',fill:'#a85b1e'},'['+fmt(selected)+'; '+fmt(y)+']');
+ }
+}
+var sliderK=document.getElementById('kSlider'),sliderX=document.getElementById('xSlider');
+function redraw(){
+ var k=Number(sliderK.value),x=Number(sliderX.value),mode=document.querySelector('input[name="model"]:checked').value;
+ if(mode==='discrete'){sliderX.step='1';x=Math.round(x);sliderX.value=x}else sliderX.step='0.5';
+ document.getElementById('kOut').textContent=fmt(k);
+ document.getElementById('xOut').textContent=fmt(x);
+ document.getElementById('eq').textContent='y = '+fmt(k)+'x';
+ document.getElementById('pt').textContent='['+fmt(x)+'; '+fmt(k*x)+']';
+ document.getElementById('graphNote').textContent=mode==='continuous'
+ ?'Spojitá veličina: x může nabývat i mezihodnot. Grafem je zde část přímky.'
+ :'Počet kusů: x je celé nezáporné číslo. Zobrazujeme jen jednotlivé body; ty nespojujeme.';
+ chart('graph',k,x,mode);
+}
+sliderK.addEventListener('input',redraw);sliderX.addEventListener('input',redraw);
+document.querySelectorAll('input[name="model"]').forEach(function(n){n.addEventListener('change',redraw)});
+redraw();
+chart('reading',0.5,4,'continuous');
+var datasets=[
+ {x:[1,2,3,4,5],y:[3,6,9,12,15]},
+ {x:[5,10,15,20,25],y:[15,20,25,30,35]},
+ {x:[10,20,30,40,50],y:[3,6,9,12,15]}
+],selectEx=0;
+function renderTable(){
+ var data=datasets[selectEx],container=document.getElementById('tableDemo');
+ var rows=['x','y'].map(function(key){return '<tr><th>'+key+'</th>'+data[key].map(function(v){return '<td>'+fmt(v)+'</td>'}).join('')+'</tr>'}).join('');
+ container.innerHTML='<table aria-label="Ukázková tabulka"><tbody>'+rows+'</tbody></table>';
+ var ratios=data.x.map(function(v,i){return data.y[i]/v});
+ var same=ratios.every(function(r){return Math.abs(r-ratios[0])<1e-9});
+ document.getElementById('tableVerdict').innerHTML='<b>Podíly y/x:</b> '+ratios.map(fmt).join(' · ')+'.<br><span class="'+(same?'good':'bad')+'">'+
+ (same?'ANO – všechny podíly jsou stejné. k = '+fmt(ratios[0])+', tedy y = '+fmt(ratios[0])+'x.':
+ 'NE – podíly se liší, přímá úměrnost to není.')+'</span>';
+ Array.from(document.querySelectorAll('#examples button')).forEach(function(b,i){b.classList.toggle('on',i===selectEx)});
+}
+document.querySelectorAll('#examples button').forEach(function(b){b.addEventListener('click',function(){selectEx=Number(b.dataset.ex);renderTable()})});
+renderTable();
+show(0);
+})();
+</script>
+</body>
+</html>
