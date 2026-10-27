@@ -309,7 +309,7 @@ function begin(){
  $('setup').hidden=true;$('finish').hidden=true;$('play').hidden=false;
  displayTask();scrollToTop();
 }
-function scrollToTop(){window.scrollTo({top:0,behavior:'instant'})}
+function scrollToTop(){window.scrollTo(0,0)}
 function displayTask(){
  locked=false;shownHint=false;
  var task=tasks[results.length];
