@@ -12,12 +12,13 @@
 <body><main>
 <a href="./">← Matematika 3A8</a>
 <h1>Dělení mnohočlenu mnohočlenem</h1>
-<p class="muted">Vypočítej podíl, vyplň jeho členy a urči podmínky dělení. Všechny příklady mají nulový zbytek.</p>
+<p class="muted">Vypočítej podíl, vyplň jeho členy a urči podmínky dělení. Ve výchozím nastavení jsou příklady beze zbytku.</p>
 <section class="panel">
 <details><summary>Nastavení generátoru</summary>
 <div class="settings">
 <fieldset><legend>Počet členů dělence</legend><label class="choice"><input type="checkbox" name="size" value="3" checked>Trojčlen</label><label class="choice"><input type="checkbox" name="size" value="4" checked>Čtyřčlen</label><label class="choice"><input type="checkbox" name="size" value="5" checked>Pětičlen</label></fieldset>
 <label><span class="label">Dělitel</span><select id="divisor"><option value="2">Dvojčlen</option><option value="1">Jednočlen</option><option value="0">Střídat oba typy</option></select></label>
+<label><span class="label">Zbytek po dělení</span><select id="remainder"><option value="0">Beze zbytku</option><option value="1">Se zbytkem</option></select></label>
 <label><span class="label">Koeficienty výsledku</span><select id="fractions"><option value="0">Pouze celá čísla</option><option value="1">Včetně zlomků (smíšeně)</option><option value="2">Vždy alespoň jeden zlomek</option></select></label>
 <label><span class="label">Počet příkladů</span><input id="count" type="number" min="1" max="30" value="5"></label>
 <label><span class="label">Neznámá</span><select id="variable"><option value="x">x</option><option value="random" selected>Střídat x, y, a, b, t</option><option>y</option><option>a</option><option>b</option><option>t</option></select></label>
@@ -41,25 +42,29 @@ function product(a,b){const c=Array(a.length+b.length-1).fill(0);a.forEach((n,i)
 function num(n,d=1){const [a,b]=reduced(Math.abs(n),d);return b===1?String(a):'<span class="frac"><span>'+a+'</span><span>'+b+'</span></span>'}
 function mono(n,e,v,d=1,forceSign=false){if(n===0)return '0';const sign=n<0?'−':forceSign?'+':'';return sign+((Math.abs(n)===d&&e>0)?'':num(n,d))+(e?'<i>'+v+'</i>':'')+(e>1?'<sup>'+e+'</sup>':'')}
 function poly(p,v,d=1){const ts=terms(p);return ts.length?ts.map((t,i)=>(i?' '+(t.n<0?'−':'+')+' ':'')+mono(i?Math.abs(t.n):t.n,t.e,v,d)).join(''):'0'}
-function make(target,divType,fraction,difficulty,v){
+function make(target,divType,fraction,difficulty,v,withRemainder=false){
  const m=difficulty==='hard'?8:difficulty==='easy'?3:4;
  const den=fraction?pick([2,3]):1;
  for(let attempt=0;attempt<800;attempt++){
-  const deg=divType===1?(difficulty==='hard'?rnd(0,2):rnd(0,1)):(difficulty==='hard'?rnd(1,2):1);
+  const deg=divType===1?(difficulty==='hard'?rnd(withRemainder?1:0,2):rnd(withRemainder?1:0,1)):(difficulty==='hard'?rnd(1,2):1);
   const d=Array(deg+1).fill(0);
   d[deg]=(difficulty==='easy'?1:pick([1,1,1,2,2,3]))*den*(Math.random()<.18?-1:1);
   if(divType===2)d[0]=nz(m)*den;
   if(divType===1&&deg===0)d[0]=d[deg];
-  const qdeg=Math.max(1,target-(divType===2?2:1)+((difficulty==='hard'&&Math.random()<.4)?1:0));
+  const qdeg=Math.max(1,target-(divType===2?2:withRemainder?2:1)+((difficulty==='hard'&&Math.random()<.4)?1:0));
   const q=Array.from({length:qdeg+1},(_,i)=>i!==qdeg&&difficulty==='hard'&&Math.random()<.2?0:nz(m*den));
   if(fraction&&!q.some(n=>n%den!==0))continue;
   if(!fraction&&q.some(n=>Math.abs(n)>m))continue;
   const scaled=product(d,q);if(scaled.some(n=>n%den))continue;
   const a=scaled.map(n=>n/den);
+  const r=withRemainder?Array.from({length:deg},(_,i)=>i===0?nz(m):(Math.random()<.5?0:nz(m))):[0];
+  r.forEach((n,i)=>a[i]+=n);
   if(terms(a).length!==target||a.some(n=>Math.abs(n)>(difficulty==='hard'?180:65)))continue;
-  return {a,d,q,den,v};
+  return {a,d,q,den,v,r};
  }
- const d=divType===2?[den,den]:[den];const q=Array(target-(divType===2?1:0)).fill(den);if(fraction)q[0]=1;return {a:product(d,q).map(n=>n/den),d,q,den,v};
+ const d=divType===2?[den,den]:withRemainder?[0,den]:[den];
+ const q=Array(target-((divType===2||withRemainder)?1:0)).fill(den);if(fraction)q[0]=1;
+ const r=[withRemainder?1:0],a=product(d,q).map(n=>n/den);a[0]+=r[0];return {a,d,q,den,v,r};
 }
 function division(ex){
  const {a,d,q,den,v}=ex;let rem=a.map(n=>n*den),steps=[];
@@ -96,15 +101,15 @@ function conditions(ex){
  return '<div class="step"><b>Podmínky dělení</b><p class="muted">Dělitel nesmí být roven nule.</p>'+head+work+'<p class="math smallmath"><b>'+answer+'</b></p></div>';
 }
 function solution(ex){
- const {a,d,q,den,v}=ex,steps=division(ex);
- let s=conditions(ex)+'<p class="math smallmath">('+poly(a,v)+') : ('+poly(d,v)+') = <b>'+poly(q,v,den)+'</b></p>';
+ const {a,d,q,den,v,r}=ex,steps=division(ex),hasR=r.some(Boolean);
+ let s=conditions(ex)+'<p class="math smallmath">('+poly(a,v)+') : ('+poly(d,v)+') = <b>'+poly(q,v,den)+'</b>'+(hasR?' + <span class="frac"><span>'+poly(r,v)+'</span><span>'+poly(d,v)+'</span></span>':'')+'</p>';
  const cols=a.length, td=(p,scale)=>Array.from({length:cols},(_,j)=>{const e=cols-1-j;return '<td>'+(p[e]?mono(p[e],e,v,scale,j!==0&&p.slice(e+1).some(Boolean)):'')+'</td>'}).join('');
  s+='<div class="longwrap"><table class="long" aria-label="Písemné dělení"><tr><td class="side">Dělenec</td>'+td(a,1)+'<td class="divisor">: '+poly(d,v)+'</td></tr>';
  steps.forEach((st,i)=>{s+='<tr class="subtract"><td class="side">Odečteme</td>'+td(st.sub,den)+'<td '+(i===0?'class="quotient"':'')+'>'+(i===0?poly(q,v,den):'')+'</td></tr>';
  s+='<tr class="result"><td class="side">'+(i===steps.length-1?'Zbytek':'Rozdíl')+'</td>'+(st.after.some(Boolean)?td(st.after,den):'<td colspan="'+cols+'">0</td>')+'<td></td></tr>'});
  s+='</table></div>';
  steps.forEach((st,i)=>{const e=st.k+d.length-1;s+='<div class="step"><b>'+ (i+1)+'. krok</b><p class="muted">Vydělíme vedoucí členy, vynásobíme dělitelem a odečteme.</p><p class="math smallmath">('+mono(st.before[e],e,v,den)+') : ('+mono(d[d.length-1],d.length-1,v)+') = '+mono(st.n,st.k,v,den)+'</p><p class="math smallmath">('+mono(st.n,st.k,v,den)+') · ('+poly(d,v)+') = '+poly(st.sub,v,den)+'</p><p class="math smallmath">('+poly(st.before,v,den)+') − ('+poly(st.sub,v,den)+') = '+poly(st.after,v,den)+'</p></div>'});
- return s+'<p><b>Zbytek: 0</b></p><p class="math smallmath">Zkouška: ('+poly(d,v)+') · ('+poly(q,v,den)+') = '+poly(a,v)+'</p>';
+ return s+'<p class="math smallmath"><b>Podíl: '+poly(q,v,den)+'; zbytek: '+poly(r,v)+'</b></p>'+(hasR?'<p class="muted">Stupeň zbytku je menší než stupeň dělitele, proto už dále nedělíme.</p>':'')+'<p class="math smallmath">Zkouška: ('+poly(d,v)+') · ('+poly(q,v,den)+')'+(hasR?' + ('+poly(r,v)+')':'')+' = '+poly(a,v)+'</p>';
 }
 let exercises=[],timer=null,checked=false;
 const norm=s=>s.trim().replace(/−/g,'-').replace(/,/g,'.').replace(/\s/g,'');
@@ -114,27 +119,35 @@ function field(type,expected,extra=''){const inp=document.createElement('input')
 function render(ex,i){
  const card=document.createElement('article');card.className='exercise';card.innerHTML='<div class="number">Příklad '+(i+1)+'</div><div class="math question">('+poly(ex.a,ex.v)+') : ('+poly(ex.d,ex.v)+') =</div><div class="answer" aria-label="Výsledek"></div><div class="feedback" aria-live="polite"></div><div class="solution" hidden></div>';
  const answer=card.querySelector('.answer');
- terms(ex.q).forEach((t,j)=>{
+ function renderTerms(answer,p,scale){
+ terms(p).forEach((t,j)=>{
   const group=document.createElement('span');group.className='term';const extra=' – člen '+(j+1);
   const sign=field('sign',t.n<0?'-':'+',extra);if(j===0)sign.dataset.first='1';group.append(sign);
-  if(Math.abs(t.n)!==ex.den||t.e===0){const [n,d]=reduced(Math.abs(t.n),ex.den),c=field('coef',d===1?String(n):n+'/'+d,extra);if(ex.den>1)c.classList.add('fraction');group.append(c)}
+  if(Math.abs(t.n)!==scale||t.e===0){const [n,d]=reduced(Math.abs(t.n),scale),c=field('coef',d===1?String(n):n+'/'+d,extra);if(scale>1)c.classList.add('fraction');group.append(c)}
   if(t.e){group.append(field('var',ex.v,extra));if(t.e>1)group.append(field('exp',String(t.e),extra))}
   answer.append(group);
  });
+ }
+ renderTerms(answer,ex.q,ex.den);
+ if(ex.r.some(Boolean)){
+  const label=document.createElement('div');label.className='muted';label.textContent='Zbytek:';
+  const remainder=document.createElement('div');remainder.className='answer';remainder.setAttribute('aria-label','Zbytek');
+  answer.after(label,remainder);renderTerms(remainder,ex.r,1);
+ }
  card.querySelector('.solution').innerHTML=solution(ex);
  $('#exercises').append(card);
 }
 function generate(){
  const sizes=all('[name=size]:checked').map(x=>Number(x.value));if(!sizes.length){$('#settingsError').textContent='Vyber alespoň jeden počet členů.';return}
  $('#settingsError').textContent='';const count=Math.min(30,Math.max(1,Math.round(Number($('#count').value)||5)));$('#count').value=count;
- const mode=Number($('#divisor').value),f=Number($('#fractions').value),diff=$('#difficulty').value,variable=$('#variable').value;
+ const mode=Number($('#divisor').value),f=Number($('#fractions').value),diff=$('#difficulty').value,variable=$('#variable').value,withRemainder=$('#remainder').value==='1';
  clearTimeout(timer);checked=false;exercises=[];$('#exercises').replaceChildren();$('#report').hidden=true;
  const seen=new Set(), letters=['x','y','a','b','t'];let pool=[],last='';
  function nextLetter(){
   if(!pool.length){pool=letters.slice();for(let j=pool.length-1;j>0;j--){const k=rnd(0,j);[pool[j],pool[k]]=[pool[k],pool[j]]}if(pool[0]===last)[pool[0],pool[1]]=[pool[1],pool[0]]}
   last=pool.shift();return last;
  }
- for(let i=0;i<count;i++){const letter=variable==='random'?nextLetter():variable;let ex,key,tries=0;do{ex=make(pick(sizes),mode||pick([1,2]),f===2||(f===1&&Math.random()<.5),diff,letter);key=JSON.stringify([ex.a,ex.d,ex.v]);}while(seen.has(key)&&++tries<50);seen.add(key);exercises.push(ex);render(ex,i)}
+ for(let i=0;i<count;i++){const letter=variable==='random'?nextLetter():variable;let ex,key,tries=0;do{ex=make(pick(sizes),mode||pick([1,2]),f===2||(f===1&&Math.random()<.5),diff,letter,withRemainder);key=JSON.stringify([ex.a,ex.d,ex.v]);}while(seen.has(key)&&++tries<50);seen.add(key);exercises.push(ex);render(ex,i)}
  progress();
 }
 function inputs(){return all('.answer input')}
