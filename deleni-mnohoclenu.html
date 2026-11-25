@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dělení mnohočlenů – 3A8</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--ink:#172033;--muted:#64748b;--line:#dbe2ea;--accent:#315efb;--soft:#eef3ff;--good:#18754a;--bad:#b92c36}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px system-ui,-apple-system,"Segoe UI",Arial,sans-serif}main{width:min(980px,calc(100% - 24px));margin:0 auto;padding:26px 0 64px}a{color:var(--accent);text-decoration:none}h1{font-size:clamp(27px,5vw,40px);margin:14px 0 6px}h2{font-size:19px;margin:0 0 12px}p{line-height:1.5}.muted{color:var(--muted);font-size:14px}.panel,.exercise{border:1px solid var(--line);background:white;border-radius:16px;padding:20px;margin:16px 0;box-shadow:0 4px 18px #17203308}summary{cursor:pointer;font-weight:750}summary:focus-visible,button:focus-visible{outline:3px solid #a1b6ff;outline-offset:3px}.settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:17px;margin:16px 0 8px}fieldset{min-width:0;border:0;margin:0;padding:0}legend,.label{font-size:13px;font-weight:750;color:var(--muted);margin-bottom:8px;display:block}label.choice{display:inline-flex;gap:6px;align-items:center;margin:4px 12px 4px 0}input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}select,input[type=number]{width:100%;min-height:42px;border:1px solid var(--line);border-radius:8px;background:white;color:var(--ink);font:inherit;padding:8px}button{font:inherit;font-weight:700;background:var(--accent);color:white;border:0;border-radius:10px;padding:12px 18px;cursor:pointer}button.secondary{color:var(--accent);background:var(--soft)}button:disabled{opacity:.45;cursor:not-allowed}.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.math{font-family:Cambria,"Times New Roman",serif;font-size:clamp(20px,4.7vw,28px);line-height:1.8;letter-spacing:.015em}.math i{font-style:italic}.math sup{font-size:.65em}.question{overflow-wrap:anywhere}.number{font-weight:800;color:var(--muted);font-size:13px;letter-spacing:.05em;text-transform:uppercase}.answer{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0 8px}.term{display:inline-flex;gap:3px;align-items:center;white-space:nowrap}.term input{width:43px;height:46px;border:1.5px solid #bdc9da;border-radius:8px;background:#fff;color:var(--ink);font:23px Cambria,"Times New Roman",serif;text-align:center;padding:2px;outline:none}.term input[data-type=sign]{width:34px}.term input[data-type=var]{width:36px;font-style:italic}.term input[data-type=exp]{width:33px;height:33px;font-size:18px;align-self:flex-start}.term input[data-type=coef]{width:65px}.term input[data-type=coef].fraction{width:86px}.term input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #315efb22}.term input.ok{border-color:var(--good);background:#edf9f2}.term input.bad{border-color:var(--bad);background:#fff0f0}.feedback{font-size:14px;font-weight:700;margin-top:10px}.feedback.good{color:var(--good)}.feedback.bad{color:var(--bad)}.solution{border-top:1px solid var(--line);margin-top:18px;padding-top:16px}.step{background:#f7f9fc;border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px 0}.step p{margin:3px 0}.smallmath{font-size:21px;overflow-wrap:anywhere}.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.05;font-size:.87em;margin:0 .1em}.frac span:first-child{border-bottom:1px solid currentColor;padding:0 .14em .08em}.frac span:last-child{padding-top:.08em}.longwrap{overflow:auto;margin:14px 0}.long{border-collapse:collapse;font:20px Cambria,"Times New Roman",serif;white-space:nowrap}.long td{padding:5px 7px;text-align:right}.long td.side{text-align:left;color:var(--muted);font:12px system-ui;vertical-align:middle;padding-right:12px}.long tr.subtract td:not(.side){border-bottom:1px solid var(--ink)}.long tr.result td:not(.side){font-weight:700}.long td.divisor{text-align:left;border-left:1px solid var(--ink)}.long td.quotient{text-align:left;border-top:1px solid var(--ink);border-left:1px solid var(--ink)}.bar{height:8px;background:#e4e9f1;border-radius:10px;overflow:hidden;margin-top:12px}.bar>div{height:100%;background:var(--good)}[hidden]{display:none!important}.checkpanel{position:sticky;bottom:0;z-index:2;background:#f5f7fbf5;border-top:1px solid var(--line);padding:12px 0;backdrop-filter:blur(8px)}@media(max-width:550px){main{padding-top:16px}.panel,.exercise{padding:14px}.term input{height:43px}.term input[data-type=coef]{width:54px}.term input[data-type=coef].fraction{width:74px}.answer{gap:5px}.term{gap:2px}.long td{padding:5px}.smallmath{font-size:19px}}
+</style>
+</head>
+<body><main>
+<a href="./">← Matematika 3A8</a>
+<h1>Dělení mnohočlenu mnohočlenem</h1>
+<p class="muted">Vypočítej podíl a vyplň jeho členy. Všechny příklady mají nulový zbytek.</p>
+<section class="panel">
+<details open><summary>Nastavení generátoru</summary>
+<div class="settings">
+<fieldset><legend>Počet členů dělence</legend><label class="choice"><input type="checkbox" name="size" value="3" checked>Trojčlen</label><label class="choice"><input type="checkbox" name="size" value="4" checked>Čtyřčlen</label><label class="choice"><input type="checkbox" name="size" value="5" checked>Pětičlen</label></fieldset>
+<label><span class="label">Dělitel</span><select id="divisor"><option value="2">Dvojčlen</option><option value="1">Jednočlen</option><option value="0">Střídat oba typy</option></select></label>
+<label><span class="label">Koeficienty výsledku</span><select id="fractions"><option value="0">Pouze celá čísla</option><option value="1">Včetně zlomků (smíšeně)</option><option value="2">Vždy alespoň jeden zlomek</option></select></label>
+<label><span class="label">Počet příkladů</span><input id="count" type="number" min="1" max="30" value="5"></label>
+<label><span class="label">Neznámá</span><select id="variable"><option value="x">x</option><option value="random">Střídat x, y, a, b, t</option><option>y</option><option>a</option><option>b</option><option>t</option></select></label>
+<label><span class="label">Obtížnost</span><select id="difficulty"><option value="normal">Běžná – menší čísla</option><option value="easy">Lehká – dělitel s ±1 u nejvyšší mocniny</option><option value="hard">Těžší – větší čísla, mezery v mocninách</option></select></label>
+</div></details>
+<div class="actions"><button id="generate">Generovat příklady</button><span id="settingsError" class="muted" role="alert"></span></div>
+</section>
+<p class="muted">Piš postupně např. <b>2x2−3x+5</b>. Číslo se po krátké pauze posune do dalšího políčka; písmeno a znaménko ihned. Zlomek piš jako 3/2. Enter nebo šipka doprava posune, šipka doleva vrátí. Políčka můžeš kdykoli přepsat. První kladné znaménko může zůstat prázdné.</p>
+<div id="exercises"></div>
+<section id="report" class="panel" aria-live="polite" hidden></section>
+<div class="checkpanel"><div class="actions"><button id="check">Zkontrolovat vše</button><button id="show" class="secondary">Zobrazit / skrýt řešení</button><span id="progress" class="muted"></span></div></div>
+</main>
+<script>
+'use strict';
+const $=s=>document.querySelector(s), all=s=>Array.from(document.querySelectorAll(s));
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pick=a=>a[rnd(0,a.length-1)],nz=m=>pick(Array.from({length:2*m},(_,i)=>i<m?i-m:i-m+1));
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+function reduced(n,d=1){const g=gcd(n,d)||1;return [n/g,d/g]}
+function terms(p){return p.map((n,e)=>({n,e})).filter(t=>t.n!==0).reverse()}
+function product(a,b){const c=Array(a.length+b.length-1).fill(0);a.forEach((n,i)=>b.forEach((m,j)=>c[i+j]+=n*m));return c}
+function num(n,d=1){const [a,b]=reduced(Math.abs(n),d);return b===1?String(a):'<span class="frac"><span>'+a+'</span><span>'+b+'</span></span>'}
+function mono(n,e,v,d=1,forceSign=false){if(n===0)return '0';const sign=n<0?'−':forceSign?'+':'';return sign+((Math.abs(n)===d&&e>0)?'':num(n,d))+(e?'<i>'+v+'</i>':'')+(e>1?'<sup>'+e+'</sup>':'')}
+function poly(p,v,d=1){const ts=terms(p);return ts.length?ts.map((t,i)=>(i?' '+(t.n<0?'−':'+')+' ':'')+mono(i?Math.abs(t.n):t.n,t.e,v,d)).join(''):'0'}
+function make(target,divType,fraction,difficulty,v){
+ const m=difficulty==='hard'?8:difficulty==='easy'?3:4;
+ const den=fraction?pick([2,3]):1;
+ for(let attempt=0;attempt<800;attempt++){
+  const deg=divType===1?(difficulty==='hard'?rnd(0,2):rnd(0,1)):(difficulty==='hard'?rnd(1,2):1);
+  const d=Array(deg+1).fill(0);
+  d[deg]=(difficulty==='easy'?1:pick([1,1,1,2,2,3]))*den*(Math.random()<.18?-1:1);
+  if(divType===2)d[0]=nz(m)*den;
+  if(divType===1&&deg===0)d[0]=d[deg];
+  const qdeg=Math.max(1,target-(divType===2?2:1)+((difficulty==='hard'&&Math.random()<.4)?1:0));
+  const q=Array.from({length:qdeg+1},(_,i)=>i!==qdeg&&difficulty==='hard'&&Math.random()<.2?0:nz(m*den));
+  if(fraction&&!q.some(n=>n%den!==0))continue;
+  if(!fraction&&q.some(n=>Math.abs(n)>m))continue;
+  const scaled=product(d,q);if(scaled.some(n=>n%den))continue;
+  const a=scaled.map(n=>n/den);
+  if(terms(a).length!==target||a.some(n=>Math.abs(n)>(difficulty==='hard'?180:65)))continue;
+  return {a,d,q,den,v};
+ }
+ const d=divType===2?[den,den]:[den];const q=Array(target-(divType===2?1:0)).fill(den);if(fraction)q[0]=1;return {a:product(d,q).map(n=>n/den),d,q,den,v};
+}
+function division(ex){
+ const {a,d,q,den,v}=ex;let rem=a.map(n=>n*den),steps=[];
+ const lead=d.length-1;
+ for(let k=q.length-1;k>=0;k--){
+  if(!q[k])continue;
+  const before=rem.slice(),n=rem[k+lead]/d[lead];
+  const sub=Array(a.length).fill(0);d.forEach((x,j)=>sub[k+j]=x*n);
+  rem=rem.map((x,i)=>x-sub[i]);steps.push({before,sub,after:rem.slice(),n,k});
+ }
+ return steps;
+}
+function solution(ex){
+ const {a,d,q,den,v}=ex,steps=division(ex);
+ let s='<p class="math smallmath">('+poly(a,v)+') : ('+poly(d,v)+') = <b>'+poly(q,v,den)+'</b></p>';
+ const cols=a.length, td=(p,scale)=>Array.from({length:cols},(_,j)=>{const e=cols-1-j;return '<td>'+(p[e]?mono(p[e],e,v,scale,j!==0&&p.slice(e+1).some(Boolean)):'')+'</td>'}).join('');
+ s+='<div class="longwrap"><table class="long" aria-label="Písemné dělení"><tr><td class="side">Dělenec</td>'+td(a,1)+'<td class="divisor">: '+poly(d,v)+'</td></tr>';
+ steps.forEach((st,i)=>{s+='<tr class="subtract"><td class="side">Odečteme</td>'+td(st.sub,den)+'<td '+(i===0?'class="quotient"':'')+'>'+(i===0?poly(q,v,den):'')+'</td></tr>';
+ s+='<tr class="result"><td class="side">'+(i===steps.length-1?'Zbytek':'Rozdíl')+'</td>'+(st.after.some(Boolean)?td(st.after,den):'<td colspan="'+cols+'">0</td>')+'<td></td></tr>'});
+ s+='</table></div>';
+ steps.forEach((st,i)=>{const e=st.k+d.length-1;s+='<div class="step"><b>'+ (i+1)+'. krok</b><p class="muted">Vydělíme vedoucí členy, vynásobíme dělitelem a odečteme.</p><p class="math smallmath">('+mono(st.before[e],e,v,den)+') : ('+mono(d[d.length-1],d.length-1,v)+') = '+mono(st.n,st.k,v,den)+'</p><p class="math smallmath">('+mono(st.n,st.k,v,den)+') · ('+poly(d,v)+') = '+poly(st.sub,v,den)+'</p><p class="math smallmath">('+poly(st.before,v,den)+') − ('+poly(st.sub,v,den)+') = '+poly(st.after,v,den)+'</p></div>'});
+ return s+'<p><b>Zbytek: 0</b></p><p class="math smallmath">Zkouška: ('+poly(d,v)+') · ('+poly(q,v,den)+') = '+poly(a,v)+'</p>';
+}
+let exercises=[],timer=null,checked=false;
+const norm=s=>s.trim().replace(/−/g,'-').replace(/,/g,'.').replace(/\s/g,'');
+function rational(s){s=norm(s);if(!/^[+-]?\d+(?:[./]\d+)?$/.test(s))return null;const parts=s.split('/');const n=Number(parts[0]),d=parts.length>1?Number(parts[1]):1;return Number.isFinite(n)&&Number.isFinite(d)&&d!==0?n/d:null}
+function correct(el){const s=norm(el.value),t=el.dataset.type,e=el.dataset.expected;if(t==='coef'){const n=rational(s),v=rational(e);return n!==null&&Math.abs(n-v)<1e-10}if(t==='sign')return (s|| (el.dataset.first==='1'?'+':''))===e;if(t==='var')return s.toLowerCase()===e;return /^\d+$/.test(s)&&Number(s)===Number(e)}
+function field(type,expected,extra=''){const inp=document.createElement('input');inp.type='text';inp.autocomplete='off';inp.spellcheck=false;inp.autocapitalize='off';inp.dataset.type=type;inp.dataset.expected=expected;inp.placeholder=({sign:'±',coef:'',var:'',exp:''})[type];inp.setAttribute('aria-label',({sign:'Znaménko',coef:'Koeficient',var:'Neznámá',exp:'Exponent'})[type]+extra);inp.inputMode='text';return inp}
+function render(ex,i){
+ const card=document.createElement('article');card.className='exercise';card.innerHTML='<div class="number">Příklad '+(i+1)+'</div><div class="math question">('+poly(ex.a,ex.v)+') : ('+poly(ex.d,ex.v)+') =</div><div class="answer" aria-label="Výsledek"></div><div class="feedback" aria-live="polite"></div><div class="solution" hidden></div>';
+ const answer=card.querySelector('.answer');
+ terms(ex.q).forEach((t,j)=>{
+  const group=document.createElement('span');group.className='term';const extra=' – člen '+(j+1);
+  const sign=field('sign',t.n<0?'-':'+',extra);if(j===0)sign.dataset.first='1';group.append(sign);
+  if(Math.abs(t.n)!==ex.den||t.e===0){const [n,d]=reduced(Math.abs(t.n),ex.den),c=field('coef',d===1?String(n):n+'/'+d,extra);if(ex.den>1)c.classList.add('fraction');group.append(c)}
+  if(t.e){group.append(field('var',ex.v,extra));if(t.e>1)group.append(field('exp',String(t.e),extra))}
+  answer.append(group);
+ });
+ card.querySelector('.solution').innerHTML=solution(ex);
+ $('#exercises').append(card);
+}
+function generate(){
+ const sizes=all('[name=size]:checked').map(x=>Number(x.value));if(!sizes.length){$('#settingsError').textContent='Vyber alespoň jeden počet členů.';return}
+ $('#settingsError').textContent='';const count=Math.min(30,Math.max(1,Math.round(Number($('#count').value)||5)));$('#count').value=count;
+ const mode=Number($('#divisor').value),f=Number($('#fractions').value),diff=$('#difficulty').value,variable=$('#variable').value;
+ clearTimeout(timer);checked=false;exercises=[];$('#exercises').replaceChildren();$('#report').hidden=true;
+ const seen=new Set();
+ for(let i=0;i<count;i++){let ex,key,tries=0;do{ex=make(pick(sizes),mode||pick([1,2]),f===2||(f===1&&Math.random()<.5),diff,variable==='random'?pick(['x','y','a','b','t']):variable);key=JSON.stringify([ex.a,ex.d,ex.v]);}while(seen.has(key)&&++tries<50);seen.add(key);exercises.push(ex);render(ex,i)}
+ progress();
+}
+function inputs(){return all('.answer input')}
+function next(el,delta=1){clearTimeout(timer);const a=inputs(),n=a[a.indexOf(el)+delta];if(n){n.focus();n.select()}return n}
+function route(el,type,char){
+ const a=inputs(),i=a.indexOf(el),group=el.closest('.term');
+ if(type==='sign'&&el.dataset.type==='coef'&&!el.value&&group.querySelector('[data-type=sign]').dataset.first==='1'){const sign=group.querySelector('[data-type=sign]');sign.value=char;changed(sign);return true}
+ if(type==='sign'&&el.dataset.type==='sign'){el.value=char;changed(el);next(el);return true}
+ if(type==='var'&&el.dataset.type==='var'){el.value=char;changed(el);next(el);return true}
+ const n=a[i+1];if(n&&n.dataset.type===type&&el.value){n.value=char;changed(n);next(n);return true}
+ return false;
+}
+function changed(el){el.classList.remove('ok','bad');el.removeAttribute('aria-invalid');if(checked){checked=false;$('#report').hidden=true;all('.feedback').forEach(f=>{f.textContent='';f.className='feedback'})}progress()}
+function progress(){const a=inputs(),filled=a.filter(x=>x.value.trim()||x.dataset.first==='1').length;$('#progress').textContent=filled+' / '+a.length+' políček vyplněno'}
+$('#exercises').addEventListener('focusin',e=>{if(e.target.matches('input')){clearTimeout(timer);e.target.select()}});
+$('#exercises').addEventListener('keydown',e=>{
+ const el=e.target;if(!el.matches('input'))return;
+ if(e.key==='Enter'||e.key==='ArrowRight'){e.preventDefault();next(el);return}
+ if(e.key==='ArrowLeft'){e.preventDefault();next(el,-1);return}
+ if(e.key==='Backspace'&&!el.value){e.preventDefault();next(el,-1);return}
+ if(e.ctrlKey||e.metaKey||e.altKey)return;
+ if(/^[+\-−]$/.test(e.key)){if(route(el,'sign',e.key==='−'?'-':e.key))e.preventDefault()}
+ else if(/^[a-zA-Z]$/.test(e.key)){if(route(el,'var',e.key))e.preventDefault()}
+ else if(e.key==='^'&&el.dataset.type==='exp'){e.preventDefault()}
+});
+$('#exercises').addEventListener('input',e=>{
+ const el=e.target;if(!el.matches('input'))return;clearTimeout(timer);
+ const t=el.dataset.type;let v=norm(el.value);
+ // Mobile keyboards may send input without a keydown event.
+ if(t==='coef'||t==='exp'){
+  const tail=v.slice(-1),kind=/^[a-z]$/i.test(tail)?'var':/^[+-]$/.test(tail)?'sign':null;
+  if(kind){el.value=v.slice(0,-1);if(route(el,kind,tail)){changed(el);return}el.value=v}
+  if(t==='exp')v=v.replace(/\^/g,'');
+  el.value=v;changed(el);
+  if(t==='exp'&&/^\d$/.test(v)){next(el);return}
+  if(t==='coef'&&rational(v)!==null)timer=setTimeout(()=>{if(document.activeElement===el)next(el)},750);
+ }else{
+  if(t==='sign'){v=v.slice(-1);el.value=v;if(/^[+-]$/.test(v)){changed(el);next(el);return}}
+  if(t==='var'){v=v.slice(-1);el.value=v;if(/^[a-z]$/i.test(v)){changed(el);next(el);return}}
+  changed(el);
+ }
+});
+$('#generate').onclick=generate;
+$('#check').onclick=()=>{
+ clearTimeout(timer);let total=0,errors=0,solved=0;const cards=all('.exercise');
+ cards.forEach((card,i)=>{const a=Array.from(card.querySelectorAll('input'));let bad=0;a.forEach(el=>{const ok=correct(el);total++;if(!ok){bad++;errors++}el.classList.toggle('ok',ok);el.classList.toggle('bad',!ok);el.setAttribute('aria-invalid',String(!ok))});if(!bad)solved++;const f=card.querySelector('.feedback');f.className='feedback '+(bad?'bad':'good');f.textContent=bad?'Chybně: '+bad+' z '+a.length+' políček.':'Správně! Všech '+a.length+' políček je v pořádku.';card.querySelector('.solution').hidden=false});
+ checked=true;const pct=total?Math.round(100*(total-errors)/total):0;$('#report').innerHTML='<h2>Vyhodnocení</h2><p><b>'+solved+' / '+cards.length+'</b> příkladů bez chyby · <b>'+errors+'</b> chybných políček z '+total+' · '+pct+' % správně</p><div class="bar"><div style="width:'+pct+'%"></div></div>';$('#report').hidden=false;
+};
+$('#show').onclick=()=>{const a=all('.solution'),show=a.some(x=>x.hidden);a.forEach(x=>x.hidden=!show)};
+generate();
+</script>
+</body></html>
