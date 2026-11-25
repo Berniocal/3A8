@@ -114,10 +114,10 @@ function inputs(){return all('.answer input')}
 function next(el,delta=1){clearTimeout(timer);const a=inputs(),n=a[a.indexOf(el)+delta];if(n){n.focus();n.select()}return n}
 function route(el,type,char){
  const a=inputs(),i=a.indexOf(el),group=el.closest('.term');
- if(type==='sign'&&el.dataset.type==='coef'&&!el.value&&group.querySelector('[data-type=sign]').dataset.first==='1'){const sign=group.querySelector('[data-type=sign]');sign.value=char;changed(sign);return true}
+ if(type==='sign'&&['coef','var'].includes(el.dataset.type)&&!el.value&&group.querySelector('[data-type=sign]').dataset.first==='1'){const sign=group.querySelector('[data-type=sign]');sign.value=char;changed(sign);return true}
  if(type==='sign'&&el.dataset.type==='sign'){el.value=char;changed(el);next(el);return true}
  if(type==='var'&&el.dataset.type==='var'){el.value=char;changed(el);next(el);return true}
- const n=a[i+1];if(n&&n.dataset.type===type&&el.value){n.value=char;changed(n);next(n);return true}
+ const n=a[i+1];if(n&&n.dataset.type===type&&(el.value||el.dataset.first==='1')){n.value=char;changed(n);next(n);return true}
  return false;
 }
 function changed(el){el.classList.remove('ok','bad');el.removeAttribute('aria-invalid');if(checked){checked=false;$('#report').hidden=true;all('.feedback').forEach(f=>{f.textContent='';f.className='feedback'})}progress()}
@@ -129,6 +129,9 @@ $('#exercises').addEventListener('keydown',e=>{
  if(e.key==='ArrowLeft'){e.preventDefault();next(el,-1);return}
  if(e.key==='Backspace'&&!el.value){e.preventDefault();next(el,-1);return}
  if(e.ctrlKey||e.metaKey||e.altKey)return;
+ if(/^\d$/.test(e.key)&&el.dataset.type==='sign'&&el.dataset.first==='1'){
+  const a=inputs(),n=a[a.indexOf(el)+1];if(n&&n.dataset.type==='coef'){e.preventDefault();n.focus();n.value=e.key;n.dispatchEvent(new Event('input',{bubbles:true}));return}
+ }
  if(/^[+\-−]$/.test(e.key)){if(route(el,'sign',e.key==='−'?'-':e.key))e.preventDefault()}
  else if(/^[a-zA-Z]$/.test(e.key)){if(route(el,'var',e.key))e.preventDefault()}
  else if(e.key==='^'&&el.dataset.type==='exp'){e.preventDefault()}
@@ -145,7 +148,13 @@ $('#exercises').addEventListener('input',e=>{
   if(t==='exp'&&/^\d$/.test(v)){next(el);return}
   if(t==='coef'&&rational(v)!==null)timer=setTimeout(()=>{if(document.activeElement===el)next(el)},750);
  }else{
-  if(t==='sign'){v=v.slice(-1);el.value=v;if(/^[+-]$/.test(v)){changed(el);next(el);return}}
+  if(t==='sign'){
+   if(el.dataset.first==='1'&&!/^[+-]$/.test(v)&&v){
+    const a=inputs(),n=a[a.indexOf(el)+1];el.value='';
+    if(n&&n.dataset.type==='coef'&&/^\d+$/.test(v)){n.focus();n.value=v;n.dispatchEvent(new Event('input',{bubbles:true}));return}
+    if(n&&n.dataset.type==='var'&&/^[a-z]$/i.test(v)){n.focus();n.value=v;n.dispatchEvent(new Event('input',{bubbles:true}));return}
+   }
+   v=v.slice(-1);el.value=v;if(/^[+-]$/.test(v)){changed(el);next(el);return}}
   if(t==='var'){v=v.slice(-1);el.value=v;if(/^[a-z]$/i.test(v)){changed(el);next(el);return}}
   changed(el);
  }
