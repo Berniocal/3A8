@@ -12,15 +12,15 @@
 <body><main>
 <a href="./">← Matematika 3A8</a>
 <h1>Dělení mnohočlenu mnohočlenem</h1>
-<p class="muted">Vypočítej podíl a vyplň jeho členy. Všechny příklady mají nulový zbytek.</p>
+<p class="muted">Vypočítej podíl, vyplň jeho členy a urči podmínky dělení. Všechny příklady mají nulový zbytek.</p>
 <section class="panel">
-<details open><summary>Nastavení generátoru</summary>
+<details><summary>Nastavení generátoru</summary>
 <div class="settings">
 <fieldset><legend>Počet členů dělence</legend><label class="choice"><input type="checkbox" name="size" value="3" checked>Trojčlen</label><label class="choice"><input type="checkbox" name="size" value="4" checked>Čtyřčlen</label><label class="choice"><input type="checkbox" name="size" value="5" checked>Pětičlen</label></fieldset>
 <label><span class="label">Dělitel</span><select id="divisor"><option value="2">Dvojčlen</option><option value="1">Jednočlen</option><option value="0">Střídat oba typy</option></select></label>
 <label><span class="label">Koeficienty výsledku</span><select id="fractions"><option value="0">Pouze celá čísla</option><option value="1">Včetně zlomků (smíšeně)</option><option value="2">Vždy alespoň jeden zlomek</option></select></label>
 <label><span class="label">Počet příkladů</span><input id="count" type="number" min="1" max="30" value="5"></label>
-<label><span class="label">Neznámá</span><select id="variable"><option value="x">x</option><option value="random">Střídat x, y, a, b, t</option><option>y</option><option>a</option><option>b</option><option>t</option></select></label>
+<label><span class="label">Neznámá</span><select id="variable"><option value="x">x</option><option value="random" selected>Střídat x, y, a, b, t</option><option>y</option><option>a</option><option>b</option><option>t</option></select></label>
 <label><span class="label">Obtížnost</span><select id="difficulty"><option value="normal">Běžná – menší čísla</option><option value="easy">Lehká – dělitel s ±1 u nejvyšší mocniny</option><option value="hard">Těžší – větší čísla, mezery v mocninách</option></select></label>
 </div></details>
 <div class="actions"><button id="generate">Generovat příklady</button><span id="settingsError" class="muted" role="alert"></span></div>
@@ -72,9 +72,32 @@ function division(ex){
  }
  return steps;
 }
+function conditions(ex){
+ const {d,v}=ex,deg=d.length-1,x='<i>'+v+'</i>',head='<p class="math smallmath">'+poly(d,v)+' ≠ 0</p>';
+ if(deg===0)return '<div class="step"><b>Podmínky dělení</b>'+head+'<p>Dělitel je nenulové číslo, proto '+x+' ∈ ℝ.</p></div>';
+ let work='',answer='';
+ if(!d[0]){answer=x+' ≠ 0'}
+ else {
+  let n=-d[0],b=d[deg];if(b<0){n=-n;b=-b}
+  const g=gcd(n,b);n/=g;b/=g;
+  const signed=(n<0?'−':'')+num(n,b);
+  work='<p class="math smallmath">'+x+(deg===2?'<sup>2</sup>':'')+' ≠ '+signed+'</p>';
+  if(deg===1){answer=x+' ≠ '+signed;work=''}
+  else if(n<0){answer=x+' ∈ ℝ';work+='<p>Druhá mocnina reálného čísla nemůže být záporná, dělitel tedy nikdy není nulový.</p>'}
+  else {
+   let k=1,r=n*b;
+   for(let i=2;i*i<=r;i++){while(r%(i*i)===0){k*=i;r/=i*i}}
+   const h=gcd(k,b);k/=h;b/=h;
+   const top=r===1?String(k):(k===1?'':String(k))+'√'+r;
+   const root=b===1?top:'<span class="frac"><span>'+top+'</span><span>'+b+'</span></span>';
+   answer=x+' ≠ −'+root+'; '+x+' ≠ '+root;
+  }
+ }
+ return '<div class="step"><b>Podmínky dělení</b><p class="muted">Dělitel nesmí být roven nule.</p>'+head+work+'<p class="math smallmath"><b>'+answer+'</b></p></div>';
+}
 function solution(ex){
  const {a,d,q,den,v}=ex,steps=division(ex);
- let s='<p class="math smallmath">('+poly(a,v)+') : ('+poly(d,v)+') = <b>'+poly(q,v,den)+'</b></p>';
+ let s=conditions(ex)+'<p class="math smallmath">('+poly(a,v)+') : ('+poly(d,v)+') = <b>'+poly(q,v,den)+'</b></p>';
  const cols=a.length, td=(p,scale)=>Array.from({length:cols},(_,j)=>{const e=cols-1-j;return '<td>'+(p[e]?mono(p[e],e,v,scale,j!==0&&p.slice(e+1).some(Boolean)):'')+'</td>'}).join('');
  s+='<div class="longwrap"><table class="long" aria-label="Písemné dělení"><tr><td class="side">Dělenec</td>'+td(a,1)+'<td class="divisor">: '+poly(d,v)+'</td></tr>';
  steps.forEach((st,i)=>{s+='<tr class="subtract"><td class="side">Odečteme</td>'+td(st.sub,den)+'<td '+(i===0?'class="quotient"':'')+'>'+(i===0?poly(q,v,den):'')+'</td></tr>';
@@ -106,8 +129,12 @@ function generate(){
  $('#settingsError').textContent='';const count=Math.min(30,Math.max(1,Math.round(Number($('#count').value)||5)));$('#count').value=count;
  const mode=Number($('#divisor').value),f=Number($('#fractions').value),diff=$('#difficulty').value,variable=$('#variable').value;
  clearTimeout(timer);checked=false;exercises=[];$('#exercises').replaceChildren();$('#report').hidden=true;
- const seen=new Set();
- for(let i=0;i<count;i++){let ex,key,tries=0;do{ex=make(pick(sizes),mode||pick([1,2]),f===2||(f===1&&Math.random()<.5),diff,variable==='random'?pick(['x','y','a','b','t']):variable);key=JSON.stringify([ex.a,ex.d,ex.v]);}while(seen.has(key)&&++tries<50);seen.add(key);exercises.push(ex);render(ex,i)}
+ const seen=new Set(), letters=['x','y','a','b','t'];let pool=[],last='';
+ function nextLetter(){
+  if(!pool.length){pool=letters.slice();for(let j=pool.length-1;j>0;j--){const k=rnd(0,j);[pool[j],pool[k]]=[pool[k],pool[j]]}if(pool[0]===last)[pool[0],pool[1]]=[pool[1],pool[0]]}
+  last=pool.shift();return last;
+ }
+ for(let i=0;i<count;i++){const letter=variable==='random'?nextLetter():variable;let ex,key,tries=0;do{ex=make(pick(sizes),mode||pick([1,2]),f===2||(f===1&&Math.random()<.5),diff,letter);key=JSON.stringify([ex.a,ex.d,ex.v]);}while(seen.has(key)&&++tries<50);seen.add(key);exercises.push(ex);render(ex,i)}
  progress();
 }
 function inputs(){return all('.answer input')}
